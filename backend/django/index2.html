@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+</head>
+<body>
+    <textarea id="chatArea" rows="10" cols="50" readonly></textarea><br>
+    <input type="text" id="messageInput" placeholder="Type your message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const username = "test1";
+        const nickname = "test1";
+        const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MzA1OTU4LCJpYXQiOjE3MTkzMDQxNTgsImp0aSI6Ijc5NDE5MWQ0MTAyZjQyNjFiYTFjM2YyNDE3MTQ5Njc5IiwidXNlcl9pZCI6NjEzNzczNTM4LCJ1c2VybmFtZSI6InRlc3QyIiwibmlja25hbWUiOiJ0ZXN0MiJ9.lKtYO7_m8VC0oqvL43rgBv45K6lCU0PDRlOYK1rOryY"; // Bearer 토큰을 여기에 입력
+
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const ws = new WebSocket(`wss://localhost:443/ws/socket/`, ['token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MzA5MDMwLCJpYXQiOjE3MTkzMDcyMzAsImp0aSI6ImZmNmM4NjBkYWRmYzQ2ZWFhYTI3OGRkNGU3Y2E2NDdkIiwidXNlcl9pZCI6NDU4MTY1OTEyLCJ1c2VybmFtZSI6InRlc3QxIiwibmlja25hbWUiOiJ0ZXN0MSJ9.SLGwW5TNdcJhuqWm_Z-8-sqIrOBty0EMBej74kn_6xo']);  // 여기 백틱 사용 확인
+
+        ws.onopen = function () {
+            console.log('WebSocket connected');
+            console.log('Token:', token);  // 콘솔에 토큰 출력
+        };
+
+        ws.onmessage = function (event) {
+            console.log(event);
+            const data = JSON.parse(event.data);
+            console.log(data);
+            const message = data.message;
+            const sender = data.sender;
+            const whisper = data.whisper || false;
+            const displayMessage = whisper ? `[Whisper] ${sender}: ${message}` : `${sender}: ${message}`;
+            chatArea.value += displayMessage + '\n';
+        };
+
+        function sendMessage() {
+            const message = messageInput.value;
+            const jsonMessage = JSON.stringify({ 
+                message: message, 
+                username: username, 
+                nickname: nickname 
+            });
+            ws.send(jsonMessage);
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: maran
+      POSTGRES_USER: maran08
+      POSTGRES_PASSWORD: maran4242!
+    networks:
+      - internal
+
+  redis:
+    image: redis:alpine
+    container_name: redis_service
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+# version: '3'
+
+# services:
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "443:443"
+#     depends_on:
+#       - backend
+#     volumes:
+#       - ssl-certs:/etc/ssl/private
+#     networks:
+#       - internal
+
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     expose:
+#       - "8000"
+#     depends_on:
+#       - db
+#       - redis
+#     volumes:
+#       - ssl-certs:/etc/ssl/private
+#     networks:
+#       - internal
+
+#   db:
+#     image: postgres
+#     environment:
+#       POSTGRES_DB: maran
+#       POSTGRES_USER: maran08
+#       POSTGRES_PASSWORD: maran4242!
+#     networks:
+#       - internal
+
+#   redis:
+#     image: redis:alpine
+#     container_name: redis_service
+#     ports:
+#       - "6379:6379"
+#     networks:
+#       - internal
+
+# networks:
+#   internal:
+#     driver: bridge
+
+# volumes:
+#   ssl-certs:
