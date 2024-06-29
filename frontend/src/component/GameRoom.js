@@ -67,7 +67,7 @@ const GameRoom = () => {
   useEffect(() => {
     if (gameInfo.id && !gameSocket.current && !exit) {
       const newgameSocket = new WebSocket(
-        "ws://localhost/api/ws/game/" + gameInfo.id + "/"
+        "ws://localhost:443/api/ws/game/" + gameInfo.id + "/"
       );
       console.log("Creating new WebgameSocket connection...");
       newgameSocket.onopen = () => {

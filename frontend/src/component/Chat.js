@@ -24,7 +24,9 @@ const Chat = () => {
 
   function initSocket() {
     var ws = new WebSocket(
-      `ws://localhost/api/ws/chat/?token=${localStorage.getItem("accessToken")}`
+      `ws://localhost:443/api/ws/chat/?token=${localStorage.getItem(
+        "accessToken"
+      )}`
     );
     ws.onopen = () => {
       console.log("chat socket opened");
