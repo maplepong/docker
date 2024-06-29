@@ -1,0 +1,148 @@
+/* @font-face {
+    font-family: 'Maplestory';
+    src: url('./Maplestory OTF Bold.otf') format('truetype'); /* 폰트 파일 경로에 맞게 수정하세요 */
+
+/* 로비 */
+
+/* 로비 배경 이미지 */
+.bg {
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    width: 1181px;
+    height: 581px;
+}
+
+.room {
+    position: relative;
+    width: 1181px;
+    height: 581px;
+}
+
+.room_header {
+    position: relative;
+    color: black;
+    text-shadow: -1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white;
+    top: 10%;
+    /* left: 10%; */
+    font-size:20px;
+    font-weight: bold;
+}
+
+.game_interface {
+    position: relative;
+    top: 10%;
+    width: 80%;
+    height: 75%;
+    margin: 0 auto;
+    color: white;
+    text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background: linear-gradient(#71CCFF, white);
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    
+}
+
+.closebtn-section {
+    position: absolute;
+    top : 0;
+    right: 0;
+    margin-top: 10px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.closebtn {
+    background: url( "./img/closebtn.png" ) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    border: none;
+}
+
+.locked img 
+{
+    width: 2%;
+    height: 2%;
+    margin-left: 2%;
+    margin-right: 1%;
+    text-align: center;
+}
+
+.pwdbtn
+{
+    background: url( "./img/pwbtn.png" ) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    width: 44px;
+    height: 22px;
+    border: none;
+}
+
+.top-section{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    color: #0085FF;
+    text-shadow: 1px 0px 1px rgb(0, 0, 0);
+}
+
+.logo-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.owner-img, .player-img{
+    background-size: contain;
+    width: 280px;
+    height: 280px;
+    margin-top: -50px;
+    filter: drop-shadow(1px 1px 2px #909090);
+}
+
+.owner_stat, .player_stat
+{
+    margin-top: 5px;
+    color: #000000;
+    text-shadow: none;
+}
+
+.invbtn {
+    background: url( "./img/invbtn.png" ) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    width: 170px;
+    height: 120px;
+    border: none;
+}
+
+.strbtn {
+    background: url( "./img/strbtn.png" ) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    width: 170px;
+    height: 120px;
+    border: none;
+}
+
+.logo
+{
+    background: url( "./img/logo.png" ) no-repeat;
+    background-size: contain;
+    width: 170px;
+    height: 120px;
+    margin-bottom: 20px;
+    border: none;
+}

@@ -1,0 +1,13 @@
+#box
+{
+    background-color: aquamarine;
+    width:75%;
+    height:100%;
+    margin:0 auto;
+    text-align: center;
+}
+
+.users
+{
+    margin:30px;
+}

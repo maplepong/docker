@@ -1,0 +1,8 @@
+node_modules
+dist
+dist/*
+.venv*
+
+Makefile
+
+src/component/<!DOCTYPE html>.html
