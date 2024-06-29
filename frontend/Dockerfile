@@ -6,7 +6,7 @@ RUN apt-get update && \
 
 RUN mkdir /html
 
-COPY ./html /html
+COPY ./dist /html
 COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
 RUN openssl genrsa -out /etc/ssl/private/my_key.key 2048
