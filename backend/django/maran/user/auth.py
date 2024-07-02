@@ -28,6 +28,7 @@ import json
 import requests
 from django.conf import settings
 
+
 logger = logging.getLogger("django")
 
 
@@ -64,16 +65,22 @@ def api_login(request):
     code = request.data.get("code")
     if code is None:
         return Response("No api code", status=400)
-
     token_params = {
         "client_id": settings.CLIENT_ID,
         "client_secret": settings.CLIENT_SECRET,
         "code": code,
-        "redirect_uri": settings.REDIRECT_URI,
+        "redirect_uri": "http://localhost:5050/api-login",
         "grant_type": "authorization_code",
     }
+    print(code)
+    logger.info(f"Sending token request to {settings.TOKEN_URL} with {token_params}")
+
+    print(code)
 
     token_response = requests.post(settings.TOKEN_URL, data=token_params)
+    # 응답 받은 후 로깅
+    logger.info(f"Token response: {token_response.status_code} {token_response.text}")
+    print(token_response)
 
     if token_response.status_code == 200:
         access_token = token_response.json().get("access_token")
@@ -99,7 +106,7 @@ def api_login(request):
                 return response
             except User.DoesNotExist:
                 return Response(
-                    {"error": "User have to sign up", "id": user_info["id"]}, status=409
+                    {"id": user_info["id"]}, status=202
                 )
         else:
             return Response(
@@ -141,6 +148,7 @@ class TokenRefreshView(BaseView):
         # if response:
         #     return Response({'error': 'You are not an admin'}, status=400)
         refresh_token = request.COOKIES.get("refresh_token")
+        print("cookie: ", request.COOKIES)
         print("refresh_token : ", refresh_token)
         if not refresh_token:
             return Response({"error": "No refresh token provided"}, status=400)

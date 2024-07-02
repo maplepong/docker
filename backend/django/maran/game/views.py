@@ -18,6 +18,7 @@ from rest_framework.decorators import (
 )
 from rest_framework import status
 from user.models import User, FriendRequest
+from user.image import get_image_url
 from requests import Request
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
@@ -32,6 +33,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 import hashlib
+import os
 
 
 from rest_framework import serializers
@@ -45,13 +47,30 @@ class GameInfoSerializer(serializers.Serializer):
     password = serializers.CharField()
     status = serializers.CharField()
 
+class GameUserSerializer(serializers.Serializer):
+    nickname = serializers.CharField()
+    win_rate = serializers.IntegerField()
+    image = serializers.CharField()
+
+
+def index(request):
+    return render(request, "game/index.html")
+
+def get_game_user_info(user):
+    return GameUserSerializer({
+        'nickname': user.nickname,
+        'win_rate': user.win_rate,
+        'image': get_image_url(user.image),
+    }).data
+
+
 def get_game_info(game):
     return GameInfoSerializer({
         'id': game.id,
         'name': game.name,
         'current_players_num': game.players.count(),
-        'players': [player.username for player in game.players.all()],
-        'owner': game.creator.username,
+        'players': [get_game_user_info(player) for player in game.players.all()],
+        'owner': game.creator.nickname,
         'password': game.password,
         'status': game.status,
     }).data
@@ -65,29 +84,36 @@ def get_game_list(request):
     return Response({"games": games})
 
 
-
-
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def new(request):
     room_title = request.data.get("room_title")
+    if not room_title:
+        return Response({"detail": "Room title is required"}, status=status.HTTP_400_BAD_REQUEST)
     game = Game(name=room_title, creator=request.user)
     if request.data.get("password"):
         game.password = request.data.get("password")
     game.save()
     game.players.add(request.user)
-    return Response({"game name: ": game.name}, status = 200)
-
-
+    return Response({"id" : game.id, "game name: ": game.name}, status = status.HTTP_201_CREATED)
 
 @api_view(["GET"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
-def enter(request, game_id):
+def game_info(request, game_id):
+    game = Game.objects.get(id=game_id)
+    game_info = get_game_info(game)
+    return Response(game_info, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def enter(request):
+    game_id = request.data.get("id")
     game = Game.objects.get(id=game_id)
     if game.players.count() >= 2 and request.user not in game.players.all():
-        return Response({"detail": "Game is full"}, status = status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "Game is full"}, status = status.HTTP_409_CONFLICT)
     if game.password:
         request_pwd = request.data.get("password")
         if not request_pwd:
@@ -95,8 +121,7 @@ def enter(request, game_id):
         if request_pwd != game.password:
             return Response({"detail": "Invalid password"}, status=status.HTTP_403_FORBIDDEN)
     game.players.add(request.user)
-    # game_info = get_game_info(game)
-    return Response({"detail": "Successfully joined the game"}, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET"])
@@ -113,24 +138,29 @@ def start(request, game_id):
     return Response({"detail": "Game started successfully"}, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
+@api_view(["DELETE"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def exit(request, game_id):
-    game = Game.objects.get(id=game_id)
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        return Response({"detail": "Game not found"}, status=status.HTTP_404_NOT_FOUND)
     game.players.remove(request.user)
     if game.players.count() == 0:
         game.delete()
         return Response({"detail": "Successfully exited the game room and the game room has been deleted"}, status=status.HTTP_200_OK)
-    another = game.players.all()[0]
-    game.creator = another
+    anothor = game.players.all()[0]
+    game.creator = anothor
     game.save()
     return Response({"detail": "Successfully exited the game room"}, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
-def invite(request, game_id, nickname):      #게임방 초대 보내기
+def invite(request):      #게임방 초대 보내기
+    game_id = request.data.get("id")
+    nickname = request.data.get("nickname")
     game = Game.objects.get(id=game_id)
     if request.method == "POST":
         try:
@@ -192,7 +222,9 @@ def game_invite_list(request):
 @api_view(["POST", "DELETE"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
-def game_request(request, game_id, nickname):
+def game_request(request):
+    game_id = request.data.get("id")
+    nickname = request.data.get("nickname")
     try:
         to_user = User.objects.get(nickname=nickname)
     except User.DoesNotExist:
@@ -293,3 +325,12 @@ def adjust_win_rate(winner, loser):
     loser.total_games += 1
     loser.win_rate = (loser.wins / loser.total_games) * 100
     loser.save()
+
+def remove_player(game, player):
+    game.players.remove(player)
+    if game.players.count() == 0:
+        game.delete()
+    else:
+        if game.creator == player:
+            game.creator = game.players.all()[0]
+            game.save()

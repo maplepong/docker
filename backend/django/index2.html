@@ -4,35 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Chat</title>
+    <style>
+        #chatArea {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
 </head>
 <body>
     <textarea id="chatArea" rows="10" cols="50" readonly></textarea><br>
     <input type="text" id="messageInput" placeholder="Type your message">
     <button onclick="sendMessage()">Send</button>
+    <br>
+    <div>
+        <h3>Online Users</h3>
+        <ul id="onlineUsers"></ul>
+    </div>
 
     <script>
-        const username = "test1";
-        const nickname = "test1";
-        const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MzA1OTU4LCJpYXQiOjE3MTkzMDQxNTgsImp0aSI6Ijc5NDE5MWQ0MTAyZjQyNjFiYTFjM2YyNDE3MTQ5Njc5IiwidXNlcl9pZCI6NjEzNzczNTM4LCJ1c2VybmFtZSI6InRlc3QyIiwibmlja25hbWUiOiJ0ZXN0MiJ9.lKtYO7_m8VC0oqvL43rgBv45K6lCU0PDRlOYK1rOryY"; // Bearer 토큰을 여기에 입력
+        const username = "test2";
+        const nickname = "test2";
+        const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5ODQxNzIzLCJpYXQiOjE3MTk4Mzk5MjMsImp0aSI6IjI5ZmUyZGJkMGM0ZjQ4MTVhMGJiNjA5YWNjMmMxNDE1IiwidXNlcl9pZCI6NDU4MTY1OTEyLCJ1c2VybmFtZSI6InRlc3QxIiwibmlja25hbWUiOiJ0ZXN0MSJ9.nE91by6VoACXa1UWvn9DwbK5dsUhlMMFK-POJoAjnGc"; // Bearer 토큰을 여기에 입력
 
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
-        const ws = new WebSocket(`wss://localhost:443/ws/socket/`, ['token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MzA5MDMwLCJpYXQiOjE3MTkzMDcyMzAsImp0aSI6ImZmNmM4NjBkYWRmYzQ2ZWFhYTI3OGRkNGU3Y2E2NDdkIiwidXNlcl9pZCI6NDU4MTY1OTEyLCJ1c2VybmFtZSI6InRlc3QxIiwibmlja25hbWUiOiJ0ZXN0MSJ9.SLGwW5TNdcJhuqWm_Z-8-sqIrOBty0EMBej74kn_6xo']);  // 여기 백틱 사용 확인
+        const onlineUsersList = document.getElementById('onlineUsers');
+
+        const ws = new WebSocket(`wss://localhost:443/ws/socket/`, ['token', token]);
 
         ws.onopen = function () {
             console.log('WebSocket connected');
-            console.log('Token:', token);  // 콘솔에 토큰 출력
+            console.log('Token:', token);
         };
 
         ws.onmessage = function (event) {
-            console.log(event);
-            const data = JSON.parse(event.data);
-            console.log(data);
-            const message = data.message;
-            const sender = data.sender;
-            const whisper = data.whisper || false;
-            const displayMessage = whisper ? `[Whisper] ${sender}: ${message}` : `${sender}: ${message}`;
-            chatArea.value += displayMessage + '\n';
+            console.log('Message received:', event);
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Parsed data:', data);
+
+                if (data.message && data.sender) {
+                    const message = data.message;
+                    const sender = data.sender;
+                    const whisper = data.whisper || false;
+                    const displayMessage = whisper ? `[Whisper] ${sender}: ${message}` : `${sender}: ${message}`;
+                    chatArea.value += displayMessage + '\n';
+                    chatArea.scrollTop = chatArea.scrollHeight;  // Scroll to the bottom
+                    console.log('Displayed message:', displayMessage);
+                } else if (data.type === 'user_status') {
+                    const username = data.username;
+                    const status = data.status;
+                    handleUserStatus(username, status);
+                    console.log('User status updated:', username, status);
+                } else if (data.type === 'online_users') {
+                    const users = data.users;
+                    updateOnlineUsers(users);
+                    console.log('Online users updated:', users);
+                }
+            } catch (e) {
+                console.error('Error parsing message:', e);
+            }
         };
 
         function sendMessage() {
@@ -43,7 +74,36 @@
                 nickname: nickname 
             });
             ws.send(jsonMessage);
+            console.log('Sent message:', jsonMessage);
             messageInput.value = '';
+        }
+
+        function handleUserStatus(username, status) {
+            const userElement = document.getElementById(`user-${username}`);
+            if (status === 'online') {
+                if (!userElement) {
+                    const li = document.createElement('li');
+                    li.id = `user-${username}`;
+                    li.textContent = username;
+                    onlineUsersList.appendChild(li);
+                }
+            } else if (status === 'offline') {
+                if (userElement) {
+                    userElement.remove();
+                }
+            }
+            console.log('Handled user status:', username, status);
+        }
+
+        function updateOnlineUsers(users) {
+            onlineUsersList.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.id = `user-${user}`;
+                li.textContent = user;
+                onlineUsersList.appendChild(li);
+            });
+            console.log('Updated online users:', users);
         }
     </script>
 </body>
