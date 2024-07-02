@@ -15,6 +15,8 @@ def duplicate_check(request):
         user = User.objects.filter(username=value)
     elif type == "nickname":
         user = User.objects.filter(nickname=value)
+    elif type == "email":
+        user = User.objects.filter(email=value)
     else:
         return Response({"error": "Invalid type"}, status=400)
 

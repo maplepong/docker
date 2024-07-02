@@ -27,12 +27,14 @@ django.setup()
 
 import chat.routing
 from chat.middlewares import JWTAuthMiddleware
+import game.routing
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": JWTAuthMiddleware(
         URLRouter(
-            chat.routing.websocket_urlpatterns
+            chat.routing.websocket_urlpatterns +
+            game.routing.websocket_urlpatterns
         )
     ),
 })

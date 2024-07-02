@@ -32,6 +32,80 @@ def friend_list(request):
     ]
     return Response(serialized_friends, status=status.HTTP_200_OK)
 
+@api_view(["POST"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def block_user(request):
+    blocked_user = request.data.get("username")
+    try:
+        to_user = User.objects.get(username=blocked_user)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "user not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+    if to_user == request.user:
+        return Response(
+            {"error": "Cannot block yourself"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    blocked_users = request.user.blocked_users.all()
+    if to_user in blocked_users:
+        return Response(
+            {"error": "User is already blocked."}, status=status.HTTP_400_BAD_REQUEST
+        )
+    request.user.blocked_users.add(to_user)
+    return Response(
+        {"message": f"User '{blocked_user}' has been blocked successfully."},
+        status=status.HTTP_200_OK,
+    )
+
+@api_view(["DELETE"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def unblock_user(request):
+    unblocked_user = request.data.get("username")
+    try:
+        to_user = User.objects.get(username=unblocked_user)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "User not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+    if to_user == request.user:
+        return Response(
+            {"error": "Cannot unblock yourself."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 차단 목록에서 사용자를 제거
+    blocked_users = request.user.blocked_users.all()
+    if to_user not in blocked_users:
+        return Response(
+            {"error": "User is not blocked."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 차단을 해제
+    request.user.blocked_users.remove(to_user)
+    return Response(
+        {"message": f"User '{unblocked_user}' has been unblocked successfully."},
+        status=status.HTTP_200_OK,
+    )
+
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def get_blocked_users(request):
+    blocked_users = request.user.blocked_users.all()
+    serialized_blocked_users = []
+    for user in blocked_users:
+        serialized_blocked_users.append({
+            "id": user.id,
+            "username": user.username,
+            "nickname": user.nickname,
+            "email": user.email,
+            "image": user.image
+        })
+    return Response(
+        {"blocked_users": serialized_blocked_users},
+        status=status.HTTP_200_OK,
+    )
 
 @api_view(["POST", "DELETE"])
 @permission_classes((IsAuthenticated,))
