@@ -489,10 +489,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user.last_online = timezone.now()
         user.save()
 
-    def invite_message(self, event):
+    async def invite_message(self, event):
         sender = event['sender']
         gameId = event['gameId']
-
         await self.send(text_data=json.dumps({
             'type': 'invite',
             'sender': sender,
