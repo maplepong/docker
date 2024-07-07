@@ -55,38 +55,54 @@ const Chat = () => {
     setMessages([...messages, { sender: data.sender, message: data.message }]);
   };
 
+  //key: inputType
   const msgTypeList = {
-    "/all": "<전체>",
-    "/w": "<귓속말>",
-    "/game": "<초대>",
+    "/all": { showtype: "<전체>", sendtype: "all" },
+    "/w": { showtype: "<귓속말>", sendtype: "whisper" },
+    "/game": { showtype: "<게임>", sendtype: "game" },
   };
+  //inputType
   let msgType = "/all";
+  let whisperTarget = "";
   const parseMsg = (e, currentInput) => {
     if (e.key === "Enter") {
-      sendMessage(currentInput, msgType);
+      sendMessage(currentInput);
       e.target.value = "";
       return;
     }
-    if (msgType === "/all" && currentInput[0] === "/") {
-      var type = currentInput.split(" ")[0];
-      if (msgTypeList[type]) {
-        msgType = type;
-        setMessageType(msgType);
+
+    //귓속말 타겟
+    //접속중인지 확인 불가능
+    if (msgType === "/w" && e.key === " ") {
+      whisperTarget = currentInput.trim().split(" ")[0];
+      setMessageType("/w", whisperTarget);
+      currentInput = currentInput.slice(whisperTarget.length);
+      e.target.value = "";
+    }
+
+    //메시지 타입 변경 이벤트
+    if (msgType === "/all") {
+      var inputType = currentInput.split(" ")[0];
+      if (currentInput[0] === "/" && msgTypeList[inputType]) {
+        //메시지 타입 들어왔을 경우
+        setMessageType(inputType);
         currentInput = currentInput.slice(msgType.length);
         e.target.value = "";
       }
+      // 메시지 타입 지우기 이벤트
     } else if (e.key === "Backspace" || e.key === "Delete") {
       if (currentInput === "") {
-        msgType = "/all";
-        setMessageType(msgType);
+        setMessageType("/all");
       }
     }
   };
 
   const chatLabel = document.getElementById("chat-label");
-  const setMessageType = (msgType) => {
-    console.log(msgType);
-    chatLabel.innerText = msgTypeList[msgType];
+  const setMessageType = (inputType, target) => {
+    console.log(inputType);
+    chatLabel.innerText =
+      msgTypeList[inputType].showtype + (target ? ` : ${target}에게` : "");
+    msgType = inputType;
   };
 
   const sendMessage = (message) => {
@@ -94,9 +110,10 @@ const Chat = () => {
       chatSocket.current &&
       chatSocket.current.readyState === WebSocket.OPEN
     ) {
+      console.log(msgTypeList[msgType], message);
       chatSocket.current.send(
         JSON.stringify({
-          type: msgTypeList[msgType],
+          type: msgType,
           message: message,
           sender: localStorage.getItem("nickname"),
         })
@@ -124,7 +141,7 @@ const Chat = () => {
         </div>
       </div>
       <label for="chat-input" id="chat-label">
-        {msgTypeList[msgType]}
+        {msgTypeList[msgType].showtype}
       </label>
       <input
         type="text"
@@ -132,7 +149,7 @@ const Chat = () => {
           parseMsg(e, e.target.value);
         }}
         id="chat-input"
-      />
+      ></input>
     </div>
   );
 };
