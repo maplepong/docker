@@ -32,8 +32,8 @@ const Chat = () => {
       ws.send(
         JSON.stringify({
           type: "connect",
-          message: "hello",
-          username: localStorage.getItem("username"),
+          message: "chat connected",
+          sender: localStorage.getItem("username"),
         })
       );
     };
@@ -58,9 +58,9 @@ const Chat = () => {
     ) {
       chatSocket.current.send(
         JSON.stringify({
-          type: "chat",
+          type: "all",
           message: message,
-          username: localStorage.getItem("username"),
+          sender: localStorage.getItem("username"),
         })
       );
       chatSocket.current.onmessage = (event) => getMessage(event);
