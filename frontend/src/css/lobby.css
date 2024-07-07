@@ -1,0 +1,213 @@
+
+/*    src: url('asset/Lobby/Maplestory OTF Bold.otf') format('truetype'); /* 폰트 파일 경로에 맞게 수정하세요 */
+
+/* 로비 */
+
+/* 로비 배경 이미지 */
+body {
+    background-image: url('../../public/asset/Lobby/bg.jpg'); /* 배경 이미지 경로에 맞게 수정하세요 */
+    background-size: cover;
+}
+
+.lobby {
+    margin-top: 5%;
+    position: relative;
+    width: 1181px;
+    height: 581px;
+    flex-direction: column;
+    top: 10%;
+    display:flex;
+    background-color: aliceblue;
+}
+
+.lobby_header {
+    position: relative;
+    color: black;
+    text-shadow: -1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white;
+    text-align: center;
+    font-family: 'Maplestory';
+    font-size:20px;
+    font-weight: bold;
+    flex-direction: row;
+    display: flex;
+    left: 11%; 
+}
+
+/* game_interface */
+.game_interface {
+    position: relative;
+    width: 80%;
+    height: 60%;
+    margin: 0 auto;
+    color: white;
+    text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    /* font-family: 'Maplestory'; */
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+
+.crtbtn {
+    background: url( "../../public/asset/Lobby/crtbtn.png" ) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    width: 92px;
+    height: 35px;
+    border: none;
+    margin-left: 62%;
+}
+
+#modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+#modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color:#6ACAFF;
+    padding: 20px;
+    z-index: 100;
+    border-radius: 10px;
+    width: 300px;
+}
+#modal-icon img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+#room-form {
+    background-color: #909090;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+#modal-header {
+    justify-content:center;
+    align-items: center;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#confirmbtn, #cancelbtn {
+    background-image: linear-gradient(white, #4396E3, white);
+    border-radius: 10px;
+    border: solid 1px #000000;
+    cursor: pointer;
+    width: 92px;
+    height: 35px;
+    font-family: 'Maplestory';
+    font-size: 15px;
+    text-shadow: -1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white;
+}
+
+.lobby_body {
+    height: 100%;
+    overflow-y: auto;
+    /* width: 1181px; DEV*/ 
+	width: 100%;
+}
+
+.lobby_body::-webkit-scrollbar {
+    width: 10px;
+  }
+  .lobby_body::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+    background-clip: padding-box;
+  }
+.lobby_body::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 10px;
+  }
+
+/* 방 목록 스타일 */
+.room_list {
+	position: relative;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+.room_header {
+    width: 100%;
+    background-color: black;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+/* 각 방 스타일 */
+.room_info {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: fit-content;
+}
+
+.room_number {
+    display: inline-block;
+    width: 10%;
+    text-align: center;
+}
+
+.room_title {
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+    cursor: pointer;
+}
+
+.room_status {
+    display: inline-block;
+    width: 10%;
+    text-align: center;
+}
+
+.players {
+    display: inline-block;
+    width: 20%;
+    text-align: center;
+}
+
+.locked img {
+    width: 2%;
+    height: 2%;
+    margin-left: 4%;
+    text-align: center;
+    margin-bottom: -5px;
+}
+/* 상태에 따른 글자 색상 */
+.waiting .room_status {
+    color: #2BD900; /* 대기중일 때의 글자 색상(초록색) */
+}
+
+.playing .room_status {
+    color: #FF0000; /* 게임중일 때의 글자 색상(빨간색) */
+}
+
+.waiting .players {
+    color: #2BD900;
+}
+
+.playing .players {
+    color: #FF0000;
+}

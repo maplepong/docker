@@ -465,7 +465,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = await sync_to_async(User.objects.get)(nickname=nickname)
 
         friends = user.friends.all()
-        if statue == 'on':
+        if status == 'on':
             #처음 접속한 경우 본인에게 친구들의 접속 상태 반환
             await self.send(text_data=json.dumps({
                 'type': 'connect',

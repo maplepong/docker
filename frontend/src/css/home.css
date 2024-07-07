@@ -1,0 +1,46 @@
+#home {
+    display: flex;
+    justify-content: space-between;
+}
+
+#myStatus {
+    display:flex;
+    flex-direction: column;
+}
+
+#choose-container {
+    display: flex;
+    width: 80%;
+}
+
+#mini {
+    background-color: gray;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+}
+
+#tour {
+    background-color: gray;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+}
+
+#pong {
+    background-color: gray;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+}
+
+.word {
+    margin: 0 auto;
+    font-size: 50px;
+}

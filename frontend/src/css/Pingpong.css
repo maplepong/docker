@@ -1,0 +1,30 @@
+canvas {
+	background-image: url("../../public/asset/background/bg7.gif");
+	width: 100%;
+	height: 100%;
+  }
+  button {
+	display: block;
+  }
+
+#score {
+	z-index:1000;
+	position: relative;
+	left: 475px;
+	top: -300px;
+	width: 300px;
+	font-size: 48px;
+}
+#score > div {
+	position: absolute;
+}
+
+
+#app {
+	width: 100%;
+	max-width: 100%;
+}
+
+/* .ball {
+	background-image: url("../../public/asset/background/mushroom.gif");
+} */
