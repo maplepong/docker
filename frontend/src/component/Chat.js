@@ -111,13 +111,15 @@ const Chat = () => {
       chatSocket.current.readyState === WebSocket.OPEN
     ) {
       console.log(msgTypeList[msgType], message);
-      chatSocket.current.send(
-        JSON.stringify({
-          type: msgType,
-          message: message,
-          sender: localStorage.getItem("nickname"),
-        })
-      );
+      const data = {
+        type: msgTypeList[msgType].sendtype,
+        message: message,
+        sender: localStorage.getItem("nickname"),
+      };
+      if (msgType === "/w") {
+        data.receiver = whisperTarget;
+      }
+      chatSocket.current.send(JSON.stringify(data));
       chatSocket.current.onmessage = (event) => getMessage(event);
     } else {
       alert("socket이 연결되지 않았습니다.");
