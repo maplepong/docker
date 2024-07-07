@@ -9,5 +9,5 @@ class Message(models.Model):
 
     def __str__(self):
         if self.receiver:
-            return f'{self.user.username} to {self.receiver.username}: {self.content}'
-        return f'{self.user.username}: {self.content}'
+            return f'{self.user.nickname} to {self.receiver.nickname}: {self.content}'
+        return f'{self.user.nickname}: {self.content}'

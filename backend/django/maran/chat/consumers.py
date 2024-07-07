@@ -342,13 +342,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             text_data_json = json.loads(text_data)
-            message = text_data_json['message']
             type = text_data_json['type']
             sender_nickname = text_data_json['sender']
             sender = await sync_to_async(User.objects.get)(nickname=sender_nickname)
-
-            message_instance = Message(user=sender, content=message)
-            await sync_to_async(message_instance.save)()
+            
+            if type == 'whisper' or type == 'all':
+                message = text_data_json['message']
+                message_instance = Message(user=sender, content=message)
+                await sync_to_async(message_instance.save)()
 
             # 타입이 귓속말일 때
             if type == 'whisper':
