@@ -349,6 +349,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if type == 'whisper' or type == 'all':
                 message = text_data_json['message']
                 message_instance = Message(user=sender, content=message)
+                message_instance.receiver = None
                 await sync_to_async(message_instance.save)()
 
             # 타입이 귓속말일 때
@@ -463,24 +464,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         nickname = event['nickname']
         status = event['status']
 
-        user = await sync_to_async(User.objects.get)(nickname=nickname)
+        # user = await sync_to_async(User.objects.get)(nickname=nickname)
 
-        friends = user.friends.all()
+        # friends = user.friends.all()
         if status == 'on':
             #처음 접속한 경우 본인에게 친구들의 접속 상태 반환
             await self.send(text_data=json.dumps({
                 'type': 'connect',
                 'sender': nickname,
-                'friends': [{friend.nickname, friend.is_online} for friend in friends]
+                'friends': 'test',
+                #'friends': [friend.nickname for friend in friends]
             }))
-        friends = friends.filter(is_online=True)
-        #친구들에게 본인의 접속 상태 반환
-        if self.user.nickname in [friend.nickname for friend in friends]:
-            await self.send(text_data=json.dumps({
-                'type': 'update',
-                'sender': nickname,
-                'status': status
-            }))
+        # friends = friends.filter(is_online=True)
+        # #친구들에게 본인의 접속 상태 반환
+        # if self.user.nickname in [friend.nickname for friend in friends]:
+        #     await self.send(text_data=json.dumps({
+        #         'type': 'update',
+        #         'sender': nickname,
+        #         'status': status
+        #     }))
 
     
     def update_user_status(self, nickname, is_online):

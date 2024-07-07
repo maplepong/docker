@@ -33,7 +33,7 @@ const Chat = () => {
         JSON.stringify({
           type: "connect",
           message: "chat connected",
-          sender: localStorage.getItem("username"),
+          sender: localStorage.getItem("nickname"),
         })
       );
     };
@@ -47,7 +47,10 @@ const Chat = () => {
   const getMessage = (event) => {
     const data = JSON.parse(event.data);
     console.log("chat data :", data);
-    // if (data.type === "chat") {
+    // if !(data.type) return console.error("ws data type이 없습니다.");
+    // switch (data.type) {
+
+    // }
     setMessages([...messages, { sender: data.sender, message: data.message }]);
   };
 
@@ -60,7 +63,7 @@ const Chat = () => {
         JSON.stringify({
           type: "all",
           message: message,
-          sender: localStorage.getItem("username"),
+          sender: localStorage.getItem("nickname"),
         })
       );
       chatSocket.current.onmessage = (event) => getMessage(event);
