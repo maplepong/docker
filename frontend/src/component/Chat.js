@@ -47,11 +47,46 @@ const Chat = () => {
   const getMessage = (event) => {
     const data = JSON.parse(event.data);
     console.log("chat data :", data);
+    // 귓속말 / 전체 채팅 / 초대  / 친구 접속 상태 받기 요청 (접속자 → 서버) / 친구 접속 상태 업데이트 (서버 → 다수)
     // if !(data.type) return console.error("ws data type이 없습니다.");
     // switch (data.type) {
 
     // }
     setMessages([...messages, { sender: data.sender, message: data.message }]);
+  };
+
+  const msgTypeList = {
+    "/all": "<전체>",
+    "/w": "<귓속말>",
+    "/game": "<초대>",
+  };
+  let msgType = "/all";
+  const parseMsg = (e, currentInput) => {
+    if (e.key === "Enter") {
+      sendMessage(currentInput, msgType);
+      e.target.value = "";
+      return;
+    }
+    if (msgType === "/all" && currentInput[0] === "/") {
+      var type = currentInput.split(" ")[0];
+      if (msgTypeList[type]) {
+        msgType = type;
+        setMessageType(msgType);
+        currentInput = currentInput.slice(msgType.length);
+        e.target.value = "";
+      }
+    } else if (e.key === "Backspace" || e.key === "Delete") {
+      if (currentInput === "") {
+        msgType = "/all";
+        setMessageType(msgType);
+      }
+    }
+  };
+
+  const chatLabel = document.getElementById("chat-label");
+  const setMessageType = (msgType) => {
+    console.log(msgType);
+    chatLabel.innerText = msgTypeList[msgType];
   };
 
   const sendMessage = (message) => {
@@ -61,7 +96,7 @@ const Chat = () => {
     ) {
       chatSocket.current.send(
         JSON.stringify({
-          type: "all",
+          type: msgTypeList[msgType],
           message: message,
           sender: localStorage.getItem("nickname"),
         })
@@ -88,14 +123,15 @@ const Chat = () => {
           ))}
         </div>
       </div>
+      <label for="chat-input" id="chat-label">
+        {msgTypeList[msgType]}
+      </label>
       <input
         type="text"
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            sendMessage(e.target.value);
-            e.target.value = "";
-          }
+          parseMsg(e, e.target.value);
         }}
+        id="chat-input"
       />
     </div>
   );
