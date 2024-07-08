@@ -17,7 +17,7 @@ from rest_framework.decorators import (
     authentication_classes,
 )
 from rest_framework import status
-from user.models import User, FriendRequest
+from user.models import User, FriendRequest, GameRecord
 from user.image import get_image_url
 from requests import Request
 from django.contrib.auth import get_user_model
@@ -275,7 +275,15 @@ def game_request(request):
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
-def update_game_result(request, game_id, winner_nickname, loser_nickname):
+def update_game_result(request):
+    game_id = request.data.get('game_id')
+    winner_nickname = request.data.get('winner_nickname')
+    loser_nickname = request.data.get('loser_nickname')
+    loser_score = request.data.get('loser_score')
+
+    if not game_id or not winner_nickname or not loser_nickname or not loser_score:
+        return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         # Get the game object
         game = Game.objects.get(id=game_id)
@@ -312,8 +320,9 @@ def update_game_result(request, game_id, winner_nickname, loser_nickname):
 
     # Adjust win rate for winner and loser
     adjust_win_rate(winner, loser)
-
-    return Response({"message": "Game result updated successfully"}, status=status.HTTP_200_OK)
+    winner.game_history = GameRecord(nickname=winner.nickname, opponent=loser.nickname, user_score=3, opponent_score=loser_score, result="승")
+    loser.game_history = GameRecord(nickname=loser.nickname, opponent=winner.nickname, user_score=loser_score, opponent_score=3, result="패")
+    return JsonResponse({"winnerNickname": winner.nickname, "loserNickname": loser.nickname, "winnerScore": 3, "loserScore": loser_score}, status=status.HTTP_200_OK)
 
 def adjust_win_rate(winner, loser):
     winner.wins += 1
@@ -325,12 +334,3 @@ def adjust_win_rate(winner, loser):
     loser.total_games += 1
     loser.win_rate = (loser.wins / loser.total_games) * 100
     loser.save()
-
-def remove_player(game, player):
-    game.players.remove(player)
-    if game.players.count() == 0:
-        game.delete()
-    else:
-        if game.creator == player:
-            game.creator = game.players.all()[0]
-            game.save()
