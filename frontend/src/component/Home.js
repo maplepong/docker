@@ -46,9 +46,9 @@ const Home = () => {
     <div id="home">
       <ChooseGame />
       {/* <div id="myStatus"> */}
-        {/* <UserStatus data={data} /> */}
-        {/* <FriendList list={list} friendlist={friendlist} /> */}
-        {/* <Chat /> */}
+      {/* <UserStatus data={data} /> */}
+      {/* <FriendList list={list} friendlist={friendlist} /> */}
+      {/* <Chat /> */}
       {/* </div> */}
     </div>
   );
