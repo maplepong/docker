@@ -320,8 +320,15 @@ def update_game_result(request):
 
     # Adjust win rate for winner and loser
     adjust_win_rate(winner, loser)
-    winner.game_history = GameRecord(nickname=winner.nickname, opponent=loser.nickname, user_score=3, opponent_score=loser_score, result="승")
-    loser.game_history = GameRecord(nickname=loser.nickname, opponent=winner.nickname, user_score=loser_score, opponent_score=3, result="패")
+    
+    # Create game record for winner and loser
+    winner_record = GameRecord.objects.create(nickname=winner.nickname, opponent=loser.nickname, user_score=3, opponent_score=loser_score, result="승")
+    loser_record = GameRecord.objects.create(nickname=loser.nickname, opponent=winner.nickname, user_score=loser_score, opponent_score=3, result="패")
+    
+    # Add game records to the user's game history
+    winner.game_history.add(winner_record)
+    loser.game_history.add(loser_record)
+
     return JsonResponse({"winnerNickname": winner.nickname, "loserNickname": loser.nickname, "winnerScore": 3, "loserScore": loser_score}, status=status.HTTP_200_OK)
 
 def adjust_win_rate(winner, loser):
@@ -334,3 +341,12 @@ def adjust_win_rate(winner, loser):
     loser.total_games += 1
     loser.win_rate = (loser.wins / loser.total_games) * 100
     loser.save()
+
+def remove_player(game, player):
+    game.players.remove(player)
+    if game.players.count() == 0:
+        game.delete()
+    else:
+        if game.creator == player:
+            game.creator = game.players.all()[0]
+            game.save()

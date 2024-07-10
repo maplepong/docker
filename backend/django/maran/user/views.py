@@ -242,7 +242,7 @@ def signup(request):
 def userinfo(request):
     if request.method == "GET":
         nickname = request.GET.get("nickname")
-        user = User.objects.get(nickname=nickname)
+        user = request.user
         if not user:
             return Response({"error": "Invalid credentials"}, status=400)
         return Response(user.serialize())
