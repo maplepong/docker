@@ -20,7 +20,7 @@ import Test from "./component/Test.js";
 import api from "./core/Api_.js";
 
 const setAxios = () => {
-  axios.defaults.baseURL = "http://localhost:443/api/";
+  axios.defaults.baseURL = "https://localhost/api/";
   // axios.defaults.baseURL = "http://localhost:8001/";
   axios.defaults.timeout = 3000;
 };

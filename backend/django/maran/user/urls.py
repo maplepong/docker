@@ -24,4 +24,7 @@ urlpatterns = [
     path("friend/<str:nickname>", friend.friend),
     path("friend-request-list", friend.friend_request_list),
     path("friend-request/<str:nickname>", friend.friend_request),
+    path("block-user", friend.block_user),
+    path("unblock-user", friend.unblock_user),
+    path("blocked-list", friend.get_blocked_users),
 ]

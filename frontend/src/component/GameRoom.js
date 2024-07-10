@@ -67,7 +67,7 @@ const GameRoom = () => {
   useEffect(() => {
     if (gameInfo.id && !gameSocket.current && !exit) {
       const newgameSocket = new WebSocket(
-        "ws://localhost:443/api/ws/game/" + gameInfo.id + "/"
+        "ws://localhost:8000/ws/game/" + gameInfo.id + "/"
       );
       console.log("Creating new WebgameSocket connection...");
       newgameSocket.onopen = () => {
@@ -166,7 +166,7 @@ const GameRoom = () => {
 
   return ready ? (
     <div className="game-container">
-      <canvas id="myCanvas" width="240" height="160"></canvas>
+      <canvas id="myCanvas" width="480" height="320"></canvas>
       <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
     </div>
   ) : gameInfo.id ? (

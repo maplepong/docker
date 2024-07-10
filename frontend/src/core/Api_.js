@@ -3,12 +3,12 @@ import myReact from "./myReact";
 import axios from "axios";
 
 const apiInstance = axios.create({
-  baseURL: "http://localhost:443/api/",
+  baseURL: "https://localhost/api/",
   headers: {
     "Content-Type": "application/json",
   },
   timeout: 5000,
-  withCredentials: false, //develope
+  withCredentials: true, //develope
 }); //정리 필요
 
 function getCookie(name) {
@@ -276,7 +276,7 @@ const api = {
     localStorage.removeItem("nickname");
     localStorage.removeItem("accessToken");
     apiInstance.defaults.headers.common["Authorization"] = null;
-    apiInstance.defaults.withCredentials = false;
+    apiInstance.defaults.withCredentials = true;
     alert("로그아웃되었습니다");
     myReact.redirect("/");
   },
@@ -485,6 +485,48 @@ const api = {
             console.log(err);
         }
         return err;
+      });
+  },
+  sendGameResult(leftscore, rightscore, nickname) {
+    return apiInstance
+      .request({
+        url: "game/result",
+        method: "POST",
+        data: {
+          left: leftscore,
+          right: rightscore,
+          nickname: nickname,
+        },
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          alert(res, "게임결과송신완료.");
+        }
+        return res;
+      })
+      .catch((error) => {
+        console.log("게임결과송신실패");
+        return error;
+      });
+  },
+  gameExit(roomId) {
+    return apiInstance
+      .request({
+        url: "game/exit",
+        method: "DELETE",
+        data: {
+          id: roomId,
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          alert("게임방을 나갔습니다.");
+        }
+        return res;
+      })
+      .catch((error) => {
+        console.log("게임방을 나가지 못했습니다.");
+        return error;
       });
   },
 };

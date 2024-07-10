@@ -4,9 +4,9 @@ from django.db import models
 
 class User(AbstractUser):
     id = models.IntegerField(primary_key=True, editable=False)
-    username = models.CharField(max_length=30, unique=True)  # 일반회원 id
+    username = models.CharField(max_length=30, unique=True)
     nickname = models.CharField(max_length=30, unique=True)
-    email = models.EmailField(unique=True)  # 새로운 이메일 필드 추가
+    email = models.EmailField(unique=True)
     password = models.CharField(
         max_length=1000,
         validators=[
@@ -19,17 +19,21 @@ class User(AbstractUser):
     type = models.IntegerField()  # 0: 일반회원, 1: api
     image = models.CharField(max_length=100, default="default.png")
     friends = models.ManyToManyField("self", symmetrical=True)
+    blocked_users = models.ManyToManyField("self", symmetrical=False, blank=True)
     wins = models.PositiveIntegerField(default=0)
     losses = models.PositiveIntegerField(default=0)
     total_games = models.PositiveIntegerField(default=0)
-    win_rate = models.FloatField(default=0.0)  # 승률 필드 추가
-    secret_keys = models.CharField(max_length=100, blank=True, null=True)  # 비밀 키 저장 필드 추가
-    is_2fa_enabled = models.BooleanField(default=False)  # 2FA 설정 여부 필드 추가
+    win_rate = models.FloatField(default=0.0)
+    secret_keys = models.CharField(max_length=100, blank=True, null=True)
+    is_2fa_enabled = models.BooleanField(default=False)
     last_2fa_time = models.DateTimeField(null=True, blank=True)
 
+    # 접속 상태 필드 추가
+    is_online = models.BooleanField(default=False)
+    last_online = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.username  # or self.nickname, depending on what you want to display
+        return self.username
 
     def serialize(self):
         from .image import get_image_url
@@ -43,14 +47,14 @@ class User(AbstractUser):
             "wins": self.wins,
             "losses": self.losses,
             "total_games": self.total_games,
-            "win_rate": self.win_rate,  # 승률 필드 추가
-            # 추가 필드가 있다면 여기에 추가
+            "win_rate": self.win_rate,
+            "is_online": self.is_online,  # 접속 상태 추가
+            "last_online": self.last_online,  # 마지막 접속 시간 추가
         }
 
     @classmethod
     def get_queryset(cls):
         return cls.objects.all()
-
 
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(

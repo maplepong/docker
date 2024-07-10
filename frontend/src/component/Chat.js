@@ -23,18 +23,17 @@ const Chat = () => {
   });
 
   function initSocket() {
-    var ws = new WebSocket(
-      `ws://localhost:443/api/ws/chat/?token=${localStorage.getItem(
-        "accessToken"
-      )}`
-    );
+    var ws = new WebSocket(`wss://localhost:443/ws/socket/`, [
+      "token",
+      localStorage.getItem("accessToken"),
+    ]);
     ws.onopen = () => {
       console.log("chat socket opened");
       ws.send(
         JSON.stringify({
           type: "connect",
-          message: "hello",
-          username: localStorage.getItem("username"),
+          message: "chat connected",
+          sender: localStorage.getItem("nickname"),
         })
       );
     };
@@ -48,8 +47,62 @@ const Chat = () => {
   const getMessage = (event) => {
     const data = JSON.parse(event.data);
     console.log("chat data :", data);
-    // if (data.type === "chat") {
+    // 귓속말 / 전체 채팅 / 초대  / 친구 접속 상태 받기 요청 (접속자 → 서버) / 친구 접속 상태 업데이트 (서버 → 다수)
+    // if !(data.type) return console.error("ws data type이 없습니다.");
+    // switch (data.type) {
+
+    // }
     setMessages([...messages, { sender: data.sender, message: data.message }]);
+  };
+
+  //key: inputType
+  const msgTypeList = {
+    "/all": { showtype: "<전체>", sendtype: "all" },
+    "/w": { showtype: "<귓속말>", sendtype: "whisper" },
+    "/game": { showtype: "<게임>", sendtype: "game" },
+  };
+  //inputType
+  let msgType = "/all";
+  let whisperTarget = "";
+  const parseMsg = (e, currentInput) => {
+    if (e.key === "Enter") {
+      sendMessage(currentInput);
+      e.target.value = "";
+      return;
+    }
+
+    //귓속말 타겟
+    //접속중인지 확인 불가능
+    if (msgType === "/w" && e.key === " ") {
+      whisperTarget = currentInput.trim().split(" ")[0];
+      setMessageType("/w", whisperTarget);
+      currentInput = currentInput.slice(whisperTarget.length);
+      e.target.value = "";
+    }
+
+    //메시지 타입 변경 이벤트
+    if (msgType === "/all") {
+      var inputType = currentInput.split(" ")[0];
+      if (currentInput[0] === "/" && msgTypeList[inputType]) {
+        //메시지 타입 들어왔을 경우
+        setMessageType(inputType);
+        currentInput = currentInput.slice(msgType.length);
+        e.target.value = "";
+      }
+      // 메시지 타입 지우기 이벤트
+    } else if (e.key === "Backspace" || e.key === "Delete") {
+      if (currentInput === "") {
+        setMessageType("/all");
+      }
+    }
+  };
+
+  const chatLabel = document.getElementById("chat-label");
+  const setMessageType = (inputType, target) => {
+    console.log(inputType);
+    chatLabel.innerText =
+      msgTypeList[inputType].showtype + (target ? ` : ${target}에게` : "");
+    msgType = inputType;
   };
 
   const sendMessage = (message) => {
@@ -57,13 +110,16 @@ const Chat = () => {
       chatSocket.current &&
       chatSocket.current.readyState === WebSocket.OPEN
     ) {
-      chatSocket.current.send(
-        JSON.stringify({
-          type: "chat",
-          message: message,
-          username: localStorage.getItem("username"),
-        })
-      );
+      console.log(msgTypeList[msgType], message);
+      const data = {
+        type: msgTypeList[msgType].sendtype,
+        message: message,
+        sender: localStorage.getItem("nickname"),
+      };
+      if (msgType === "/w") {
+        data.receiver = whisperTarget;
+      }
+      chatSocket.current.send(JSON.stringify(data));
       chatSocket.current.onmessage = (event) => getMessage(event);
     } else {
       alert("socket이 연결되지 않았습니다.");
@@ -86,15 +142,16 @@ const Chat = () => {
           ))}
         </div>
       </div>
+      <label for="chat-input" id="chat-label">
+        {msgTypeList[msgType].showtype}
+      </label>
       <input
         type="text"
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            sendMessage(e.target.value);
-            e.target.value = "";
-          }
+          parseMsg(e, e.target.value);
         }}
-      />
+        id="chat-input"
+      ></input>
     </div>
   );
 };

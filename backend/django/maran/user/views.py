@@ -241,7 +241,7 @@ def signup(request):
 @authentication_classes((JWTAuthentication,))
 def userinfo(request):
     if request.method == "GET":
-        nickname = request.data.get("nickname")
+        nickname = request.GET.get("nickname")
         user = User.objects.get(nickname=nickname)
         if not user:
             return Response({"error": "Invalid credentials"}, status=400)
