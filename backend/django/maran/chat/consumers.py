@@ -378,14 +378,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             'whisper': True,
                             'receiver': receiver.nickname
                         }))
-                    else:
+                    else: # 수신자가 오프라인인 경우
                         await self.send(text_data=json.dumps({
-                            'error': f'User {receiver_nickname} is not connected.'
+                            'message': "User is not connected.",
+                            'sender': 'system',
+                            'whisper': True,
+                            'receiver': sender.nickname
                         }))
-                except User.DoesNotExist:
+                except User.DoesNotExist: # 수신자가 존재하지 않는 경우
                     await self.send(text_data=json.dumps({
-                        'error': f'User {receiver_nickname} does not exist.'
-                    }))
+                            'message': "User does not exist.",
+                            'sender': 'system',
+                            'whisper': True,
+                            'receiver': sender.nickname
+                        }))
             elif type == 'all':
                 await self.channel_layer.group_send(
                     "chat_group",
@@ -401,16 +407,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 try:
                     receiver = await sync_to_async(User.objects.get)(nickname=receiver_nickname)
                     game = await sync_to_async(Game.objects.get)(id=gameId)
-                    if receiver.is_online:
+                    if receiver.is_online: # 수신자가 온라인인 경우
                         receiver_channel_name = await sync_to_async(self.redis.get)(f"user_channel_{receiver.nickname}")
                         if receiver_channel_name:
-                            if game.status == 1 :
+                            if game.status == 1 : # 게임이 이미 시작된 경우
                                 await self.send(text_data=json.dumps({
-                                    'error': f'Game {gameId} is already started.'
+                                'message': "Game is already started.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
                                 }))
                             elif game.players.count() == 2:
                                 await self.send(text_data=json.dumps({
-                                    'error': f'Game {gameId} is already full.'
+                                'message': "Game is already full.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
                                 }))
                             else:
                                 await self.channel_layer.send(
@@ -421,18 +433,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                         'gameId': gameId
                                     }
                                 )
-                    else:
-                        await self.send(text_data=json.dumps({
-                            'error': f'User {receiver_nickname} is not connected.'
-                        }))
+                    else: # 수신자가 오프라인인 경우
+                           await self.send(text_data=json.dumps({
+                                'message': "User is not connected.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
                 except User.DoesNotExist:
-                    await self.send(text_data=json.dumps({
-                        'error': f'User {receiver_nickname} does not exist.'
-                    }))
+                          await self.send(text_data=json.dumps({
+                                'message': "User does not exist.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
                 except Game.DoesNotExist:
-                    await self.send(text_data=json.dumps({
-                        'error': f'Game {gameId} does not exist.'
-                    }))
+                       await self.send(text_data=json.dumps({
+                                'message': "Game is not exist.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid JSON'
