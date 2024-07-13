@@ -10,6 +10,7 @@ const Login = () => {
 	async function login () {
 		const username = document.querySelector("#input-username").value;
 		const password = document.querySelector("#input-password").value;
+		const otpBlock = document.querySelector("#otp-block")
 		const getInfo = () => {
 			return ([username, password]);
 		}
@@ -17,9 +18,26 @@ const Login = () => {
 		const response = await api.login(getInfo)
 		if (response.status != 200) {
 			console.log(response)
+			if (response.status == 201) {
+				otpBlock.style.display = "block"
+			}
 			return response;
 		}
 		else {
+			console.log(response);
+			myReact.redirect("home")
+		}
+	}
+
+	async function checkOtp() {
+		const username = document.querySelector("#input-username").value;
+		const pin = document.querySelector("#input-otp").value
+		const response = await api.otpVerifyPin(username, pin)
+		if (response.status != 200) {
+			alert('otp를 다시 확인해주세요')
+		}
+		else {
+			alert('otp 확인 완료')
 			console.log(response);
 			myReact.redirect("home")
 		}
@@ -34,6 +52,13 @@ const Login = () => {
 					</div>
 					<div class="info">
 						<input id="input-password" placeholder="password"></input>
+					</div>
+					<div id="otp-block" style="display:none;">
+						<p style="color:white;">당신의 Email에서 QR 코드를 확인하고</p>
+						<p style="color:white;">Google Authenticator를 통해</p>
+						<p style="color:white;">입력받은 번호 6자리를 보내주세요.</p>
+						<input id="input-otp"></input>
+						<button style="margin:5px;" onclick={checkOtp}>확인</button>
 					</div>
 				</div>
 				<div id="login">

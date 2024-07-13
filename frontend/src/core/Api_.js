@@ -193,6 +193,29 @@ const api = {
         return error;
       });
   },
+  otpVerifyPin(_username, _pin) {
+    console.log(_username, _pin)
+    return apiInstance
+      .request({
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        method: "POST",
+        url: "user/otp_verify",
+        data: {
+          username: _username,
+          otp: _pin
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+        return error;
+      });
+  },
   checkEmailVerifyPin(_email, _pin) {
     console.log("YOUR EMAIL", _email, "YOUR PIN", _pin);
     return apiInstance
