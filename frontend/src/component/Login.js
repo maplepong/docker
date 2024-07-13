@@ -31,6 +31,7 @@ const Login = () => {
 
 	async function checkOtp() {
 		const username = document.querySelector("#input-username").value;
+		const password = document.querySelector("#input-password").value;
 		const pin = document.querySelector("#input-otp").value
 		const response = await api.otpVerifyPin(username, pin)
 		if (response.status != 200) {
@@ -38,8 +39,14 @@ const Login = () => {
 		}
 		else {
 			alert('otp 확인 완료')
-			console.log(response);
-			myReact.redirect("home")
+			const relogin = await api.login(getInfo)
+			if (relogin.status == 200) {
+				console.log(response);
+				myReact.redirect("home")
+			}
+			else {
+				alert('무언가 오류가 발생했습니다. 다시 시도해주세요.')
+			}
 		}
 	}
 
