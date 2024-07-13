@@ -4,7 +4,66 @@ import "../css/Chat.css";
 import NicknameModal from "./NicknameModal.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      message: "방가방가^^",
+      type: "all",
+      sender: "시우리",
+    },
+    {
+      message: "하이루 - 오늘뭐함",
+      type: "all",
+      sender: "교park",
+    },
+    {
+      message: "즐겜;; 가야겠다",
+      type: "all",
+      sender: "subcho",
+    },
+    {
+      message: "<system> WONS2님이 게임에 초대했습니다!",
+      type: "invite",
+    },
+    {
+      message: "<<나를 부르는 회사>> 로...",
+      type: "all",
+      sender: "subcho",
+    },
+    {
+      message: "이걸가네",
+      type: "whisper",
+      sender: "게임담당",
+    },
+    {
+      message: "방가방가^^",
+      type: "all",
+      sender: "시우리",
+    },
+    {
+      message: "하이루 - 오늘뭐함",
+      type: "all",
+      sender: "교park",
+    },
+    {
+      message: "즐겜;; 가야겠다",
+      type: "all",
+      sender: "subcho",
+    },
+    {
+      message: "<system> WONS2님이 게임에 초대했습니다!",
+      type: "invite",
+    },
+    {
+      message: "<<나를 부르는 회사>> 로...",
+      type: "all",
+      sender: "subcho",
+    },
+    {
+      message: "이걸가네",
+      type: "whisper",
+      sender: "게임담당",
+    },
+  ]);
   const chatSocket = useRef(null);
 
   console.log(chatSocket.current);
@@ -44,6 +103,7 @@ const Chat = () => {
     };
     return ws;
   }
+  const chat = document.getElementById("chat");
   const getMessage = (event) => {
     const data = JSON.parse(event.data);
     console.log("chat data :", data);
@@ -53,6 +113,7 @@ const Chat = () => {
 
     // }
     setMessages([...messages, { sender: data.sender, message: data.message }]);
+    chat.scrollTop(chat.prop("scrollHeight"));
   };
 
   //key: inputType
@@ -129,9 +190,6 @@ const Chat = () => {
 
   return (
     <div id="container-chat">
-      <div id="chat-list">
-        <button>전체</button>
-      </div>
       <div id="chat">
         <div id="messages">
           {messages.map((msg, index) => (

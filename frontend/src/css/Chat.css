@@ -6,6 +6,8 @@
   width: 75%;
   height: auto;
   margin: 10px;
+  background-color: rgb(0, 0, 0, 0.7);
+  border-radius: 10px;
 }
 
 #nav-btn-container {
@@ -22,34 +24,19 @@
   height: auto;
 }
 
-#chat-list {
-  width: 100%;
-  width: max-content;
-  margin: 0 10px;
-  padding: 0;
-  gap: 0;
-  display: flex;
-}
-
-#chat-list > button {
-  margin: 0;
-  padding: 0;
-  width: 40px;
-  height: 20px;
-  background-color: rgb(0, 0, 0, 0.8);
-  border-radius: 5px 5px 0 0;
-}
-
 #chat {
   width: 100%;
   height: 300px;
-  background-color: rgb(0, 0, 0, 0.7);
-  border-radius: 10px;
+  overflow: auto;
 }
 .message-container {
   color: white;
   display: flex;
 }
 .nickname {
-  color: rgb(220, 220, 220);
+  color: white;
+}
+
+#chat-label {
+  color: white;
 }

@@ -18,6 +18,7 @@ import "./css/index.css";
 import "./css/friend.css";
 import Test from "./component/Test.js";
 import api from "./core/Api_.js";
+import Navbar from "./component/Navbar.js";
 
 const setAxios = () => {
   axios.defaults.baseURL = "https://localhost/api/";
@@ -54,6 +55,7 @@ const App = () => {
       {/* <Link to="test" id="home"><button>Test</button></Link> */}
       {/* <Link to="api-test" id="home"><button>APITest</button></Link> */}
       {/* <SignUp /> */}
+      <Navbar />
     </div>
   );
 };
