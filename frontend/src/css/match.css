@@ -1,0 +1,29 @@
+#matchbox
+{
+	background-color: rgb(0,0,0,0.8);
+    width: 700px;
+    height: 100%;
+    margin: 10px;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+}
+
+#infobox
+{
+    margin: 5px;
+    width: 50%;
+}
+
+#historybox
+{
+    margin: 5px;
+}
+
+.myInfo {
+    margin: 5px;
+    background-color: aliceblue;
+    color:gray;
+    padding:10px;
+    border-radius: 10px;
+}
