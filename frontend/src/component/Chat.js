@@ -23,6 +23,7 @@ const Chat = () => {
     {
       message: "<system> WONS2님이 게임에 초대했습니다!",
       type: "invite",
+      sender: "<<system>>",
     },
     {
       message: "<<나를 부르는 회사>> 로...",
@@ -50,8 +51,9 @@ const Chat = () => {
       sender: "subcho",
     },
     {
-      message: "<system> WONS2님이 게임에 초대했습니다!",
+      message: "WONS2님이 게임에 초대했습니다!",
       type: "invite",
+      sender: "<<system>>",
     },
     {
       message: "<<나를 부르는 회사>> 로...",
@@ -193,8 +195,8 @@ const Chat = () => {
       <div id="chat">
         <div id="messages">
           {messages.map((msg, index) => (
-            <div key={index} class="message-container">
-              <NicknameModal nickname={msg.sender} />
+            <div key={index} class={msg.type + " message-container"}>
+              <NicknameModal nickname={msg.sender + " : "} />
               <p class="message">{msg.message}</p>
             </div>
           ))}

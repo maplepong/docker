@@ -33,10 +33,16 @@
   color: white;
   display: flex;
 }
-.nickname {
-  color: white;
-}
 
 #chat-label {
   color: white;
+}
+
+.whisper {
+  color: rgb(255, 35, 244);
+}
+
+.system,
+.invite {
+  color: rgb(86, 255, 35);
 }
