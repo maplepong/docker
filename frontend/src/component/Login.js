@@ -43,6 +43,7 @@ const Login = () => {
 		else {
 			alert('otp 확인 완료.')
 			await api.logout()
+			alert('새로 로그인 합니다.')
 			await api.login(getInfo)
 			console.log(response);
 			myReact.redirect("home")
