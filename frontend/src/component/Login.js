@@ -38,15 +38,11 @@ const Login = () => {
 			alert('otp를 다시 확인해주세요')
 		}
 		else {
-			alert('otp 확인 완료')
-			const relogin = await api.login(getInfo)
-			if (relogin.status == 200) {
-				console.log(response);
-				myReact.redirect("home")
-			}
-			else {
-				alert('무언가 오류가 발생했습니다. 다시 시도해주세요.')
-			}
+			alert('otp 확인 완료.')
+			await api.logout()
+			await api.login(getInfo)
+			console.log(response);
+			myReact.redirect("home")
 		}
 	}
 
