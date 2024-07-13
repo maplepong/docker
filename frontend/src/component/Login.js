@@ -34,6 +34,9 @@ const Login = () => {
 		const password = document.querySelector("#input-password").value;
 		const pin = document.querySelector("#input-otp").value
 		const response = await api.otpVerifyPin(username, pin)
+		const getInfo = () => {
+			return ([username, password]);
+		}
 		if (response.status != 200) {
 			alert('otp를 다시 확인해주세요')
 		}
