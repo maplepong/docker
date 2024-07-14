@@ -8,6 +8,6 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        if self.receiver:
+        if self.recipient:
             return f'{self.user.nickname} to {self.receiver.nickname}: {self.content}'
         return f'{self.user.nickname}: {self.content}'
