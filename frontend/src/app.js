@@ -41,11 +41,9 @@ const App = () => {
   return (
     <div class="app">
       <Link to="">
-        <img style={"width:500px"} src="./asset/design/maplepong.png"></img>
+        <img id="bg"></img>
       </Link>
-
       <Login />
-
       {/* <button id="btn-nav-logout" onclick={() => {api.logout()}}>로그아웃</button> */}
       {/* <FriendList /> */}
       {/* <RequestFriend /> */}

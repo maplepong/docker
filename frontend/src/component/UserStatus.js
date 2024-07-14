@@ -4,11 +4,14 @@ import myReact from "../core/myReact.js";
 import '../css/UserStatus.css';
 
 const UserStatus = (props) => {
-	return <div id="container-UserStatus">
+	return ( 
+		<div id="container-UserStatus">
 			<div id="info-line">
-				<div class="level">level</div>
-				<div class="level">42</div>
-				<div class="usernickname">{localStorage.nickname}</div>
+				<div id="info" style="flex-direction: column;">
+					<div class="usernickname">{localStorage.nickname}</div>
+					<div class="level">level 42</div>
+				</div>
+				<img id="statImage" src={props.data.image} style="margin-left:5px; margin-right:5px;"></img>
 			</div>
 			<div class="status-line" style="background-color: #f1f1f1">
 				<div id="stat-name">핑퐁 승률</div>
@@ -25,6 +28,7 @@ const UserStatus = (props) => {
 				</div>
 			</div>
 		</div>
+	)
 }
 
 export default UserStatus;

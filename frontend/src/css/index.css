@@ -289,3 +289,10 @@ nav {
 .hidden {
   display: none;
 }
+
+#bg {
+  background-image: url("../../public/asset/design/maplepong.png");
+  background-size: 100%;
+  width: 500px;
+  height: 500px;
+}

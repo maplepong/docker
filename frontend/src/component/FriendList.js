@@ -9,7 +9,7 @@ import RequestFriend from "./RequestFriend.js";
 
 const FriendList = (props) => {
   return (
-    <div id="box">
+    <div id="box" style="margin: 15px;">
       <span id="manage">친구 관리</span>
       <RequestFriend />
       <hr className="line" />
