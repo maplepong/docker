@@ -15,5 +15,5 @@ urlpatterns = [
     path("invite", views.invite, name="invite"),
     path("invite-list", views.game_invite_list),
     path("react-invite", views.game_request),
-    path("update_game_result/<int:game_id>/<str:winner_nickname>/<str:loser_nickname>", views.update_game_result),
+    path("update_game_result", views.update_game_result),
 ]
