@@ -13,7 +13,7 @@ const Tournament = (props) => {
                 <div style="display: block;">
                     <div style="display:flex; justify-content: space-between;">
                             <span class="users">
-                                <img src="../csss/img/logo.png"></img>
+                                <img src="../css/img/logo.png"></img>
                                 <p>1번 유저</p>
                             </span>
                             <span class="users">

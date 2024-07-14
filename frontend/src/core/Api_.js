@@ -453,7 +453,7 @@ const api = {
         })
         .then((response) => {
           console.log("사진을 올렸다");
-          return response.status;
+          return response;
         })
         .catch((error) => {
           console.log("사진을 올리지 못했다...");
