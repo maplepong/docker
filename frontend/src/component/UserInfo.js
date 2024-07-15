@@ -37,17 +37,12 @@ const UserInfo = (props) => {
         fetchData();
     }, []);
 
-	function patchInfo(flag) {
-		var patchBox = document.querySelectorAll(".infoPatchBox");
-		console.log(patchBox);
-		if (patchBox[flag - 1].style.display === "block")
-			patchBox[flag - 1].style.display = "none";
-		else
-			patchBox[flag - 1].style.display = "block";
-	}
+	// function patchInfo() {
+	// 	var patchBox = document.querySelector(".infoPatchBox");
+	// 	patchBox.style.display = "block";
+	// }
 
 	async function changeInfo(flag) {
-		var patchBox = document.querySelectorAll(".infoPatchBox");
 		if (flag === 1) {
 			var introError = document.querySelector("#intro-error")
 			var newIntro = document.querySelector("#newIntro").value
@@ -66,15 +61,14 @@ const UserInfo = (props) => {
 			}
 			var response = await api.patchUserInfomation(flag, newNick);
 		} 
-		patchBox[flag - 1].style.display = "none";
 		setData(response)
 	}
 
-	async function changeImage() {
-		console.log("이미지를 바꿔볼거에요")
-	}
-
 	const onFileChange = (e) => {
+		if (!e)
+			console.log("이미지에 문제가잇수")
+		else
+			console.log(e)
 		const {
 			target: {files},
 		} = e;
@@ -85,6 +79,7 @@ const UserInfo = (props) => {
 	async function patchImage(FILE){
 		const del = await api.userImage("DELETE")
 		console.log("del", del);
+		console.log(FILE)
 		const post = await api.userImage("POST", FILE)
 		console.log("post", post);
 		setData({...data, image : post.data.image});
@@ -92,14 +87,83 @@ const UserInfo = (props) => {
 
 	return (
 		<div style="display:flex;">
-			<div id="container-myinfo" class="modal">
+			<div id="container-myinfo">
 				<div id="myinfo-headline">
 					<p>내정보</p>
 					<button>X</button>
 				</div>
+
+				<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">새로운 자기소개를 입력해주세요.</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						적절한 자기소개를 입력해 주세요.
+						이전 자기소개와 동일하거나, 빈 자기소개는 안돼요.
+					</div>
+					<input id="newIntro"></input>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick={() => changeInfo(1)}> Save changes</button>
+					</div>
+					</div>
+				</div>
+				</div>
+
+				<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">새로운 닉네임을 알려주세요.</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						적절한 닉네임을 입력해 주세요.
+						이전 닉네임과 동일하거나, 빈 닉네임은 안돼요.
+					</div>
+					<input id="newNickname"></input>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick={() => changeInfo(2)}> Save changes</button>
+					</div>
+					</div>
+				</div>
+				</div>
+
+				<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">새로운 이미지를 업로드 해주세요.</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						파일을 업로드하면 이미지가 변경됩니다.
+					</div>
+						<input type="file" accept="image/*" id="testUpload" onchange={onFileChange}></input>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						{/* <button type="button" class="btn btn-primary" onclick={onFileChange}> Save changes</button> */}
+					</div>
+					</div>
+				</div>
+				</div>
+
 				<div id="myinfo-body" onclick={() => console.log(data)}>
 					<img id="myinfo-img" src={data.image}></img>
-					<button onclick={() => patchInfo(3)}>이미지 변경</button>
+					{/* <button onclick={() => patchInfo()}>이미지 변경</button> */}
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal3">
+							이미지 변경
+					</button>
 					<ul id="info-body">
 						<li>
 							<span> id </span>
@@ -108,7 +172,9 @@ const UserInfo = (props) => {
 						<li>
 							<span> introduction </span>
 							<span> {data.introduction} </span>
-							<button onclick={() => patchInfo(1)}>변경</button>
+							<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal1">
+  								변경
+							</button>
 						</li>
 						<li>
 							<span> lose </span>
@@ -117,7 +183,9 @@ const UserInfo = (props) => {
 						<li>
 							<span> nickname </span>
 							<span> {data.nickname} </span>
-							<button onclick={() => patchInfo(2)}>변경</button>
+							<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">
+								변경
+							</button>
 						</li>
 						<li>
 							<span> totalgame </span>
@@ -143,25 +211,7 @@ const UserInfo = (props) => {
 					</ul>
 				</div>
 			</div>
-			<div id="patchBox">
-				<div class="infoPatchBox">
-					<p>수정할 자기소개를 알려주세요.</p>
-					<p id="intro-error">
-						적절한 자기소개를 입력해 주세요.
-						이전 자기소개와 동일하거나, 빈 자기소개는 안돼요.
-					</p>
-					<input id="newIntro"></input>
-					<button onclick={() => changeInfo(1)}>변경</button>
-				</div>
-				<div class="infoPatchBox">
-					<p>수정할 닉네임을 알려주세요.</p>
-					<p id="nick-error">
-						적절한 닉네임을 입력해 주세요.
-						이전 닉네임과 동일하거나, 빈 닉네임은 안돼요.
-					</p>
-					<input id="newNickname"></input>
-					<button onclick={() => changeInfo(2)}>변경</button>
-				</div>
+			{/* <div id="patchBox">
 				<div class="infoPatchBox">
 					<p>이미지를 업로드 해주세요.</p>
 					<p>파일을 선택하면 이미지가 변경됩니다.</p>
@@ -169,7 +219,7 @@ const UserInfo = (props) => {
 						<input type="file" accept="image/*"  id="testUpload" onchange={onFileChange}></input>
 					</div>
 				</div>
-			</div>
+			</div> */}
 			<Matchhistory data={data}/>
 		</div>
 	)

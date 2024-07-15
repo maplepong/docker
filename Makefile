@@ -9,16 +9,16 @@ $(BUILD) :
 
 $(NAME) :
 	cd frontend && npm run build
-	sudo docker compose  up --build #--detach 
+	docker compose  up --build #--detach 
 
 clean :
-	sudo docker compose  down --rmi all --remove-orphans -v
+	docker compose  down --rmi all --remove-orphans -v
 
 ps		: 
-	sudo docker compose ps -a
+	docker compose ps -a
 
 fclean : clean
-	sudo docker system prune --volumes --all --force
+	docker system prune --volumes --all --force
 
 re : fclean all
 

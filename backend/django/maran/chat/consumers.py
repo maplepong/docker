@@ -425,11 +425,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 'receiver': sender.nickname
                                 }))
                             else:
+                                await self.send(text_data=json.dumps({
+                                'message': "성공적으로 초대를 전송했습니다.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
                                 await self.channel_layer.send(
                                     receiver_channel_name.decode('utf-8'),
                                     {
                                         'type': 'invite_message',
                                         'sender': sender.nickname,
+                                        'receiver' : receiver.nickname,
                                         'gameId': gameId
                                     }
                                 )
@@ -521,3 +528,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender': sender,
             'gameId': gameId
         }))
+        
+

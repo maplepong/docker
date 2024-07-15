@@ -42,15 +42,6 @@ from django.core.files.base import ContentFile
 
 logger = logging.getLogger("django")
 
-
-@api_view(["GET, POST"])
-def test(request):
-    if request.method == "GET":
-        response = Response("get_test")
-    elif request.method == "POST":
-        response = Response(request.data)
-    return response
-
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
@@ -216,6 +207,10 @@ def signup(request):
     username = request.data.get("username")
     password = request.data.get("password")
     nickname = request.data.get("nickname")
+
+    if nickname.upper() == "SYSTEM" or nickname.upper() == "ADMIN":
+        return Response({"error": "Invalid nickname"}, status=400)
+
     email = request.data.get("email")
     hashed_id = hashlib.sha256(username.encode()).hexdigest()
 
@@ -242,7 +237,7 @@ def signup(request):
 def userinfo(request):
     if request.method == "GET":
         nickname = request.GET.get("nickname")
-        user = User.objects.get(nickname=nickname)
+        user = request.user
         if not user:
             return Response({"error": "Invalid credentials"}, status=400)
         return Response(user.serialize())
@@ -253,6 +248,8 @@ def userinfo(request):
         if nickname is None and introduction is None:
             return Response({"error": "Invalid credentials"}, status=400)
         if nickname:
+            if nickname.upper() == "SYSTEM" or nickname.upper() == "ADMIN":
+                return Response({"error": "Invalid nickname"}, status=400)
             if User.objects.filter(nickname=nickname).exists():
                 return Response({"error": "Conflict"}, status=409)
             request.user.nickname = nickname
