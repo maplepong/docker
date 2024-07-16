@@ -69,7 +69,16 @@ const Tournament = (props) => {
     };
 
     const onPlayerLeft = (data) => {
-        setPlayers((prevPlayers) => prevPlayers.filter(player => player !== data.nickname));
+        setPlayers((prevPlayers) => {
+            const newPlayers = prevPlayers.filter(player => player !== data.nickname);
+            if (data.nickname === host && newPlayers.length > 0) {
+                // 방장이 나갔을 경우 새로운 방장을 랜덤으로 선정
+                const newHost = newPlayers[Math.floor(Math.random() * newPlayers.length)];
+                setHost(newHost);
+                console.log(`New host is: ${newHost}`);
+            }
+            return newPlayers;
+        });
     };
 
     const onRoomFull = (data) => {
