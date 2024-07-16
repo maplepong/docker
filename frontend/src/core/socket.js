@@ -36,7 +36,7 @@ const SocketController = () => {
     // 무조건 타입 필요
     sendMessage: function sendMessage({ type, ...rest }) {
       if (this._ws.current && this._ws.current.readyState === WebSocket.OPEN) {
-        console.log("sending data", type, ...rest);
+        // console.log("sending data", type, ...rest);
         if (!type) return console.error("type이 없습니다.");
         const data = {
           type: type,
@@ -53,6 +53,7 @@ const SocketController = () => {
     // 첫 사용을 위한 연결
     // 이미 연결되어있으면 리턴
     initSocket: function initSocket() {
+      console.log("initSocket", this._ws.current);
       if (this._ws.current) return this._ws.current; // 이미 연결되어있으면 리턴
       this._ws.current = new WebSocket(`wss://localhost:443/ws/socket/`, [
         "token",

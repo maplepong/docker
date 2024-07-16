@@ -6,7 +6,7 @@ import { requestGameInfo, requestExitGame } from "../core/ApiGame.js";
 import "../css/GameRoom.css";
 import "../css/Pingpong.css";
 import PingPong from "./Game.js";
-import Chat from "./Chat.js";
+import SocketController from "../core/socket";
 
 const GameRoom = () => {
   const [ready, setReady] = useState(false);
@@ -25,8 +25,21 @@ const GameRoom = () => {
     player_info: {},
   });
 
+  const sendGameInvite = (gameId, nickname) => {
+    const data = {
+      type: "invite",
+      gameId: gameId,
+      message: "테스트입니다.",
+      receiver: nickname,
+    };
+    console.log(data);
+    SocketController.sendMessage(data);
+  };
+
   useEffect(() => {
     const fetchGameInfo = async () => {
+      SocketController.initSocket();
+
       const path = window.location.pathname;
       const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
 
@@ -202,7 +215,11 @@ const GameRoom = () => {
                     class="strbtn"
                     onClick={startGame}
                   ></input>
-                  <input type="button" class="invbtn"></input>
+                  <input
+                    type="button"
+                    class="invbtn"
+                    onClick={() => sendGameInvite(gameInfo.id, "milky")}
+                  ></input>
                 </div>
               ) : (
                 <span>아무거또 모태</span>
