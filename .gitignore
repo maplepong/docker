@@ -1,1 +1,7 @@
 frontend/node_modules
+
+anima*
+
+frontend/dist
+*frontend/dist
+*frontend/dist/*
