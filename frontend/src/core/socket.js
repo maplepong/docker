@@ -1,6 +1,3 @@
-import myReact from "./myReact";
-import { useEffect, useRef } from "./myReact";
-
 const SocketController = () => {
   return {
     // socket을 init할 함수
@@ -35,12 +32,14 @@ const SocketController = () => {
       console.error("ws 메시지를 받았으나 알 수 없는 타입입니다.", data);
     },
 
-    sendMessage: function sendMessage({ type, message, ...rest }) {
+    // 메시지를 보내는 함수
+    // 무조건 타입 필요
+    sendMessage: function sendMessage({ type, ...rest }) {
       if (this._ws.current && this._ws.current.readyState === WebSocket.OPEN) {
-        console.log(type, message);
+        console.log("sending data", type, ...rest);
+        if (!type) return console.error("type이 없습니다.");
         const data = {
           type: type,
-          message: message,
           sender: localStorage.getItem("nickname"),
           ...rest,
         };
