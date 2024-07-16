@@ -54,7 +54,7 @@ const SocketController = () => {
     // 첫 사용을 위한 연결
     // 이미 연결되어있으면 리턴
     initSocket: function initSocket() {
-      console.log("initSocket", this._ws.current);
+      // console.log("initSocket", this._ws.current);
       if (this._ws.current) return this._ws.current; // 이미 연결되어있으면 리턴
       this._ws.current = new WebSocket(`wss://localhost:443/ws/socket/`, [
         "token",
