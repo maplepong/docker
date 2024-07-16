@@ -3,36 +3,9 @@ import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
 import "../css/Chat.css";
 import NicknameModal from "./NicknameModal.js";
 import socketController from "../core/socket.js";
-import socket from "../core/socket.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([
-    {
-      message: "방가방가^^",
-      type: "all",
-      sender: "시우리",
-    },
-    {
-      message: "하이루 - 오늘뭐함",
-      type: "all",
-      sender: "교park",
-    },
-    {
-      message: "즐겜;; 가야겠다",
-      type: "all",
-      sender: "subcho",
-    },
-    {
-      message: "<system> WONS2님이 게임에 초대했습니다!",
-      type: "invite",
-      sender: "<<system>>",
-    },
-    {
-      message: "<<나를 부르는 회사>> 로...",
-      type: "all",
-      sender: "subcho",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
