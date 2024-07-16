@@ -3,6 +3,7 @@ import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
 import "../css/Chat.css";
 import NicknameModal from "./NicknameModal.js";
 import socketController from "../core/socket.js";
+import socket from "../core/socket.js";
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -32,7 +33,6 @@ const Chat = () => {
       sender: "subcho",
     },
   ]);
-  const chatSocket = null;
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -41,7 +41,7 @@ const Chat = () => {
       ...messages,
       { type: data.type, sender: data.sender, message: data.message },
     ]);
-    chat.scrollTop(chat.prop("scrollHeight"));
+    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
@@ -59,7 +59,7 @@ const Chat = () => {
         message: `초대 메시지 : ${data.message}`,
       },
     ]);
-    chat.scrollTop(chat.prop("scrollHeight"));
+    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
   const onMessageConnect = (data) => {
     const chat = document.getElementById("chat");
@@ -71,7 +71,7 @@ const Chat = () => {
         message: `접속되었습니다. 현재 친구들 : ${data.friends}`,
       },
     ]);
-    chat.scrollTop(chat.prop("scrollHeight"));
+    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
   const onMessageUpdate = (data) => {
     const chat = document.getElementById("chat");
@@ -85,15 +85,13 @@ const Chat = () => {
         }하셨습니다.`,
       },
     ]);
-    chat.scrollTop(chat.prop("scrollHeight"));
+    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
 
   useEffect(() => {
-    if (!chatSocket) {
-      chatSocket = socketController.initSocket();
-    }
+    socketController.initSocket();
     socketController.setSocketTypes([
-      { type: "chat", func: onMessageDefault },
+      { type: "all", func: onMessageDefault },
       { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
       { type: "connect", func: onMessageConnect },
@@ -153,26 +151,16 @@ const Chat = () => {
   };
 
   const sendMessage = (message) => {
-    if (
-      chatSocket.current &&
-      chatSocket.current.readyState === WebSocket.OPEN
-    ) {
-      console.log(msgTypeList[msgType], message);
-      const data = {
-        type: msgTypeList[msgType].sendtype,
-        message: message,
-        sender: localStorage.getItem("nickname"),
-      };
-      if (msgType === "/w") {
-        data.receiver = whisperTarget;
-      }
-      chatSocket.current.send(JSON.stringify(data));
-      chatSocket.current.onmessage = (event) => getMessage(event);
-    } else {
-      alert("socket이 연결되지 않았습니다.");
+    const data = {
+      type: msgTypeList[msgType].sendtype,
+      message: message,
+      sender: localStorage.getItem("nickname"),
+    };
+    if (msgType === "/w") {
+      data.receiver = whisperTarget;
     }
+    socketController.sendMessage(data);
   };
-  console.log(messages);
 
   return (
     <div id="container-chat">
