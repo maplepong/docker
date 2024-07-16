@@ -2,6 +2,7 @@
 import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
 import "../css/Chat.css";
 import NicknameModal from "./NicknameModal.js";
+import socketController from "../core/socket.js";
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -30,95 +31,78 @@ const Chat = () => {
       type: "all",
       sender: "subcho",
     },
-    {
-      message: "이걸가네",
-      type: "whisper",
-      sender: "게임담당",
-    },
-    {
-      message: "방가방가^^",
-      type: "all",
-      sender: "시우리",
-    },
-    {
-      message: "하이루 - 오늘뭐함",
-      type: "all",
-      sender: "교park",
-    },
-    {
-      message: "즐겜;; 가야겠다",
-      type: "all",
-      sender: "subcho",
-    },
-    {
-      message: "WONS2님이 게임에 초대했습니다!",
-      type: "invite",
-      sender: "<<system>>",
-    },
-    {
-      message: "<<나를 부르는 회사>> 로...",
-      type: "all",
-      sender: "subcho",
-    },
-    {
-      message: "이걸가네",
-      type: "whisper",
-      sender: "게임담당",
-    },
   ]);
-  const chatSocket = useRef(null);
+  const chatSocket = null;
 
-  console.log(chatSocket.current);
-  useEffect(() => {
-    console.log(chatSocket.current);
-    if (!chatSocket.current) chatSocket.current = initSocket();
-    else {
-      chatSocket.current.onmessage = (event) => getMessage(event);
-    }
-    return () => {
-      if (chatSocket.current) {
-        chatSocket.current.close();
-        chatSocket.current = null;
-      }
-    };
-  });
-
-  function initSocket() {
-    var ws = new WebSocket(`wss://localhost:443/ws/socket/`, [
-      "token",
-      localStorage.getItem("accessToken"),
-    ]);
-    ws.onopen = () => {
-      console.log("chat socket opened");
-      ws.send(
-        JSON.stringify({
-          type: "connect",
-          message: "chat connected",
-          sender: localStorage.getItem("nickname"),
-        })
-      );
-    };
-    ws.onmessage = (event) => getMessage(event);
-    ws.onclose = () => {
-      console.log("채팅 연결 종료");
-      ws = null;
-    };
-    return ws;
-  }
-  const chat = document.getElementById("chat");
-  const getMessage = (event) => {
-    const data = JSON.parse(event.data);
+  const onMessageDefault = (data) => {
+    const chat = document.getElementById("chat");
     console.log("chat data :", data);
-    // 귓속말 / 전체 채팅 / 초대  / 친구 접속 상태 받기 요청 (접속자 → 서버) / 친구 접속 상태 업데이트 (서버 → 다수)
-    // if !(data.type) return console.error("ws data type이 없습니다.");
-    // switch (data.type) {
-
-    // }
-    setMessages([...messages, { sender: data.sender, message: data.message }]);
+    setMessages([
+      ...messages,
+      { type: data.type, sender: data.sender, message: data.message },
+    ]);
+    chat.scrollTop(chat.prop("scrollHeight"));
+  };
+  const onMessageInvite = (data) => {
+    const chat = document.getElementById("chat");
+    console.log("chat data :", data);
+    setMessages([
+      ...messages,
+      {
+        sender: "system",
+        gameId: data.gameId,
+        message: `${data.sender} 님이 게임에 초대하셨습니다.`,
+      },
+      {
+        sender: "system",
+        gameId: data.gameId,
+        message: `초대 메시지 : ${data.message}`,
+      },
+    ]);
+    chat.scrollTop(chat.prop("scrollHeight"));
+  };
+  const onMessageConnect = (data) => {
+    const chat = document.getElementById("chat");
+    console.log("chat data :", data);
+    setMessages([
+      ...messages,
+      {
+        sender: "system",
+        message: `접속되었습니다. 현재 친구들 : ${data.friends}`,
+      },
+    ]);
+    chat.scrollTop(chat.prop("scrollHeight"));
+  };
+  const onMessageUpdate = (data) => {
+    const chat = document.getElementById("chat");
+    console.log("chat data :", data);
+    setMessages([
+      ...messages,
+      {
+        sender: "system",
+        message: `${data.sender} 님이 ${
+          data.status === "on" ? "접속" : "접속종료"
+        }하셨습니다.`,
+      },
+    ]);
     chat.scrollTop(chat.prop("scrollHeight"));
   };
 
-  //key: inputType
+  useEffect(() => {
+    if (!chatSocket) {
+      chatSocket = socketController.initSocket();
+    }
+    socketController.setSocketTypes([
+      { type: "chat", func: onMessageDefault },
+      { type: "whisper", func: onMessageDefault },
+      { type: "invite", func: onMessageInvite },
+      { type: "connect", func: onMessageConnect },
+      { type: "update", func: onMessageUpdate },
+    ]);
+  });
+
+  // key: inputType
+  // for send
   const msgTypeList = {
     "/all": { showtype: "<전체>", sendtype: "all" },
     "/w": { showtype: "<귓속말>", sendtype: "whisper" },

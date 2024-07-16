@@ -53,7 +53,6 @@ const App = () => {
       {/* <Link to="test" id="home"><button>Test</button></Link> */}
       {/* <Link to="api-test" id="home"><button>APITest</button></Link> */}
       {/* <SignUp /> */}
-      <Navbar />
     </div>
   );
 };
