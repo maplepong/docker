@@ -131,13 +131,15 @@ function createMyReact() {
         console.error("redirect err: no path");
         return;
       } else if (param === "/") {
-        param = "";
+        param = location.origin;
+      } else {
+        param = location.origin + "/" + param;
       }
-      var path;
-      if (param !== "/") path = "/" + param;
-      else path = "/";
-      console.log("redirect call", path);
-      history.pushState({}, "", path);
+      // if (param !== "/") path = "/" + param;
+      // else path = "/";
+      // path = location.origin + path;
+      console.log("redirect call", param);
+      history.pushState({}, "", param);
       router();
     },
   };

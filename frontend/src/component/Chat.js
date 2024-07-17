@@ -3,9 +3,27 @@ import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
 import "../css/Chat.css";
 import NicknameModal from "./NicknameModal.js";
 import socketController from "../core/socket.js";
+import { requestJoinGame } from "../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      sender: "system",
+      type: "invite",
+      gameId: 3,
+      message: "초대 메시지 : 테스트",
+    },
+    {
+      sender: "milky",
+      type: "all",
+      message: "안녕하세요",
+    },
+    {
+      sender: "milky",
+      type: "all",
+      message: "안녕하세요",
+    },
+  ]);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -23,11 +41,12 @@ const Chat = () => {
       ...messages,
       {
         sender: "system",
-        gameId: data.gameId,
+        type: "invite",
         message: `${data.sender} 님이 게임에 초대하셨습니다.`,
       },
       {
         sender: "system",
+        type: "invite",
         gameId: data.gameId,
         message: `초대 메시지 : ${data.message}`,
       },
@@ -65,7 +84,7 @@ const Chat = () => {
     socketController.initSocket();
     socketController.setSocketTypes([
       { type: "all", func: onMessageDefault },
-      { type: "whisper", func: onMessageDefault },
+      // { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
       { type: "connect", func: onMessageConnect },
       { type: "update", func: onMessageUpdate },
@@ -135,14 +154,36 @@ const Chat = () => {
     socketController.sendMessage(data);
   };
 
+  async function enterGame(gameId) {
+    const res = await requestJoinGame(gameId, null);
+    if (res.status === 201) {
+      myReact.redirect(`gameroom/${gameId}`);
+    } else alert("방 진입에 문제가 있습니다.");
+  }
+
   return (
     <div id="container-chat">
       <div id="chat">
         <div id="messages">
           {messages.map((msg, index) => (
             <div key={index} class={msg.type + " message-container"}>
-              <NicknameModal nickname={msg.sender + " : "} />
-              <p class="message">{msg.message}</p>
+              <div class="chat-line">
+                <NicknameModal nickname={msg.sender + " : "} />
+                <p class="message">{msg.message}</p>
+              </div>
+              {msg.type === "invite" && msg.gameId ? (
+                <button
+                  class="acceptBtn"
+                  onclick={() => {
+                    enterGame(msg.gameId);
+                  }}
+                >
+                  {" "}
+                  초대 수락하기
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           ))}
         </div>

@@ -3,11 +3,14 @@
 }
 
 #container-chat {
-  width: 50%;
+  width: 100%;
   height: auto;
   margin: 10px;
   background-color: rgb(0, 0, 0, 0.7);
   border-radius: 10px;
+  font-size: 1rem;
+  padding: 10px;
+  font-family: "Ramche";
 }
 
 #nav-btn-container {
@@ -32,6 +35,22 @@
 .message-container {
   color: white;
   display: flex;
+  align-items: center;
+  display: inline-block;
+  width: 100%;
+  word-break: keep-all;
+}
+.chat-line {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  line-height: 1;
+  margin-bottom: 0;
 }
 
 #chat-label {
@@ -45,4 +64,15 @@
 .system,
 .invite {
   color: rgb(86, 255, 35);
+}
+
+.acceptBtn {
+  display: inline-flex;
+  padding: 4px 7px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: #ffa2a2;
+  margin-left: 10px;
+  margin: 0;
 }
