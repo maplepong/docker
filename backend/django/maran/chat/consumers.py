@@ -284,6 +284,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 from django.conf import settings
 from user.models import User
+from game.models import Game
 from .models import Message
 from rest_framework_simplejwt.tokens import AccessToken
 from asgiref.sync import sync_to_async
@@ -417,7 +418,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 'whisper': True,
                                 'receiver': sender.nickname
                                 }))
-                            elif game.players.count() == 2:
+                            elif await sync_to_async(game.players.count)() >= 2:
                                 await self.send(text_data=json.dumps({
                                 'message': "Game is already full.",
                                 'sender': 'system',
