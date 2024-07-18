@@ -86,8 +86,8 @@ const Chat = () => {
       { type: "all", func: onMessageDefault },
       // { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
-      { type: "connect", func: onMessageConnect },
-      { type: "update", func: onMessageUpdate },
+      // { type: "connect", func: onMessageConnect },
+      // { type: "update", func: onMessageUpdate },
     ]);
   });
 
