@@ -549,4 +549,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_user_friends(self, nickname):
         user = User.objects.get(nickname=nickname)
-        return list(user.friends.all().values('nickname', 'is_online'))
+        friends = list(user.friends.all().values('nickname', 'is_online'))
+        friends_list = [{'nickname': friend['nickname'], 'status': friend['is_online']} for friend in friends]
+        return friends_list
