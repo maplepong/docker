@@ -48,7 +48,7 @@ services:
       - ./frontend:/app
     command: sh -c "npm install && npm run dev"
     ports:
-      - "8080:8080"
+      - "5050:5050"
     networks:
       - internal
 

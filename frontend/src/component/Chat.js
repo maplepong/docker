@@ -23,6 +23,11 @@ const Chat = () => {
       type: "all",
       message: "안녕하세요",
     },
+    {
+      sender: "milky",
+      type: "all",
+      message: "안녕sdff하세요",
+    },
   ]);
 
   const onMessageDefault = (data) => {
