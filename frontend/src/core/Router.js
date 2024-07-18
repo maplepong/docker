@@ -11,15 +11,15 @@ import UserInfoPage from "../component/UserInfoPage.js";
 import ApiLogin from "../component/ApiLogin.js";
 import SignUp from "../component/SignUp.js";
 import ApiSignUp from "../component/ApiSignUp.js";
-import Game from "../component/Game.js";
+import Game from "../component/Game/PlayingGame.js";
 import Navbar from "../component/Navbar.js";
 import Test from "../component/Test";
 import ApiTest from "../component/ApiTest";
 import Lobby from "../component/Lobby.js";
 import FriendList from "../component/FriendList";
 import UserInfo from "../component/UserInfo";
-import GameRoom from "../component/GameRoom";
-import PingPong from "../component/Game.js";
+import GameRoom from "../component/Game/GameRoom.js";
+import PingPong from "../component/Game/PlayingGame.js";
 import Tournament from "../component/Tournament.js";
 
 const pathList = {
