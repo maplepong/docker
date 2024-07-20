@@ -18,27 +18,20 @@ const Navbar = () => {
 		image: "",
 		email: "",
 	});
-	
-	const [list, setList] = useState({
-		sends: [],
-		receives: [],
-	});
-	
-	const [friendlist, setFriendList] = useState([]);
-	
-	useEffect(() => {
-			const fetchData = async () => {
-			const response = await api.getUserInfomation(localStorage.nickname);
-			const friendRequests = await api.getRequestFriendList();
-			const friends = await api.getFriendList();
 
-			setList(friendRequests);
-			setFriendList(friends);
+  useEffect(() => {
+    const fetchData = async () => {
+			const response = await api.getUserInfomation(localStorage.nickname);
+			// const friendRequests = await api.getRequestFriendList();
+			// const friends = await api.getFriendList();
+
+			// setList(friendRequests);
+			// setFriendList(friends);
 			setData(response);
 		};
 		fetchData();
-	}, []);
-
+  }, []);
+	
 	return (<nav>
 		<Chat socket={null}></Chat>
 		{/* <div id="btn-box"> */}
@@ -47,7 +40,7 @@ const Navbar = () => {
 			{/* </div> */}
 		{/* </div> */}
 		<div style="display: flex; flex-direction: row; width: 100%; height: auto;">
-			<FriendList list={list} friendlist={friendlist} />
+			<FriendList/>
 			<div style="flex-direction: column; margin: 5px;">
 				<UserStatus data={data} />
 				<div style="display: flex;">

@@ -27,7 +27,7 @@ function addEvent(target, eventType, selector, callback) {
 }
 
 function createDOM(fNode) {
-  if (typeof fNode === "string" || typeof fNode === "number") {
+  if (typeof fNode === "string" || typeof fNode === "number" || typeof fNode === "boolean") {
     const node = document.createTextNode(fNode);
     return node;
   }
