@@ -4,7 +4,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: dev-Dockerfile
     ports:
       - "443:443"
     depends_on:
@@ -48,7 +48,7 @@ services:
       - ./frontend:/app
     command: sh -c "npm install && npm run dev"
     ports:
-      - "5050:5050"
+      - "8080:8080"
     networks:
       - internal
 

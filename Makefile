@@ -2,29 +2,31 @@ NAME	= maran
 
 COMPOSEFILE = ./docker-compose.yml
 
+FILE = $(COMPOSEFILE)
+
 all		: $(BUILD) $(NAME)
+
+dev : FILE = ./docker-compose.dev.yml
+dev : $(NAME)
 
 $(BUILD) :
 	cd frontend && npm run build
 
 $(NAME) :
 	cd frontend && npm run build
-	docker compose  up --build #--detach 
+	docker compose -f $(FILE) up --build #--detach 
 
 clean :
-	docker compose  down --rmi all --remove-orphans -v
+	docker compose -f $(FILE)  down --rmi all --remove-orphans -v
 
 ps		: 
-	docker compose ps -a
+	docker compose -f $(FILE) ps -a
 
 fclean : clean
 	docker system prune --volumes --all --force
 
 re : fclean all
 
-fe :
-	docker kill docker-frontend-1
 
 
-
-.PHONY	:	all remove ps
+.PHONY	:	all ps dev clean fclean re
