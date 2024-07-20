@@ -1,11 +1,11 @@
 .nicknameContainer {
   display: flex;
   gap: 20px;
-  height: 20px;
+  height: 100%;
   /* width: max-content; */
   padding: 5px;
   position: relative;
-  align-items: first baseline;
+  align-items: center;
 }
 
 .hovermenu {
@@ -16,6 +16,7 @@
   box-shadow: 2px 2px 3px black;
   padding: 5px 10px;
   width: max-content;
+  display: ;
   z-index: 3000;
   position: absolute;
 }
@@ -27,4 +28,6 @@ ul {
 }
 .nickname {
   position: static;
+  align-self: center;
+  margin-bottom: 0;
 }

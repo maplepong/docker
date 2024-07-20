@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 //not import: it's node
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require("webpack");
 // ...
 
 module.exports = {
@@ -13,10 +14,20 @@ module.exports = {
     //2출력
     path: path.resolve(__dirname, "dist"), //__dirname: 현재위치
     filename: "bundle.js",
+    publicPath: "/",
   },
   devServer: {
     compress: false,
-    port: 5050,
+    // port: 5050,
+    // contentBase: path.join(__dirname, "dist"),
+    hot: true,
+    port: 8080,
+    watchFiles: "./src",
+    // publicPath: "/", //option err
+    historyApiFallback: true,
+    //valid  object { allowedHosts?, bonjour?, client?, compress?, devMiddleware?, headers?,
+    // historyApiFallback?, host?, hot?, ipc?, liveReload?, onListening?, open?, port?, proxy?,
+    // server?, setupExitSignals?, setupMiddlewares?, static?, watchFiles?, webSocketServer? }
   },
   module: {
     //3트랜스파일러
@@ -43,5 +54,6 @@ module.exports = {
       title: "none",
       template: "./index.html",
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 };

@@ -200,17 +200,14 @@ function createMyReactDOM() {
       this.rootNode.appendChild(this.DOM);
       addEvent(this.rootNode, "click", "a", ({ target }) => {
         const route = target.closest("a").getAttribute("href");
-        console.log("routing?", route);
         if (typeof route === "string") {
           const newPath = "/" + route;
-          console.log(newPath);
           history.pushState({}, "", newPath);
           router();
         }
       });
     },
     updateDOM: function updateDOM(newFiberRoot) {
-      // //console.log("HEEHEH", newFiberRoot);
       diffDom(this.rootNode, newFiberRoot, this.fiberRoot, 0);
       this.fiberRoot = newFiberRoot;
     },

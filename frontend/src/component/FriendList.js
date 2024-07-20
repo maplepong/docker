@@ -6,8 +6,25 @@ import api from "../core/Api_.js";
 import NicknameModal from "./NicknameModal.js";
 import RequestFriend from "./RequestFriend.js";
 // import { requestFriendList } from "../core/Api.js";
+import SocketController from "../core/socket";
 
 const FriendList = (props) => {
+  const onConnect = (data) => {
+    console.log("ws connnected data :", data);
+  };
+  const onUpdate = (data) => {
+    console.log("ws update data :", data);
+  };
+
+  SocketController.setSocketTypes([
+    { type: "connect", func: onConnect },
+    { type: "update", func: onUpdate },
+  ]);
+
+  useEffect(() => {
+    SocketController.initSocket();
+  }, []);
+
   return (
     <div id="box" style="margin: 15px;">
       <span id="manage">친구 관리</span>
