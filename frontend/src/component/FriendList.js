@@ -25,6 +25,9 @@ const FriendList = (props) => {
   };
   const onUpdate = (data) => {
     console.log("ws update data :", data);
+    data.status = data.status === "on" ? true : false;
+    friendlist.forEach((friend) =>{data.sender === friend.nickname ? friend.status = data.status : null});
+    setFriendList([...friendlist]);
   };
 
   socketController.setSocketTypes([

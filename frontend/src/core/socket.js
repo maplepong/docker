@@ -78,8 +78,39 @@ const SocketController = () => {
       return this._ws;
     },
 
+    closeSocket : () => {
+      _ws.close();
+    },
+
+    isConnected : () => {
+      return _ws.readyState === OPEN;
+    }
+
     // function setSocket
   };
 };
 
-export default SocketController();
+const sc = SocketController();
+const ws = sc.initSocket();
+
+localStorage.setItem("mainSocket", sc);
+
+document.onvisibilitychange = () => {document.onvisibilitychange = () => {
+  if (document.visibilityState === "hidden") {
+    localStorage.getItem("mainSocket").closeSocket();
+  }
+};}
+
+document.onpopstate = (e) => {
+  console.log("popstate", e.state);
+  if (window.location.href != "localhost") {
+    localStorage.getItem("mainSocket").closeSocket();
+  }
+  else {
+    if (!localStorage.getItem("mainSocket").isConnected())
+    localStorage.getItem("mainSocket").initSocket();
+  }
+}
+
+
+export default sc;
