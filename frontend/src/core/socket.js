@@ -92,13 +92,13 @@ const SocketController = () => {
 
     callbackVisibilityChange: function () {
       if (document.visibilityState === "hidden") {
-        this._ws.current.close();
+        this.closeSocket();
       }
     },
 
     callbackPopstate: function () {
       if (window.location.href != "localhost") {
-        this._ws.current.close();
+        this.closeSocket();
       } else {
         if (!this.isConnected()) this.initSocket();
       }
@@ -110,11 +110,11 @@ const SocketController = () => {
         this.callbackVisibilityChange
       );
       document.removeEventListener("popstate", this.callbackPopstate);
-      this._ws.current.close();
+      this.closeSocket();
     },
 
     closeSocket: function closeSocket() {
-      this._ws.current.close();
+      if (this._ws.current) this._ws.current.close();
     },
 
     isConnected: () => {
