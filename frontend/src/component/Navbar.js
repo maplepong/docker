@@ -19,8 +19,8 @@ const Navbar = () => {
 		email: "",
 	});
 
-  useEffect(() => {
-    const fetchData = async () => {
+  useEffect(async() => {
+		if (data.id === "") {
 			const response = await api.getUserInfomation(localStorage.nickname);
 			// const friendRequests = await api.getRequestFriendList();
 			// const friends = await api.getFriendList();
@@ -29,7 +29,6 @@ const Navbar = () => {
 			// setFriendList(friends);
 			setData(response);
 		};
-		fetchData();
   }, []);
 	
 	return (<nav>
