@@ -6,29 +6,7 @@ import socketController from "../core/socket.js";
 import { requestJoinGame } from "../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([
-    {
-      sender: "system",
-      type: "invite",
-      gameId: 3,
-      message: "초대 메시지 : 테스트",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕하세요",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕하세요",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕sdff하세요",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -37,7 +15,7 @@ const Chat = () => {
       ...messages,
       { type: data.type, sender: data.sender, message: data.message },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
+    // chat.scrollTop= chat.scrollHeight;
   };
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
@@ -56,43 +34,14 @@ const Chat = () => {
         message: `초대 메시지 : ${data.message}`,
       },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
-  const onMessageConnect = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `접속되었습니다. 현재 친구들 : ${data.friends}`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
-  const onMessageUpdate = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `${data.sender} 님이 ${
-          data.status === "on" ? "접속" : "접속종료"
-        }하셨습니다.`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
 
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
       { type: "all", func: onMessageDefault },
-      // { type: "whisper", func: onMessageDefault },
+      { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
-      // { type: "connect", func: onMessageConnect },
-      // { type: "update", func: onMessageUpdate },
     ]);
   });
 
@@ -165,6 +114,10 @@ const Chat = () => {
       myReact.redirect(`gameroom/${gameId}`);
     } else alert("방 진입에 문제가 있습니다.");
   }
+  useEffect(() => {
+    const chat = document.getElementById("chat");
+    chat.scrollTop = chat.scrollHeight;
+  }, [messages]);
 
   return (
     <div id="container-chat">
