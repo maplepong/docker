@@ -58,41 +58,13 @@ const Chat = () => {
     ]);
     chat.setAttribute("scrollTop", chat.scrollHeight);
   };
-  const onMessageConnect = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `접속되었습니다. 현재 친구들 : ${data.friends}`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
-  const onMessageUpdate = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `${data.sender} 님이 ${
-          data.status === "on" ? "접속" : "접속종료"
-        }하셨습니다.`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
 
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
       { type: "all", func: onMessageDefault },
-      // { type: "whisper", func: onMessageDefault },
+      { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
-      // { type: "connect", func: onMessageConnect },
-      // { type: "update", func: onMessageUpdate },
     ]);
   });
 
