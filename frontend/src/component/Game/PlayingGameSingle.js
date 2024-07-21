@@ -108,7 +108,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
       function updateBall() {
         ball.position.add(ballDirection);
-
+``
         if (ball.position.y >= 3 || ball.position.y <= -3) {
           ballDirection.y = -ballDirection.y;
         }
@@ -124,7 +124,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
             ballDirection.x = -ballDirection.x;
           } else {
             rightscore++;
-            updateScore(1, 0);
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -146,7 +145,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
             ballDirection.x = -ballDirection.x;
           } else {
             leftscore++;
-            updateScore(0, 1);
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -165,20 +163,16 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
       document.addEventListener("keydown", keyDownHandler, false);
       document.addEventListener("keyup", keyUpHandler, false);
+      document.addEventListener("enemykeydown", enemykeyDownHandler, false);
+      document.addEventListener("enemykeyup", enemykeyUpHandler, false);
 
       function updatePlayerPaddle() {
         if (upPressed) {
           playerPaddle.position.y += 0.1;
-          sendGameState();
         } else if (downPressed) {
           playerPaddle.position.y -= 0.1;
-          sendGameState();
         }
       }
-
-      // function updateaiPaddle() {
-      //   aiPaddle.position.y;
-      // }
 
       function animate() {
         requestAnimationFrame(animate);
@@ -186,7 +180,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         //updateBall();
 
         updatePlayerPaddle();
-        // updateaiPaddle();
 
         renderer.render(scene, camera);
       }
@@ -209,58 +202,37 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       return () => {
         document.removeEventListener("keydown", keyDownHandler);
         document.removeEventListener("keyup", keyUpHandler);
+        document.removeEventListener("enemykeydown", keyDownHandler);
+        document.removeEventListener("enemykeyup", keyUpHandler);
       };
     } else {
       console.log("Canvas context not supported");
     }
   }, [gameinfo, gameSocket.current]);
 
-  function handleSocketMessage(message) {
-      if (message.type === "paddle_move") {
-          const { data } = message;
-          aiPaddle = data.x;
-      } else if (message.type === "game_update") {
-          const { ball, paddle, uscore } = message.data;
-          if (ball && !isowner) {
-              x = ball.x;
-              y = ball.y;
-              dx = ball.dx;
-              dy = ball.dy;
-          }
-          if (paddle) {
-              aiPaddle.position.y = paddle.x;
-              console.log("cavnas", canvas.width, "paddle", paddle.x);
-              console.log("enemypaddle:", enemyPaddleX);
-          }
-          if (uscore && !isowner) {
-              userscore = uscore.y;
-              enemyscore = uscore.x;
-          }
-      }
-  }
-
-    function updateScore(leftAdd, rightAdd) {//스코어 업데이트
-      userscore += leftAdd;
-      enemyscore += rightAdd;
-      sendGameState();
-      if (userscore < 3 && enemyscore < 3) resetGame();
-      else {
-          api.sendGameResult(userscore,enemyscore,localStorage.getItem("nickname"));
-          gameSocket.current.close();
-          window.history.back();
-      }
-      return ;
-  }
-
-  function sendGameState() {
-    if (gameSocket.current && gameSocket.current.readyState === WebSocket.OPEN) {
-        const data = {
-            paddle: { x: -playerPaddle.position.y},
-            uscore: { x: userscore, y : enemyscore}
-        };
-        gameSocket.current.send(JSON.stringify({ data: data, type: "game_update", nickname: localStorage.getItem("nickname") }));
-    }
-  }
+  // function handleSocketMessage(message) {
+  //     if (message.type === "paddle_move") {
+  //         const { data } = message;
+  //         enemyPaddleX = data.x;
+  //     } else if (message.type === "game_update") {
+  //         const { ball, paddle, uscore } = message.data;
+  //         if (ball && !isowner) {
+  //             x = ball.x;
+  //             y = ball.y;
+  //             dx = ball.dx;
+  //             dy = ball.dy;
+  //         }
+  //         if (paddle) {
+  //             enemyPaddleX = paddle.x;
+  //             console.log("cavnas", canvas.width, "paddle", paddle.x);
+  //             console.log("enemypaddle:", enemyPaddleX);
+  //         }
+  //         if (uscore && !isowner) {
+  //             userscore = uscore.y;
+  //             enemyscore = uscore.x;
+  //         }
+  //     }
+  // }
 
   function keyDownHandler(e) {
     if (e.key === "W" || e.key === "w") {
@@ -274,6 +246,20 @@ const PingPong = ({ gameinfo, gameSocket }) => {
     if (e.key === "w" || e.key === "W") {
       upPressed = false;
     } else if (e.key === "s" || e.key === "S") {
+      downPressed = false;
+    }
+  }
+  function enemykeyUpHandler(e) {
+    if (e.key === "e" || e.key === "E") {
+      upPressed = false;
+    } else if (e.key === "d" || e.key === "D") {
+      downPressed = false;
+    }
+  }
+  function enemykeyDownHandler(e) {
+    if (e.key === "e" || e.key === "E") {
+      upPressed = false;
+    } else if (e.key === "d" || e.key === "D") {
       downPressed = false;
     }
   }
