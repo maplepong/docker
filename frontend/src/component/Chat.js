@@ -6,29 +6,7 @@ import socketController from "../core/socket.js";
 import { requestJoinGame } from "../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([
-    {
-      sender: "system",
-      type: "invite",
-      gameId: 3,
-      message: "초대 메시지 : 테스트",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕하세요",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕하세요",
-    },
-    {
-      sender: "milky",
-      type: "all",
-      message: "안녕sdff하세요",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -37,7 +15,7 @@ const Chat = () => {
       ...messages,
       { type: data.type, sender: data.sender, message: data.message },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
+    // chat.scrollTop= chat.scrollHeight;
   };
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
@@ -56,7 +34,6 @@ const Chat = () => {
         message: `초대 메시지 : ${data.message}`,
       },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
 
   useEffect(() => {
@@ -137,6 +114,10 @@ const Chat = () => {
       myReact.redirect(`gameroom/${gameId}`);
     } else alert("방 진입에 문제가 있습니다.");
   }
+  useEffect(() => {
+    const chat = document.getElementById("chat");
+    chat.scrollTop = chat.scrollHeight;
+  }, [messages]);
 
   return (
     <div id="container-chat">
