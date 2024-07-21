@@ -6,50 +6,10 @@ import api from "../core/Api_.js";
 import NicknameModal from "./NicknameModal.js";
 import RequestFriend from "./RequestFriend.js";
 // import { requestFriendList } from "../core/Api.js";
-import socketController from "../core/socket";
 
 const FriendList = (props) => {
-  const [friendRequests, setFriendRequests] = useState({
-    sends: [],
-    receives: [],
-  });
-
-  const [friendlist, setFriendList] = useState([]);
-
-  const onConnect = (data) => {
-    console.log("ws connnected data :", data.friends);
-    data.friends.forEach((friend) => {
-      friendlist[friend.nickname] = friend.status === "on" ? true : false;
-    });
-
-    setFriendList(data.friends);
-  };
-  const onUpdate = (data) => {
-    console.log("ws update data :", data);
-    data.status = data.status === "on" ? true : false;
-    friendlist[data.sender] = data.status;
-    // friendlist.forEach((friend) =>{data.sender === friend.nickname ? friend.status = data.status : null});
-    setFriendList(friendlist);
-  };
-
-  socketController.setSocketTypes([
-    { type: "connect", func: onConnect },
-    { type: "update", func: onUpdate },
-  ]);
-
-  useEffect(async () => {
-    socketController.initSocket();
-    const friendRequests = await api.getRequestFriendList(); // [{nickname: .. , id :..}]
-    const friends = await api.getFriendList();
-    const temp = {};
-    friends.forEach((req) => {
-      temp[req.nickname] = false;
-    });
-
-    setFriendRequests(friendRequests);
-    setFriendList(temp);
-  }, []);
-  console.log("friendlist,", friendlist);
+  const friendList = props.friendList;
+  const friendRequests = props.friendRequests;
 
   return (
     <div id="box" style="margin: 15px;">
@@ -121,8 +81,8 @@ const FriendList = (props) => {
       <div class="content">
         <span id="request">내 친구들</span>
         <ul>
-          {friendlist && friendlist.length && friendlist.length > 0 ? (
-            friendlist.map((item) => (
+          {friendList && friendList.length && friendList.length > 0 ? (
+            friendList.map((item) => (
               <div>
                 <li class="exchange" key={item.id}>
                   <NicknameModal nickname={item.nickname} />

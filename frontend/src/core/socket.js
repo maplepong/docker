@@ -75,42 +75,57 @@ const SocketController = () => {
         console.error("전체 웹소켓 연결이 중지되었습니다.");
         this._ws.current = null;
       };
+      this.addEvent();
       return this._ws;
     },
 
-    closeSocket : () => {
-      _ws.close();
+    // 초기화 시 추가하는 함수
+    addEvent: function () {
+      document.onvisibilitychange = () => {
+        this.callbackVisibilityChange();
+      };
+
+      document.onpopstate = () => {
+        this.callbackPopstate();
+      };
     },
 
-    isConnected : () => {
-      return _ws.readyState === OPEN;
-    }
+    callbackVisibilityChange: function () {
+      if (document.visibilityState === "hidden") {
+        this._ws.current.close();
+      }
+    },
+
+    callbackPopstate: function () {
+      if (window.location.href != "localhost") {
+        this._ws.current.close();
+      } else {
+        if (!this.isConnected()) this.initSocket();
+      }
+    },
+
+    removeEvent: function () {
+      document.removeEventListener(
+        "visibilitychange",
+        this.callbackVisibilityChange
+      );
+      document.removeEventListener("popstate", this.callbackPopstate);
+      this._ws.current.close();
+    },
+
+    closeSocket: function closeSocket() {
+      this._ws.current.close();
+    },
+
+    isConnected: () => {
+      return this._ws.current.readyState === OPEN;
+    },
 
     // function setSocket
   };
 };
 
 const sc = SocketController();
-const ws = sc.initSocket();
-
-localStorage.setItem("mainSocket", sc);
-
-document.onvisibilitychange = () => {document.onvisibilitychange = () => {
-  if (document.visibilityState === "hidden") {
-    localStorage.getItem("mainSocket").closeSocket();
-  }
-};}
-
-document.onpopstate = (e) => {
-  console.log("popstate", e.state);
-  if (window.location.href != "localhost") {
-    localStorage.getItem("mainSocket").closeSocket();
-  }
-  else {
-    if (!localStorage.getItem("mainSocket").isConnected())
-    localStorage.getItem("mainSocket").initSocket();
-  }
-}
-
+sc.initSocket();
 
 export default sc;
