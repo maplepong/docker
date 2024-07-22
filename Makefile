@@ -14,6 +14,7 @@ $(BUILD) :
 
 $(NAME) :
 	cd frontend && npm run build
+
 	docker compose -f $(FILE) up --build #--detach 
 
 clean :
@@ -29,4 +30,6 @@ re : fclean all
 
 
 
+
 .PHONY	:	all ps dev clean fclean re
+
