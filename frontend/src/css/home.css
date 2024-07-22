@@ -24,17 +24,15 @@
 }
 
 #tour {
-    background-color: gray;
+    margin: 0 auto;
+    display: flex;
+    background-image: url("../../public/asset/design/pang2.png");
+    background-size: 100%;
     width: 300px;
     height: 300px;
-    margin: 0 auto;
-    border-radius: 50%;
-    display: flex;
 }
 
 #pong {
-    /* background-color: gray; */
-    justify-content: space-between;
     margin: 0 auto;
     display: flex;
     background-image: url("../../public/asset/design/pang1.png");
@@ -47,5 +45,5 @@
     margin: 0 auto;
     font-size: 50px;
     text-align: center;
-    font-size: 16px;
+    font-size: 20px;
 }

@@ -3,7 +3,7 @@ import api from "../core/Api_.js";
 import myReact, { Link } from "../core/myReact.js";
 import "../css/NicknameModal.css";
 
-const NicknameModal = ({ nickname }) => {
+const NicknameModal = ({ nickname, ...rest }) => {
   var show = 0; //0 hidden 1 show;
   function showmenu(e) {
     const menu = e.target
