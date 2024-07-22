@@ -449,6 +449,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             'sender' : sender.nickname,
                             'status' : status
                             }))
+                    elif type == 'connect':
+                        friends = await self.get_user_friends(nickname)
+                        
+                        await self.send(text_data=json.dumps({
+                            'type': 'connect',
+                            'sender': nickname,
+                            'friends': friends
+                        }))
                     else: # 수신자가 오프라인인 경우
                            await self.send(text_data=json.dumps({
                                 'message': "User is not connected.",
