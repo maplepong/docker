@@ -6,7 +6,7 @@ import myReact, {
   useRef,
 } from "../../core/myReact.js";
 import Chat from "./Chat.js";
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 import UserStatus from "./UserStatus.js";
 import FriendList from "./FriendList.js";
 import socketController from "../../core/socket.js";

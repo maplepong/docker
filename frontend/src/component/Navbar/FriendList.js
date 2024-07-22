@@ -2,7 +2,7 @@
 import myReact, { Link } from "../../core/myReact.js";
 import { useState, useEffect } from "../../core/myReact.js";
 import "../../css/friend.css";
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 import NicknameModal from "../NicknameModal.js";
 import RequestFriend from "../RequestFriend.js";
 

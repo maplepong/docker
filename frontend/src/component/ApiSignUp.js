@@ -1,6 +1,6 @@
 /* @jsx myReact.createElement */
 import myReact, { Link, useEffect } from "../core/myReact.js";
-import api from "../core/Api_.js";
+import api from "../core/Api.js";
 
 const ApiSignUp = () => {
   async function getInfo() {

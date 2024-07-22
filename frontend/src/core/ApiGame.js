@@ -1,6 +1,6 @@
 import router from "./Router";
 import myReact from "./myReact";
-import { apiInstance } from "./Api_.js";
+import { apiInstance } from "./Api.js";
 import axios from "axios";
 
 const baseUrl = () => {
