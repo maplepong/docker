@@ -48,7 +48,7 @@ const Navbar = () => {
     console.log("ws update data :", data);
     data.status = data.status === "on" ? true : false;
     friendList[data.sender] = data.status;
-    friendsCount = Object.keys(friendList).length;
+    friendsCount.current = Object.keys(friendList).length;
     setFriendList(friendList);
   };
 
@@ -81,7 +81,10 @@ const Navbar = () => {
     };
   }, []);
 
-  if (friendsCount !== Object.keys(friendList).length) {
+  if (
+    friendsCount !== Object.keys(friendList).length &&
+    socketController.isConnected()
+  ) {
     socketController.sendMessage({ type: "connect" });
   }
 
