@@ -4,7 +4,11 @@ import WaitingTournament from "./TournamentWaiting.js";
 import TournamentSchedule from "./TournamentSchedule.js";
 
 const Tournament = () => {
-  return {};
+  return (
+    <div id={"tournament"}>
+      <WaitingTournament />
+    </div>
+  );
 };
 
 export default Tournament;
