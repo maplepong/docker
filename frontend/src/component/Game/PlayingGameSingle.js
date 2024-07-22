@@ -6,6 +6,7 @@ import api from "../../core/Api_.js";
 const PingPong = ({ gameinfo, gameSocket }) => {
   let isowner = false;
   let upPressed, downPressed;
+  let enemyupPressed, enemydownPressed;
   let flag = false;
 
   useEffect(() => {
@@ -174,12 +175,21 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         }
       }
 
+      function updateaiPaddle() {
+        if (enemyupPressed) {
+          aiPaddle.position.y += 0.1;
+        } else if (enemydownPressed) {
+          aiPaddle.position.y -= 0.1;
+        }
+      }
+
       function animate() {
         requestAnimationFrame(animate);
 
         //updateBall();
 
         updatePlayerPaddle();
+        updateaiPaddle();
 
         renderer.render(scene, camera);
       }
@@ -251,16 +261,16 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   }
   function enemykeyUpHandler(e) {
     if (e.key === "e" || e.key === "E") {
-      upPressed = false;
+      enemyupPressed = false;
     } else if (e.key === "d" || e.key === "D") {
-      downPressed = false;
+      enemydownPressed = false;
     }
   }
   function enemykeyDownHandler(e) {
     if (e.key === "e" || e.key === "E") {
-      upPressed = false;
+      enemyupPressed = false;
     } else if (e.key === "d" || e.key === "D") {
-      downPressed = false;
+      enemydownPressed = false;
     }
   }
 
