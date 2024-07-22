@@ -1,5 +1,5 @@
 /* @jsx myReact.createElement */
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 import myReact from "../../core/myReact.js";
 import "../../css/UserStatus.css";
 

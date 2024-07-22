@@ -1,7 +1,7 @@
 /* @jsx myReact.createElement */
 import myReact, { useState, useEffect } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 
 const PingPong = ({ gameinfo, gameSocket }) => {
   let isowner = false;

@@ -1,6 +1,6 @@
 /* @jsx myReact.createElement */
 import myReact, { useEffect, useState } from "../core/myReact.js";
-import api from "../core/Api_.js";
+import api from "../core/Api.js";
 import router from "../core/Router.js";
 import GameList from "./GameList.js";
 import "../css/tournament.css"
