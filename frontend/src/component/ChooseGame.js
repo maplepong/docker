@@ -7,9 +7,9 @@ const ChooseGame = () => {
     return (
         <div id="choose-container">
                 <Link to="localgame">
-                <div id="mini">
-                    <span class="word">미니게임</span>
-                </div>
+                    <div id="mini">
+                        <span class="word">미니게임</span>
+                    </div>
                 </Link>
                 <Link to="tournament">
                     <div id="tour">

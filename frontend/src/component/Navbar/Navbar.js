@@ -82,13 +82,13 @@ const Navbar = () => {
   }, []);
 
   if (
-    friendsCount !== Object.keys(friendList).length &&
+    friendsCount.current !== Object.keys(friendList).length &&
     socketController.isConnected()
   ) {
     socketController.sendMessage({ type: "connect" });
   }
 
-  console.log("friendsCount ", friendsCount);
+  // console.log("friendsCount ", friendsCount);
 
   return (
     <nav>
