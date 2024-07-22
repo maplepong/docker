@@ -9,7 +9,7 @@ import {
   requestFriendList,
   requestUserInfo,
 } from "./core/Api.js";
-import FriendList from "./component/FriendList.js";
+import FriendList from "./component/Navbar/FriendList.js";
 import RequestFriend from "./component/RequestFriend.js";
 import { useState, useEffect } from "./core/myReact.js";
 import Login from "./component/Login.js";
@@ -18,7 +18,7 @@ import "./css/index.css";
 import "./css/friend.css";
 import Test from "./component/Test.js";
 import api from "./core/Api_.js";
-import Navbar from "./component/Navbar.js";
+import Navbar from "./component/Navbar/Navbar.js";
 
 const setAxios = () => {
   axios.defaults.baseURL = "https://localhost/api/";

@@ -1,15 +1,17 @@
 /* @jsx myReact.createElement */
-import myReact, { Link } from "../core/myReact.js";
-import { useState, useEffect } from "../core/myReact.js";
-import "../css/friend.css";
-import api from "../core/Api_.js";
-import NicknameModal from "./NicknameModal.js";
-import RequestFriend from "./RequestFriend.js";
+import myReact, { Link } from "../../core/myReact.js";
+import { useState, useEffect } from "../../core/myReact.js";
+import "../../css/friend.css";
+import api from "../../core/Api_.js";
+import NicknameModal from "../NicknameModal.js";
+import RequestFriend from "../RequestFriend.js";
 // import { requestFriendList } from "../core/Api.js";
 
 const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
+  console.log("friendList..", friendList);
+  Object.entries(friendList).map(([key, value]) => {console.log( "key : " + key + "value : " + value)});
 
   return (
     <div id="box" style="margin: 15px;">
@@ -81,14 +83,12 @@ const FriendList = (props) => {
       <div class="content">
         <span id="request">내 친구들</span>
         <ul>
-          {friendList && friendList.length && friendList.length > 0 ? (
-            friendList.map((item) => (
+          {friendList && Object.keys(friendList).length > 0 ? (
+            Object.entries(friendList).map(([key, value]) => (
               <div>
-                <li class="exchange" key={item.id}>
-                  <NicknameModal nickname={item.nickname} />
-                  <p>{item.status ? "접속중" : "비접속"}</p>
-                  {/* <button class="inter" onClick={() => {seeInfo(item.nickname)}}>정보</button>
-                        <button class="inter" onClick={() => api.deleteFriend(item.nickname)}>삭제</button> */}
+                <li class="exchange" >
+                  <NicknameModal nickname={key} />
+                  <p>{value ? "접속중" : "비접속"}</p>
                 </li>
               </div>
             ))
