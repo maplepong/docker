@@ -20,7 +20,7 @@ import FriendList from "../component/Navbar/FriendList.js";
 import UserInfo from "../component/UserInfo";
 import GameRoom from "../component/Game/GameRoom.js";
 import PingPong from "../component/Game/PlayingGame.js";
-import Tournament from "../component/Tournament.js";
+import Tournament from "../component/Tournament/Tournament.js";
 
 const pathList = {
   "/": <App />,
