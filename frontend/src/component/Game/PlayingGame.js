@@ -7,6 +7,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   let isowner = false;
   let upPressed, downPressed;
   let flag = false;
+  var playerPaddle;
 
   useEffect(() => {
     if (!gameinfo || !gameSocket.current) {
@@ -30,7 +31,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         1000
       );
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.8);
 
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(5, 5, 5).normalize();
@@ -54,7 +55,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       );
       const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0xffc0cb });
 
-      const playerPaddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
+      playerPaddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
       playerPaddle.position.x = -2;
       scene.add(playerPaddle);
 

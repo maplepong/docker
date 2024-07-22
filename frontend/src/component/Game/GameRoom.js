@@ -190,6 +190,7 @@ const GameRoom = () => {
       gameInfo={gameInfo}
       startGame={startGame}
       exitGame={exitGame}
+      sendGameInvite={sendGameInvite}
     />
   ) : (
     <Loading type="game"/>
