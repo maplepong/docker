@@ -29,7 +29,9 @@ def new_tournament(request):
             return JsonResponse({'error': 'Already in tournament room.'}, status=status.HTTP_409_CONFLICT)
         # 유저를 방에 추가
         tournament.participants.add(user)
-        return JsonResponse({'message': 'Enter tournament room.'}, status=status.HTTP_200_OK)
+
+        participants = list(tournament.participants.values('id', 'nickname'))
+        return JsonResponse({'message': 'Enter tournament room.', 'participants': participants}, status=status.HTTP_200_OK)
     else:
         # 새로운 토너먼트 방 생성
         tournament = Tournament.objects.create(host=user)
@@ -51,8 +53,8 @@ def invite_tournament(request):
             return JsonResponse({"error": "user is not found"}, status = status.HTTP_404_NOT_FOUND)
         if to_user in tournament.participants.all():
             return JsonResponse({"error": "User is already in the tournament room"}, status=status.HTTP_400_BAD_REQUEST)
-        if tournament.participants.count() == 4:   #이미 토너먼트 방에 4명이 가득 차있을경우
-            return JsonResponse({"error": "Tournament room is full"}, status=status.HTTP_403_FORBIDDEN)
+        # if tournament.participants.count() == 4:   #이미 토너먼트 방에 4명이 가득 차있을경우
+            # return JsonResponse({"error": "Tournament room is full"}, status=status.HTTP_403_FORBIDDEN)
         if to_user == request.user:     #초대한 유저가 본인일 경우
             return JsonResponse({"error": "to_user is request user"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -63,6 +65,10 @@ def invite_tournament(request):
         TournamentInviteRequest.objects.create(from_user=request.user, to_user=to_user)
         return JsonResponse({"message": "Successfully invited"}, status=status.HTTP_200_OK)
     return JsonResponse({"error": "something is wrong"}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["POST"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
@@ -121,8 +127,8 @@ def get_bracket(request):
     tournament = Tournament.objects.first()
     if tournament.is_active != True:
         return JsonResponse({'error': 'Tournament are not started yet.'}, status=status.HTTP_400_BAD_REQUEST)
-    if tournament.participants.count() != 4:
-        return JsonResponse({'error': 'Less than 4 participants'}, status=status.HTTP_400_BAD_REQUEST)
+    # if tournament.participants.count() != 4:
+        # return JsonResponse({'error': 'Less than 4 participants'}, status=status.HTTP_400_BAD_REQUEST)
     nickname_lst = []
     participants = tournament.get_participants()
     for participant in participants:
@@ -147,8 +153,8 @@ def out_tournament(request):
     tournament = Tournament.objects.first()
 
     # 토너먼트 진행 중인지 확인
-    if tournament.is_active:
-        return JsonResponse({'error': 'Tournament is in progress. Cannot go out'}, status=status.HTTP_400_BAD_REQUEST)
+    # if tournament.is_active:
+        # return JsonResponse({'error': 'Tournament is in progress. Cannot go out'}, status=status.HTTP_400_BAD_REQUEST)
     
     # 유저가 방에 참가하고 있는지 확인
     if not tournament.participants.filter(id=user.id).exists():
