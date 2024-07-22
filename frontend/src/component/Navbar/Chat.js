@@ -1,9 +1,9 @@
 /* @jsx myReact.createElement */
-import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
-import "../css/Chat.css";
-import NicknameModal from "./NicknameModal.js";
-import socketController from "../core/socket.js";
-import { requestJoinGame } from "../core/ApiGame.js";
+import myReact, { useEffect, useRef, useState } from "../../core/myReact.js";
+import "../../css/Chat.css";
+import NicknameModal from "../NicknameModal.js";
+import socketController from "../../core/socket.js";
+import { requestJoinGame } from "../../core/ApiGame.js";
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
