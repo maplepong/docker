@@ -26,35 +26,33 @@ const setAxios = () => {
   axios.defaults.timeout = 3000;
 };
 
-const App = () => {
-  // setAxios(); // 필요 없다고 함
-
+const App = ({children}) => {
+  const [loginState, setLoginState] = useState(false);
   function checkLogin() {
     if (localStorage.accessToken) {
-      const login = document.querySelector("#btn-nav-login");
-      // const logout = document.querySelector("#btn-nav-logout");
-      if (login) login.style.display = "none";
+      setLoginState(true);
     }
   }
 
   document.addEventListener("DOMContentLoaded", () => checkLogin());
 
-  return (
+  if (loginState) {
+    return (
+      <div class="app">
+        {children}
+        <Navbar />
+      </div>
+    );
+  }
+  else {
+    return (
     <div class="app">
       <Link to="">
         <img id="bg"></img>
       </Link>
       <Login />
-      {/* <button id="btn-nav-logout" onclick={() => {api.logout()}}>로그아웃</button> */}
-      {/* <FriendList /> */}
-      {/* <RequestFriend /> */}
-
-      {/* <Link to="home" id="home"><button>Home</button></Link> */}
-      {/* <Link to="test" id="home"><button>Test</button></Link> */}
-      {/* <Link to="api-test" id="home"><button>APITest</button></Link> */}
-      {/* <SignUp /> */}
     </div>
-  );
+  );}
 };
 
 export default App;
