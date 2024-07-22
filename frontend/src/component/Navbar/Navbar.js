@@ -1,10 +1,15 @@
 /* @jsx myReact.createElement */
-import myReact, { Link, useState, useEffect } from "../core/myReact.js";
+import myReact, {
+  Link,
+  useState,
+  useEffect,
+  useRef,
+} from "../../core/myReact.js";
 import Chat from "./Chat.js";
-import api from "../core/Api_.js";
+import api from "../../core/Api_.js";
 import UserStatus from "./UserStatus.js";
 import FriendList from "./FriendList.js";
-import socketController from "../core/socket";
+import socketController from "../../core/socket.js";
 
 const Navbar = () => {
   const [data, setData] = useState({
@@ -23,8 +28,9 @@ const Navbar = () => {
     sends: [],
     receives: [],
   });
+  const friendsCount = useRef(0);
 
-  const [friendList, setFriendList] = useState([]);
+  const [friendList, setFriendList] = useState({});
 
   const onConnect = (data) => {
     console.log("ws connnected data :", data.friends);
@@ -32,13 +38,14 @@ const Navbar = () => {
       friendList[friend.nickname] = friend.status === "on" ? true : false;
     });
 
+    friendsCount.current = data.friends.length;
     setFriendList(data.friends);
   };
   const onUpdate = (data) => {
     console.log("ws update data :", data);
     data.status = data.status === "on" ? true : false;
     friendList[data.sender] = data.status;
-    // friendList.forEach((friend) =>{data.sender === friend.nickname ? friend.status = data.status : null});
+    friendsCount = Object.keys(friendList).length;
     setFriendList(friendList);
   };
 
@@ -59,7 +66,7 @@ const Navbar = () => {
       friends.forEach((req) => {
         temp[req.nickname] = false;
       });
-
+      friendsCount.current = friends.length;
       setFriendRequests(friendRequests);
       setFriendList(temp);
       setData(response);
@@ -68,6 +75,12 @@ const Navbar = () => {
       socketController._ws.current.close();
     };
   }, []);
+
+  if (friendsCount !== Object.keys(friendList).length) {
+    socketController.sendMessage({ type: "connect" });
+  }
+
+  console.log("friendsCount ", friendsCount);
 
   return (
     <nav>
