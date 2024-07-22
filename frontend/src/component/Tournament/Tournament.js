@@ -57,6 +57,7 @@ const Tournament = () => {
   };
 
   const onPlayerJoined = (data) => {
+    console.log(data);
     setPlayers((prevPlayers) => [...prevPlayers, data.nickname]);
     if (!host) {
       setHost(data.nickname); // 첫 번째 입장자가 방장
@@ -111,6 +112,8 @@ const Tournament = () => {
     }
     socketController.sendMessage({ type: "tournament", action: "start" });
   };
+  console.log("players",players);
+  console.log("host",host);
   return (
     <div id={"tournament"}>
       <WaitingTournament handleStartGame={handleStartGame} players={players} host={host} gameStarted={gameStarted}/>

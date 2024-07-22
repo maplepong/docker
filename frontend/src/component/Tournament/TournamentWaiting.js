@@ -6,6 +6,9 @@ import myReact, { useEffect, useState } from "../../core/myReact.js";
 import "../../css/tournament.css";
 
 const TournamentWaiting = ({handleStartGame, players, host, gameStarted}) => {
+  
+  console.log(players);
+  console.log(host);
   return (
     <div>
       <div>
