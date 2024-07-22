@@ -1,9 +1,5 @@
 import { apiInstance } from "./Api.js";
 
-const baseUrl = () => {
-  return "https://localhost/api/";
-};
-
 const requestGameInfo = async (gameId) => {
   var result = null;
   return await apiInstance
@@ -71,35 +67,29 @@ const requestLobbyList = async () => {
 
 const requestCreateGame = async (room_title, password) => {
   var result = null;
-  try {
-    console.log("room_title: ", room_title, "password: ", password);
-    console.log("token??? : ", localStorage.accessToken);
-    const formData = new FormData();
-    formData.append("room_title", room_title);
-    formData.append("password", password);
-    console.log("request Create Game");
-    const response = await apiInstance
+  console.log("room_title: ", room_title, "password: ", password);
+  console.log("token??? : ", localStorage.accessToken);
+  const formData = new FormData();
+  formData.append("room_title", room_title);
+  formData.append("password", password);
+  console.log("request Create Game");
+  return await apiInstance
       .post("game/new", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.accessToken}`,
         },
       })
       .then((response) => {
+        if (typeof result === "undefined" || result.status != 201) {
+          console.log("room create Error");
+        console.log(result);
+        return;}
         result = response;
         console.log("Response:", response);
       })
       .catch((error) => {
         console.error("Error create game room:", error);
-        return null;
       });
-    if (typeof result === "undefined" || result.status != 201) {
-      console.log("room create Error");
-      console.log(result);
-      return;
-    }
-    return result;
-  } catch (error) {
-  }
 };
 
 const requestExitGame = async (gameId) => {
