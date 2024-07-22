@@ -5,13 +5,14 @@ import "../../css/friend.css";
 import api from "../../core/Api_.js";
 import NicknameModal from "../NicknameModal.js";
 import RequestFriend from "../RequestFriend.js";
-// import { requestFriendList } from "../core/Api.js";
 
 const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
   console.log("friendList..", friendList);
-  Object.entries(friendList).map(([key, value]) => {console.log( "key : " + key + "value : " + value)});
+  Object.entries(friendList).map(([key, value]) => {
+    console.log("key : " + key + "value : " + value);
+  });
 
   return (
     <div id="box" style="margin: 15px;">
@@ -86,7 +87,7 @@ const FriendList = (props) => {
           {friendList && Object.keys(friendList).length > 0 ? (
             Object.entries(friendList).map(([key, value]) => (
               <div>
-                <li class="exchange" >
+                <li class="exchange">
                   <NicknameModal nickname={key} />
                   <p>{value ? "접속중" : "비접속"}</p>
                 </li>

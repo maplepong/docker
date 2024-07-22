@@ -34,6 +34,9 @@ const Navbar = () => {
 
   const onConnect = (data) => {
     console.log("ws connnected data :", data.friends);
+    if (data.friends || data.friends.length === 0) {
+      return;
+    }
     data.friends.forEach((friend) => {
       friendList[friend.nickname] = friend.status === "on" ? true : false;
     });
@@ -63,12 +66,14 @@ const Navbar = () => {
       const friendRequests = await api.getRequestFriendList(); // [{nickname: .. , id :..}]
       const friends = await api.getFriendList();
       const temp = {};
-      friends.forEach((req) => {
-        temp[req.nickname] = false;
-      });
-      friendsCount.current = friends.length;
+      if (friends.length != 0) {
+        friends.forEach((req) => {
+          temp[req.nickname] = false;
+        });
+        friendsCount.current = friends.length;
+        setFriendList(temp);
+      }
       setFriendRequests(friendRequests);
-      setFriendList(temp);
       setData(response);
     }
     return () => {
