@@ -1,13 +1,18 @@
 /* @jsx myReact.createElement */
-import myReact, { Link } from "../core/myReact.js";
-import { useState, useEffect } from "../core/myReact.js";
-import "../css/friend.css";
-import api from "../core/Api_.js";
-import NicknameModal from "./NicknameModal.js";
-import RequestFriend from "./RequestFriend.js";
+import myReact, { Link } from "../../core/myReact.js";
+import { useState, useEffect } from "../../core/myReact.js";
+import "../../css/friend.css";
+import api from "../../core/Api_.js";
+import NicknameModal from "../NicknameModal.js";
+import RequestFriend from "../RequestFriend.js";
 // import { requestFriendList } from "../core/Api.js";
 
 const FriendList = (props) => {
+  const friendList = props.friendList;
+  const friendRequests = props.friendRequests;
+  console.log("friendList..", friendList);
+  Object.entries(friendList).map(([key, value]) => {console.log( "key : " + key + "value : " + value)});
+
   return (
     <div id="box" style="margin: 15px;">
       <span id="manage">친구 관리</span>
@@ -16,10 +21,10 @@ const FriendList = (props) => {
       <div class="content">
         <span id="request">받은 친구 요청</span>
         <ul>
-          {props.list &&
-          props.list.receives &&
-          props.list.receives.length > 0 ? (
-            props.list.receives.map((req) => (
+          {friendRequests &&
+          friendRequests.receives &&
+          friendRequests.receives.length > 0 ? (
+            friendRequests.receives.map((req) => (
               <div>
                 <li class="exchange">
                   {req.from_user}
@@ -51,8 +56,10 @@ const FriendList = (props) => {
       <div class="content">
         <span id="request">보낸 친구 요청</span>
         <ul>
-          {props.list && props.list.sends && props.list.sends.length > 0 ? (
-            props.list.sends.map((req) => (
+          {friendRequests &&
+          friendRequests.sends &&
+          friendRequests.sends.length > 0 ? (
+            friendRequests.sends.map((req) => (
               <div>
                 <li class="exchange">
                   {req.to_user}
@@ -76,15 +83,12 @@ const FriendList = (props) => {
       <div class="content">
         <span id="request">내 친구들</span>
         <ul>
-          {props.friendlist &&
-          props.friendlist.length &&
-          props.friendlist.length > 0 ? (
-            props.friendlist.map((item) => (
+          {friendList && Object.keys(friendList).length > 0 ? (
+            Object.entries(friendList).map(([key, value]) => (
               <div>
-                <li class="exchange" key={item.id}>
-                  <NicknameModal nickname={item.nickname} />
-                  {/* <button class="inter" onClick={() => {seeInfo(item.nickname)}}>정보</button>
-                        <button class="inter" onClick={() => api.deleteFriend(item.nickname)}>삭제</button> */}
+                <li class="exchange" >
+                  <NicknameModal nickname={key} />
+                  <p>{value ? "접속중" : "비접속"}</p>
                 </li>
               </div>
             ))

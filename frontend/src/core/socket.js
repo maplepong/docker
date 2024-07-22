@@ -12,7 +12,8 @@ const SocketController = () => {
       items.forEach((item) => {
         this._messageTypes.current[item.type] = item.func;
       });
-      this._ws.current.onmessage = (e) => this._getMessage(e);
+      if (this._ws.current)
+        this._ws.current.onmessage = (e) => this._getMessage(e);
     },
     // onmessage에서 사용할 함수
     // 실행시에 messageTypes에 있는 type을 가지고 확인
@@ -36,7 +37,7 @@ const SocketController = () => {
     // 무조건 타입 필요
     sendMessage: function sendMessage({ type, ...rest }) {
       if (this._ws.current && this._ws.current.readyState === WebSocket.OPEN) {
-        console.log("sending data", type, ...rest);
+        // console.log("sending data", type, ...rest);
         if (!type) return console.error("type이 없습니다.");
         const data = {
           type: type,
@@ -53,6 +54,7 @@ const SocketController = () => {
     // 첫 사용을 위한 연결
     // 이미 연결되어있으면 리턴
     initSocket: function initSocket() {
+      // console.log("initSocket", this._ws.current);
       if (this._ws.current) return this._ws.current; // 이미 연결되어있으면 리턴
       this._ws.current = new WebSocket(`wss://localhost:443/ws/socket/`, [
         "token",
@@ -73,11 +75,57 @@ const SocketController = () => {
         console.error("전체 웹소켓 연결이 중지되었습니다.");
         this._ws.current = null;
       };
+      this.addEvent();
       return this._ws;
+    },
+
+    // 초기화 시 추가하는 함수
+    addEvent: function () {
+      document.onvisibilitychange = () => {
+        this.callbackVisibilityChange();
+      };
+
+      document.onpopstate = () => {
+        this.callbackPopstate();
+      };
+    },
+
+    callbackVisibilityChange: function () {
+      if (document.visibilityState === "hidden") {
+        this.closeSocket();
+      }
+    },
+
+    callbackPopstate: function () {
+      if (window.location.href != "localhost") {
+        this.closeSocket();
+      } else {
+        if (!this.isConnected()) this.initSocket();
+      }
+    },
+
+    removeEvent: function () {
+      document.removeEventListener(
+        "visibilitychange",
+        this.callbackVisibilityChange
+      );
+      document.removeEventListener("popstate", this.callbackPopstate);
+      this.closeSocket();
+    },
+
+    closeSocket: function closeSocket() {
+      if (this._ws.current) this._ws.current.close();
+    },
+
+    isConnected: () => {
+      return this._ws.current.readyState === OPEN;
     },
 
     // function setSocket
   };
 };
 
-export default SocketController();
+const sc = SocketController();
+sc.initSocket();
+
+export default sc;

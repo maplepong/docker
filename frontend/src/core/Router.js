@@ -11,15 +11,15 @@ import UserInfoPage from "../component/UserInfoPage.js";
 import ApiLogin from "../component/ApiLogin.js";
 import SignUp from "../component/SignUp.js";
 import ApiSignUp from "../component/ApiSignUp.js";
-import Game from "../component/Game.js";
-import Navbar from "../component/Navbar.js";
+import Game from "../component/Game/PlayingGame.js";
+import Navbar from "../component/Navbar/Navbar.js";
 import Test from "../component/Test";
 import ApiTest from "../component/ApiTest";
 import Lobby from "../component/Lobby.js";
-import FriendList from "../component/FriendList";
+import FriendList from "../component/Navbar/FriendList.js";
 import UserInfo from "../component/UserInfo";
-import GameRoom from "../component/GameRoom";
-import PingPong from "../component/Game.js";
+import GameRoom from "../component/Game/GameRoom.js";
+import PingPong from "../component/Game/PlayingGame.js";
 import Tournament from "../component/Tournament.js";
 
 const pathList = {
@@ -45,7 +45,7 @@ export default function router() {
   var path;
   let component;
   path = window.location.pathname.split("/")[1] || window.location.pathname;
-  console.log(window.location.pathname.split("/")[1]);
+  // console.log(window.location.pathname.split("/")[1]);
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
   if (gameIdMatch) {
     const gameId = gameIdMatch[1];
@@ -54,7 +54,7 @@ export default function router() {
     component = pathList[path];
   }
 
-  console.log("component", component);
+  // console.log("component", component);
   if (component === undefined) {
     myReact.render(<Undefined />, "newPage");
   } else if (

@@ -281,9 +281,11 @@
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 from django.utils import timezone
 from django.conf import settings
 from user.models import User
+from game.models import Game
 from .models import Message
 from rest_framework_simplejwt.tokens import AccessToken
 from asgiref.sync import sync_to_async
@@ -417,7 +419,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 'whisper': True,
                                 'receiver': sender.nickname
                                 }))
-                            elif game.players.count() == 2:
+                            elif await sync_to_async(game.players.count)() >= 2:
                                 await self.send(text_data=json.dumps({
                                 'message': "Game is already full.",
                                 'sender': 'system',
@@ -440,6 +442,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                         'gameId': gameId
                                     }
                                 )
+                    elif type == 'update': # 친구 상태 업데이트 받음
+                        status = text_data_json['status']
+                        await self.send(text_data=json.dumps({
+                            'message': "update",
+                            'sender' : sender.nickname,
+                            'status' : status
+                            }))
+                    elif type == 'connect':
+                        friends = await self.get_user_friends(nickname)
+                        
+                        await self.send(text_data=json.dumps({
+                            'type': 'connect',
+                            'sender': nickname,
+                            'friends': friends
+                        }))
                     else: # 수신자가 오프라인인 경우
                            await self.send(text_data=json.dumps({
                                 'message': "User is not connected.",
@@ -492,27 +509,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         nickname = event['nickname']
         status = event['status']
 
-        # user = await sync_to_async(User.objects.get)(nickname=nickname)
+        friends = await self.get_user_friends(nickname)
 
-        # friends = user.friends.all()
-        if status == 'on':
+        if status == 'on' and nickname == self.user.nickname:
             #처음 접속한 경우 본인에게 친구들의 접속 상태 반환
             await self.send(text_data=json.dumps({
                 'type': 'connect',
                 'sender': nickname,
-                'friends': 'test',
-                #'friends': [friend.nickname for friend in friends]
+                'friends': friends
             }))
-        # friends = friends.filter(is_online=True)
-        # #친구들에게 본인의 접속 상태 반환
-        # if self.user.nickname in [friend.nickname for friend in friends]:
-        #     await self.send(text_data=json.dumps({
-        #         'type': 'update',
-        #         'sender': nickname,
-        #         'status': status
-        #     }))
+            
+        if nickname != self.user.nickname and any(friend['nickname'] == self.user.nickname for friend in friends):
+            await self.send(text_data=json.dumps({
+                'type': 'update',
+                'sender': nickname,
+                'status': status
+            }))
 
-    
+
     def update_user_status(self, nickname, is_online):
         user = User.objects.get(nickname=nickname)
         user.is_online = is_online
@@ -528,5 +542,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender': sender,
             'gameId': gameId
         }))
+
+    async def update(self, event):
+        sender = event['sender']
+        status = event['status']
+        await self.send(text_data=json.dumps({
+            'type': 'update',
+            'sender': sender,
+            'status': status
+        }))
         
 
+
+    @database_sync_to_async
+    def get_user_friends(self, nickname):
+        user = User.objects.get(nickname=nickname)
+        friends = list(user.friends.all().values('nickname', 'is_online'))
+        friends_list = [{'nickname': friend['nickname'], 'status': friend['is_online']} for friend in friends]
+        return friends_list

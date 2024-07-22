@@ -1,38 +1,12 @@
 /* @jsx myReact.createElement */
-import myReact, { useEffect, useRef, useState } from "../core/myReact.js";
-import "../css/Chat.css";
-import NicknameModal from "./NicknameModal.js";
-import socketController from "../core/socket.js";
-import socket from "../core/socket.js";
+import myReact, { useEffect, useRef, useState } from "../../core/myReact.js";
+import "../../css/Chat.css";
+import NicknameModal from "../NicknameModal.js";
+import socketController from "../../core/socket.js";
+import { requestJoinGame } from "../../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([
-    {
-      message: "방가방가^^",
-      type: "all",
-      sender: "시우리",
-    },
-    {
-      message: "하이루 - 오늘뭐함",
-      type: "all",
-      sender: "교park",
-    },
-    {
-      message: "즐겜;; 가야겠다",
-      type: "all",
-      sender: "subcho",
-    },
-    {
-      message: "<system> WONS2님이 게임에 초대했습니다!",
-      type: "invite",
-      sender: "<<system>>",
-    },
-    {
-      message: "<<나를 부르는 회사>> 로...",
-      type: "all",
-      sender: "subcho",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -41,7 +15,7 @@ const Chat = () => {
       ...messages,
       { type: data.type, sender: data.sender, message: data.message },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
+    // chat.scrollTop= chat.scrollHeight;
   };
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
@@ -50,42 +24,16 @@ const Chat = () => {
       ...messages,
       {
         sender: "system",
-        gameId: data.gameId,
+        type: "invite",
         message: `${data.sender} 님이 게임에 초대하셨습니다.`,
       },
       {
         sender: "system",
+        type: "invite",
         gameId: data.gameId,
         message: `초대 메시지 : ${data.message}`,
       },
     ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
-  const onMessageConnect = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `접속되었습니다. 현재 친구들 : ${data.friends}`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
-  };
-  const onMessageUpdate = (data) => {
-    const chat = document.getElementById("chat");
-    console.log("chat data :", data);
-    setMessages([
-      ...messages,
-      {
-        sender: "system",
-        message: `${data.sender} 님이 ${
-          data.status === "on" ? "접속" : "접속종료"
-        }하셨습니다.`,
-      },
-    ]);
-    chat.setAttribute("scrollTop", chat.scrollHeight);
   };
 
   useEffect(() => {
@@ -94,8 +42,6 @@ const Chat = () => {
       { type: "all", func: onMessageDefault },
       { type: "whisper", func: onMessageDefault },
       { type: "invite", func: onMessageInvite },
-      { type: "connect", func: onMessageConnect },
-      { type: "update", func: onMessageUpdate },
     ]);
   });
 
@@ -162,14 +108,40 @@ const Chat = () => {
     socketController.sendMessage(data);
   };
 
+  async function enterGame(gameId) {
+    const res = await requestJoinGame(gameId, null);
+    if (res.status === 201) {
+      myReact.redirect(`gameroom/${gameId}`);
+    } else alert("방 진입에 문제가 있습니다.");
+  }
+  useEffect(() => {
+    const chat = document.getElementById("chat");
+    chat.scrollTop = chat.scrollHeight;
+  }, [messages]);
+
   return (
     <div id="container-chat">
       <div id="chat">
         <div id="messages">
           {messages.map((msg, index) => (
             <div key={index} class={msg.type + " message-container"}>
-              <NicknameModal nickname={msg.sender + " : "} />
-              <p class="message">{msg.message}</p>
+              <div class="chat-line">
+                <NicknameModal nickname={msg.sender + " : "} />
+                <p class="message">{msg.message}</p>
+              </div>
+              {msg.type === "invite" && msg.gameId ? (
+                <button
+                  class="acceptBtn"
+                  onclick={() => {
+                    enterGame(msg.gameId);
+                  }}
+                >
+                  {" "}
+                  초대 수락하기
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           ))}
         </div>
