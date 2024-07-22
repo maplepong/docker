@@ -1,7 +1,4 @@
-import router from "./Router";
-import myReact from "./myReact";
 import { apiInstance } from "./Api.js";
-import axios from "axios";
 
 const baseUrl = () => {
   return "https://localhost/api/";
@@ -9,13 +6,13 @@ const baseUrl = () => {
 
 const requestGameInfo = async (gameId) => {
   var result = null;
-  return await axios
+  return await apiInstance
     .request({
       headers: {
         Authorization: `Bearer ${localStorage.accessToken}`,
       },
       method: "GET",
-      url: `${baseUrl()}game/game_info/${gameId}`,
+      url: `game/game_info/${gameId}`,
     })
     .then((response) => {
       result = response;
@@ -33,8 +30,8 @@ const requestJoinGame = async (gameId, password) => {
   const formData = new FormData();
   formData.append("id", gameId);
   if (password) formData.append("password", password);
-  return await axios
-    .post(baseUrl() + "game/enter", formData, {
+  return await apiInstance
+    .post("game/enter", formData, {
       headers: {
         Authorization: `Bearer ${localStorage.accessToken}`,
       },
@@ -70,13 +67,6 @@ const requestLobbyList = async () => {
       console.error("Error:", error);
       return null;
     });
-
-  // if (typeof result === "undefined" || result.status != 200){
-  // 	console.log("Lobby request Error")
-  // 	console.log(result);
-  // 	return ;
-  // }
-  // return result.data.games;
 };
 
 const requestCreateGame = async (room_title, password) => {
@@ -99,6 +89,7 @@ const requestCreateGame = async (room_title, password) => {
         console.log("Response:", response);
       })
       .catch((error) => {
+        console.error("Error create game room:", error);
         return null;
       });
     if (typeof result === "undefined" || result.status != 201) {
@@ -108,14 +99,13 @@ const requestCreateGame = async (room_title, password) => {
     }
     return result;
   } catch (error) {
-    console.error("Error create game room:", error);
   }
 };
 
 const requestExitGame = async (gameId) => {
   var result = null;
-  return await axios
-    .delete(`${baseUrl()}game/exit/${gameId}`, {
+  return await apiInstance
+    .delete(`game/exit/${gameId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.accessToken}`,
       },
