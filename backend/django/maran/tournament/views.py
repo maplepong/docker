@@ -66,9 +66,79 @@ def invite_tournament(request):
         return JsonResponse({"message": "Successfully invited"}, status=status.HTTP_200_OK)
     return JsonResponse({"error": "something is wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["POST"])
+@api_view(["POST", "DELETE"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
+def handle_invite(request):
+    request_nickname = User.objects.get(nickname=request.data.get("nickname"))
+    user = request.user
+    if request.method == "POST":
+        try:
+            from_user = User.objects.get(nickname=request_nickname)
+            tournament_request= TournamentInviteRequest.objects.get(
+                from_user=from_user, to_user=request.user
+            )
+            try:
+                tournament = Tournament.objects.first()
+            except Tournament.DoesNotExist:
+                tournament_request.delete()
+                return JsonResponse({"error": "Tournament does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            if tournament.participants.count() >= 4 and request.user not in tournament.participants.all():
+                tournament_request.delete()
+                return JsonResponse({"error": "Tournament is full"}, status=status.HTTP_403_FORBIDDEN)
+            tournament.participants.add(request.user)
+            tournament_request.delete()
+            return JsonResponse({"detail": "Successfully joined the tournament"}, status=status.HTTP_200_OK)
+        except TournamentInviteRequest.DoesNotExist:
+            return JsonResponse(
+                {"error": "Tournament invite request does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+    elif request.method == "DELETE":
+        try:
+            from_user = User.objects.get(nickname=request_nickname)
+            tournament_request= TournamentInviteRequest.objects.get(
+                from_user=from_user, to_user=request.user
+            )
+            tournament_request.delete()
+            return JsonResponse({"detail": "Tournament invite request deleted successfully"}, status=status.HTTP_200_OK)
+        except TournamentInviteRequest.DoesNotExist:
+            return JsonResponse(
+                {"error": "Tournament invite request does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def tournament_invite_list(request):
+    if request.method == "GET":
+        sends_requests = TournamentInviteRequest.objects.filter(from_user=request.user)
+        receives_requests = TournamentInviteRequest.objects.filter(to_user=request.user)
+        
+        if not sends_requests and not receives_requests:
+            return JsonResponse({'error': 'User does not have any invite'}, status=status.HTTP_204_NO_CONTENT)
+        
+        sends = [
+            {
+                "from_user": tournament_request.from_user.nickname,
+                "to_user": tournament_request.to_user.nickname,
+            }
+            for tournament_request in sends_requests
+        ]
+        receives = [
+            {
+                "from_user": tournament_request.from_user.nickname,
+                "to_user": tournament_request.to_user.nickname,
+            }
+            for tournament_request in receives_requests
+        ]
+
+        data = {
+            "sends": sends,
+            "receives": receives,
+        }
+        return JsonResponse(data, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
