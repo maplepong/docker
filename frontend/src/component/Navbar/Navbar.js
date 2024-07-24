@@ -34,11 +34,14 @@ const Navbar = () => {
 
   const onConnect = (data) => {
     console.log("ws connnected data :", data.friends);
-    if (data.friends || data.friends.length === 0) {
+    if (!data.friends || data.friends.length === 0) {
       return;
     }
     data.friends.forEach((friend) => {
-      friendList[friend.nickname] = friend.status === "on" ? true : false;
+      friendList[friend.nickname] = {
+        nickname: friend.nickname,
+        status: friend.status === "on" ? true : false,
+      };
     });
 
     friendsCount.current = data.friends.length;
@@ -47,7 +50,7 @@ const Navbar = () => {
   const onUpdate = (data) => {
     console.log("ws update data :", data);
     data.status = data.status === "on" ? true : false;
-    friendList[data.sender] = data.status;
+    friendList[data.sender] = { nickname: data.sender, status: data.status };
     friendsCount.current = Object.keys(friendList).length;
     setFriendList(friendList);
   };
@@ -65,10 +68,15 @@ const Navbar = () => {
       socketController.initSocket();
       const friendRequests = await api.getRequestFriendList(); // [{nickname: .. , id :..}]
       const friends = await api.getFriendList();
-      const temp = {};
       if (friends.length != 0) {
+        const temp = {};
         friends.forEach((req) => {
-          temp[req.nickname] = false;
+          temp[req.nickname] = {
+            nickname: req.nickname,
+            status: friendList[req.nickname]
+              ? friendList[req.nickname].status
+              : false,
+          };
         });
         friendsCount.current = friends.length;
         setFriendList(temp);
@@ -81,13 +89,13 @@ const Navbar = () => {
     };
   }, []);
 
-  if (
-    friendsCount !== Object.keys(friendList).length &&
-    socketController.isConnected()
-  ) {
-    socketController.sendMessage({ type: "connect" });
-    console.log("connect sended");
-  }
+  // if (
+  //   friendsCount !== Object.keys(friendList).length &&
+  //   socketController.isConnected()
+  // ) {
+  //   socketController.sendMessage({ type: "connect" });
+  //   console.log("connect sended");
+  // }
 
   console.log("friendsCount ", friendsCount);
 

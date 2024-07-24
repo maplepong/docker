@@ -10,9 +10,6 @@ const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
   console.log("friendList..", friendList);
-  Object.entries(friendList).map(([key, value]) => {
-    console.log("key : " + key + "value : " + value);
-  });
 
   return (
     <div id="box" style="margin: 15px;">
@@ -86,11 +83,11 @@ const FriendList = (props) => {
         <span id="request">내 친구들</span>
         <ul>
           {friendList && Object.keys(friendList).length > 0 ? (
-            Object.entries(friendList).map(([key, value]) => (
+            Object.keys(friendList).map(key => (
               <div>
                 <li class="exchange">
-                  <NicknameModal nickname={key} />
-                  <p>{value ? "접속중" : "비접속"}</p>
+                  <NicknameModal nickname={friendList[key].nickname} />
+                  <p>{friendList[key].status ? "접속중" : "비접속"}</p>
                 </li>
               </div>
             ))
