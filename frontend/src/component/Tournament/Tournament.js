@@ -3,6 +3,9 @@ import myReact, { useEffect, useState } from "../../core/myReact.js";
 import WaitingTournament from "./TournamentWaiting.js";
 import TournamentSchedule from "./TournamentSchedule.js";
 import socketController from "../../core/socket.js";
+import api, { apiInstance } from "../../core/Api.js";
+import Loading from "../Loading.js";
+import apiTounrament from "../../core/ApiTournament.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
@@ -112,11 +115,46 @@ const Tournament = () => {
     }
     socketController.sendMessage({ type: "tournament", action: "start" });
   };
-  console.log("players",players);
-  console.log("host",host);
+  console.log("players", players);
+  console.log("host", host);
+
+  const outTournament = () => {
+    apiTounrament.out();
+  };
+
+  //방 입장
+  useEffect(async () => {
+    document.onpopstate = outTournament;
+    try {const temp =(await apiTounrament.enter())
+      setPlayers(temp);
+      setHost(temp[0]);
+    }
+    catch (err) {
+      alert(err);
+      console.log(err);
+      myReact.redirect("/home");
+    }
+    return () => {
+      document.removeEventListener("popstate", outTournament);
+    };
+  }, []);
+
+  if (host == "") {
+    return (
+      <div>
+        <Loading type="tournament" />{" "}
+        <button onClick={outTournament}>나가기</button>{" "}
+      </div>
+    );
+  }
   return (
     <div id={"tournament"}>
-      <WaitingTournament handleStartGame={handleStartGame} players={players} host={host} gameStarted={gameStarted}/>
+      <WaitingTournament
+        handleStartGame={handleStartGame}
+        players={players}
+        host={host}
+        gameStarted={gameStarted}
+      />
     </div>
   );
 };
