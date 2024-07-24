@@ -258,7 +258,10 @@ def game_request(request):
             game_request.delete()
             return Response({"detail": "Successfully joined the game"}, status=status.HTTP_200_OK)
         except GameInviteRequest.DoesNotExist:
-            pass
+            return Response(
+                {"error": "Game invite request does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
     elif request.method == "DELETE":
         try:
             game_request = GameInviteRequest.objects.get(
