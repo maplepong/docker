@@ -86,15 +86,25 @@ const Navbar = () => {
     socketController.isConnected()
   ) {
     socketController.sendMessage({ type: "connect" });
+    console.log("connect sended");
   }
 
   console.log("friendsCount ", friendsCount);
+
+  const refreshFriend = () => {
+    socketController.sendMessage({ type: "connect" });
+    console.log("connect sended");
+  };
 
   return (
     <nav>
       <Chat socket={null}></Chat>
       <div style="display: flex; flex-direction: row; width: 100%; height: auto;">
-        <FriendList friendList={friendList} friendRequests={friendRequests} />
+        <FriendList
+          friendList={friendList}
+          friendRequests={friendRequests}
+          refresh={refreshFriend}
+        />
         <div style="flex-direction: column; margin: 5px;">
           <UserStatus data={data} />
           <div style="display: flex;">
