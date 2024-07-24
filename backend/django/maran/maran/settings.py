@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "user",
     "game",
     "chat",
+    "tournament",
     "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
