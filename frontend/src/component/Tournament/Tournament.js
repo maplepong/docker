@@ -17,47 +17,23 @@ const Tournament = () => {
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
-      { type: "tournament", func: handleTournamentMessage },
+      // 시작전 유저 입장
+      { type: "tournament_in", func: function(data){onPlayerJoined(data)} },
+      // 시작전 유저 퇴장
+      { type: "tournament_out", func: function(data){onPlayerLeft(data)} }, 
+      // 토너먼트 시작
+      { type: "tournament_start", func: function(data){onTournamentStart(data)} },
+      // 한 게임 끝
+      { type: "tournament-game-end", func: function(data){onGameEnd(data)} },
     ]);
     // 방에 입장 요청
-    enterTournament();
+    socketController.sendMessage({ type: "tournament", action: "enter" });
     // 클린업 함수로 컴포넌트 언마운트 시 소켓 해제
     return () => {
       socketController._ws.current.close();
     };
   }, []);
 
-  const handleTournamentMessage = (data) => {
-    switch (data.status) {
-      case "new-user":
-        onPlayerJoined(data);
-        break;
-      case "out-user":
-        onPlayerLeft(data);
-        break;
-      case "full-room":
-        onRoomFull(data);
-        break;
-      case "tournament-start":
-        onTournamentStart(data);
-        break;
-      case "game-end":
-        onGameEnd(data);
-        break;
-      case "other-team-end":
-        onOtherTeamEnd(data);
-        break;
-      case "tournament-end":
-        onTournamentEnd(data);
-        break;
-      default:
-        console.error("Unknown tournament status:", data.status);
-    }
-  };
-
-  const enterTournament = () => {
-    socketController.sendMessage({ type: "tournament", action: "enter" });
-  };
 
   const onPlayerJoined = (data) => {
     console.log(data);
@@ -132,7 +108,7 @@ const Tournament = () => {
     } catch (err) {
       alert(err);
       console.log(err);
-      myReact.redirect("home");
+      // myReact.redirect("home");
     }
     return () => {
       document.removeEventListener("popstate", outTournament);
