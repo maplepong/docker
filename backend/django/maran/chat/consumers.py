@@ -1,3 +1,284 @@
+# import json
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# from django.conf import settings
+# from user.models import User
+# from .models import Message
+# from rest_framework_simplejwt.tokens import AccessToken
+# from asgiref.sync import sync_to_async
+# import redis
+# import asyncio
+
+# class ChatConsumer(AsyncWebsocketConsumer):
+#     async def connect(self):
+#         self.user = self.scope["user"]
+
+#         if self.user.is_anonymous:
+#             await self.close()
+#         else:
+#             self.room_group_name = "chat_group"
+#             # 전체채팅 그룹에 사용자 추가
+#             await self.channel_layer.group_add(
+#                 self.room_group_name,
+#                 self.channel_name
+#             )
+#             # Redis에 해당 유저의 채널명(귓속말) 저장
+#             self.redis = await sync_to_async(redis.Redis)(host='redis', port=6379, db=0)
+#             await sync_to_async(self.redis.set)(f"user_channel_{self.user.nickname}", self.channel_name)
+#             await self.accept()
+
+#     async def disconnect(self, close_code):
+#         if hasattr(self, 'redis') and self.user.is_authenticated:
+#             await sync_to_async(self.redis.delete)(f"user_channel_{self.user.nickname}")
+
+#             await self.channel_layer.group_discard(
+#                 self.room_group_name,
+#                 self.channel_name
+#             )
+
+#     async def receive(self, text_data):
+#         try:
+#             text_data_json = json.loads(text_data)
+#             message = text_data_json['message']
+#             sender_nickname = text_data_json['nickname']
+#             sender = await sync_to_async(User.objects.get)(nickname=sender_nickname)
+
+#             # 메시지를 DB에 저장
+#             message_instance = Message(user=sender, content=message)
+#             await sync_to_async(message_instance.save)()
+            
+#             if message.startswith('/w '):
+#                 # Extract the recipient and the message
+#                 split_message = message.split(' ', 2)
+#                 if len(split_message) >= 3:
+#                     recipient_nickname = split_message[1]
+#                     message = split_message[2]
+
+#                     try:
+#                         recipient = await sync_to_async(User.objects.get)(nickname=recipient_nickname)
+#                         # 귓속말 메시지를 DB에 저장
+#                         message_instance.recipient = recipient
+#                         message_instance.content = message
+#                         await sync_to_async(message_instance.save)()  # 비동기로 저장
+
+#                         recipient_channel_name = await sync_to_async(self.redis.get)(f"user_channel_{recipient.nickname}")
+#                         if recipient_channel_name:
+#                             # Send the whisper to the recipient
+#                             await self.channel_layer.send(
+#                                 recipient_channel_name.decode('utf-8'),
+#                                 {
+#                                     'type': 'whisper_message',
+#                                     'message': message,
+#                                     'sender': sender.nickname
+#                                 }
+#                             )
+#                             # Send the whisper to the sender as well
+#                             await self.send(text_data=json.dumps({
+#                                 'message': message,
+#                                 'sender': sender.nickname,
+#                                 'whisper': True
+#                             }))
+#                         else:
+#                             await self.send(text_data=json.dumps({
+#                                 'error': f'User {recipient_nickname} is not connected.'
+#                             }))
+#                     except User.DoesNotExist:
+#                         await self.send(text_data=json.dumps({
+#                             'error': f'User {recipient_nickname} does not exist.'
+#                         }))
+#             else:
+#                 await self.channel_layer.group_send(
+#                     "chat_group",
+#                     {
+#                         'type': 'chat_message',
+#                         'message': message,
+#                         'sender': sender.nickname
+#                     }
+#                 )
+#         except json.JSONDecodeError:
+#             await self.send(text_data=json.dumps({
+#                 'error': 'Invalid JSON'
+#             }))
+
+#     async def chat_message(self, event):
+#         message = event['message']
+#         sender = event['sender']
+
+#         await self.send(text_data=json.dumps({
+#             'message': message,
+#             'sender': sender
+#         }))
+
+#     async def whisper_message(self, event):
+#         message = event['message']
+#         sender = event['sender']
+
+#         await self.send(text_data=json.dumps({
+#             'message': message,
+#             'sender': sender,
+#             'whisper': True
+#         }))
+
+# import json
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# from django.conf import settings
+# from user.models import User
+# from .models import Message
+# from asgiref.sync import sync_to_async
+# import redis
+# import asyncio
+
+# class ChatConsumer(AsyncWebsocketConsumer):
+#     async def connect(self):
+#         self.user = self.scope["user"]
+
+#         if self.user.is_anonymous:
+#             await self.close()
+#         else:
+#             self.room_group_name = "chat_group"
+#             # Join the public chat group
+#             await self.channel_layer.group_add(
+#                 self.room_group_name,
+#                 self.channel_name
+#             )
+#             # Store the channel name for the user in Redis
+#             self.redis = await sync_to_async(redis.Redis)(host='redis', port=6379, db=0)
+#             await sync_to_async(self.redis.set)(f"user_channel_{self.user.nickname}", self.channel_name)
+#             await sync_to_async(self.redis.sadd)("online_users", self.user.nickname)
+
+#             # Notify the group that a user has connected
+#             await self.channel_layer.group_send(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'user_status',
+#                     'nickname': self.user.nickname,
+#                     'status': 'online'
+#                 }
+#             )
+
+#             # Get the list of currently online users
+#             online_users = await sync_to_async(self.redis.smembers)("online_users")
+#             online_users = [user.decode('utf-8') for user in online_users]
+
+#             await self.accept()
+
+#             # Send the list of online users to the new user
+#             await self.send(text_data=json.dumps({
+#                 'type': 'online_users',
+#                 'users': online_users
+#             }))
+
+#     async def disconnect(self, close_code):
+#         if hasattr(self, 'redis') and self.user.is_authenticated:
+#             await sync_to_async(self.redis.delete)(f"user_channel_{self.user.nickname}")
+#             await sync_to_async(self.redis.srem)("online_users", self.user.nickname)
+
+#             # Notify the group that a user has disconnected
+#             await self.channel_layer.group_send(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'user_status',
+#                     'nickname': self.user.nickname,
+#                     'status': 'offline'
+#                 }
+#             )
+
+#             await self.channel_layer.group_discard(
+#                 self.room_group_name,
+#                 self.channel_name
+#             )
+
+#     async def receive(self, text_data):
+#         try:
+#             text_data_json = json.loads(text_data)
+#             message = text_data_json['message']
+#             sender_nickname = text_data_json['nickname']
+#             sender = await sync_to_async(User.objects.get)(nickname=sender_nickname)
+
+#             # 메시지를 DB에 저장
+#             message_instance = Message(user=sender, content=message)
+#             await sync_to_async(message_instance.save)()
+            
+#             if message.startswith('/w '):
+#                 # Extract the recipient and the message
+#                 split_message = message.split(' ', 2)
+#                 if len(split_message) >= 3:
+#                     recipient_nickname = split_message[1]
+#                     message = split_message[2]
+
+#                     try:
+#                         recipient = await sync_to_async(User.objects.get)(nickname=recipient_nickname)
+#                         # 귓속말 메시지를 DB에 저장
+#                         message_instance.recipient = recipient
+#                         message_instance.content = message
+#                         await sync_to_async(message_instance.save)()  # 비동기로 저장
+
+#                         recipient_channel_name = await sync_to_async(self.redis.get)(f"user_channel_{recipient.nickname}")
+#                         if recipient_channel_name:
+#                             # Send the whisper to the recipient
+#                             await self.channel_layer.send(
+#                                 recipient_channel_name.decode('utf-8'),
+#                                 {
+#                                     'type': 'whisper_message',
+#                                     'message': message,
+#                                     'sender': sender.nickname
+#                                 }
+#                             )
+#                             # Send the whisper to the sender as well
+#                             await self.send(text_data=json.dumps({
+#                                 'message': message,
+#                                 'sender': sender.nickname,
+#                                 'whisper': True
+#                             }))
+#                         else:
+#                             await self.send(text_data=json.dumps({
+#                                 'error': f'User {recipient_nickname} is not connected.'
+#                             }))
+#                     except User.DoesNotExist:
+#                         await self.send(text_data=json.dumps({
+#                             'error': f'User {recipient_nickname} does not exist.'
+#                         }))
+#             else:
+#                 await self.channel_layer.group_send(
+#                     "chat_group",
+#                     {
+#                         'type': 'chat_message',
+#                         'message': message,
+#                         'sender': sender.nickname
+#                     }
+#                 )
+#         except json.JSONDecodeError:
+#             await self.send(text_data=json.dumps({
+#                 'error': 'Invalid JSON'
+#             }))
+
+#     async def chat_message(self, event):
+#         message = event['message']
+#         sender = event['sender']
+
+#         await self.send(text_data=json.dumps({
+#             'message': message,
+#             'sender': sender
+#         }))
+
+#     async def whisper_message(self, event):
+#         message = event['message']
+#         sender = event['sender']
+
+#         await self.send(text_data=json.dumps({
+#             'message': message,
+#             'sender': sender,
+#             'whisper': True
+#         }))
+
+#     async def user_status(self, event):
+#         nickname = event['nickname']
+#         status = event['status']
+
+#         await self.send(text_data=json.dumps({
+#             'nickname': nickname,
+#             'status': status
+#         }))
+
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -5,7 +286,6 @@ from django.utils import timezone
 from django.conf import settings
 from user.models import User
 from game.models import Game
-from tournament.models import Tournament
 from .models import Message
 from rest_framework_simplejwt.tokens import AccessToken
 from asgiref.sync import sync_to_async
@@ -74,6 +354,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message_instance.receiver = None
                 await sync_to_async(message_instance.save)()
 
+            # 타입이 귓속말일 때
             if type == 'whisper':
                 receiver_nickname = text_data_json['receiver']
                 try:
@@ -161,41 +442,42 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                         'gameId': gameId
                                     }
                                 )
-                    else: # 수신자가 오프라인인 경우
+                    elif type == 'update': # 친구 상태 업데이트 받음
+                        status = text_data_json['status']
                         await self.send(text_data=json.dumps({
-                            'message': "User is not connected.",
-                            'sender': 'system',
-                            'whisper': True,
-                            'receiver': sender.nickname
+                            'message': "update",
+                            'sender' : sender.nickname,
+                            'status' : status
+                            }))
+                    elif type == 'connect':
+                        friends = await self.get_user_friends(nickname)
+                        
+                        await self.send(text_data=json.dumps({
+                            'type': 'connect',
+                            'sender': nickname,
+                            'friends': friends
                         }))
+                    else: # 수신자가 오프라인인 경우
+                           await self.send(text_data=json.dumps({
+                                'message': "User is not connected.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
                 except User.DoesNotExist:
-                    await self.send(text_data=json.dumps({
-                        'message': "User does not exist.",
-                        'sender': 'system',
-                        'whisper': True,
-                        'receiver': sender.nickname
-                    }))
+                          await self.send(text_data=json.dumps({
+                                'message': "User does not exist.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
                 except Game.DoesNotExist:
-                    await self.send(text_data=json.dumps({
-                        'message': "Game does not exist.",
-                        'sender': 'system',
-                        'whisper': True,
-                        'receiver': sender.nickname
-                    }))
-            elif type == 'update': # 친구 상태 업데이트 받음
-                status = text_data_json['status']
-                await self.send(text_data=json.dumps({
-                    'message': "update",
-                    'sender': sender.nickname,
-                    'status': status
-                }))
-            elif type == 'connect':
-                friends = await self.get_user_friends(sender_nickname)
-                await self.send(text_data=json.dumps({
-                    'type': 'connect',
-                    'sender': sender_nickname,
-                    'friends': friends
-                }))
+                       await self.send(text_data=json.dumps({
+                                'message': "Game is not exist.",
+                                'sender': 'system',
+                                'whisper': True,
+                                'receiver': sender.nickname
+                                }))
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid JSON'
