@@ -62,9 +62,11 @@ apiInstance.interceptors.response.use(
             localStorage.clear();
             myReact.redirect("/");
             alert("로그인이 만료되었습니다");
-            return;
+            return err;
           });
       }
+    } else {
+      return Promise.reject(error);
     }
   }
 );

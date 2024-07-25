@@ -1,8 +1,8 @@
 import { apiInstance } from "./Api.js";
 
 const apiTounrament = {
-  enter: async () => {
-    return await apiInstance
+  enter: function () {
+    return apiInstance
       .post("tournament/new_tournament", {
         headers: {
           Authorization: `Bearer ${localStorage.accessToken}`,
@@ -10,28 +10,25 @@ const apiTounrament = {
       })
       .then((res) => {
         console.log(res);
-        if (res.status === "201") {
+        if (res.status === 201) {
           //방장
           return [localStorage.getItem("nickname")];
-        } else if (res.status === "200") {
+        } else if (res.status === 200) {
           const temp = [];
           res.data.participants.forEach((player) => {
             temp.push(player.nickname);
           });
           return temp;
-        } else if (res.status === "409") {
-          this.out(); // 퇴장 후 엔터
-          console.log("재입장합니다");
-          return this.enter(); //
+        } else {
+          throw new Error("error");
         }
       })
       .catch((error) => {
-          if (axios.isAxiosError(error) && error.response?.status === 409){
-            this.out(); // 퇴장 후 엔터
-            console.log("재입장합니다");
-            return this.enter();
-          }
-         else throw error;
+        if (error.response?.status === 409) {
+          this.out(); // 퇴장 후 엔터
+          console.log("재입장합니다");
+          return this.enter();
+        } else throw error;
       });
   },
   out: async () => {

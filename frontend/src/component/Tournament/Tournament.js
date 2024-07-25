@@ -125,14 +125,14 @@ const Tournament = () => {
   //방 입장
   useEffect(async () => {
     document.onpopstate = outTournament;
-    try {const temp =(await apiTounrament.enter())
+    try {
+      const temp = await apiTounrament.enter();
       setPlayers(temp);
       setHost(temp[0]);
-    }
-    catch (err) {
+    } catch (err) {
       alert(err);
       console.log(err);
-      myReact.redirect("/home");
+      myReact.redirect("home");
     }
     return () => {
       document.removeEventListener("popstate", outTournament);
