@@ -18,13 +18,33 @@ const Tournament = () => {
     socketController.initSocket();
     socketController.setSocketTypes([
       // 시작전 유저 입장
-      { type: "tournament_in", func: function(data){onPlayerJoined(data)} },
+      {
+        type: "tournament_in",
+        func: function (data) {
+          onPlayerJoined(data);
+        },
+      },
       // 시작전 유저 퇴장
-      { type: "tournament_out", func: function(data){onPlayerLeft(data)} }, 
+      {
+        type: "tournament_out",
+        func: function (data) {
+          onPlayerLeft(data);
+        },
+      },
       // 토너먼트 시작
-      { type: "tournament_start", func: function(data){onTournamentStart(data)} },
+      {
+        type: "tournament_start",
+        func: function (data) {
+          onTournamentStart(data);
+        },
+      },
       // 한 게임 끝
-      { type: "tournament-game-end", func: function(data){onGameEnd(data)} },
+      {
+        type: "tournament-game-end",
+        func: function (data) {
+          onGameEnd(data);
+        },
+      },
     ]);
     // 방에 입장 요청
     socketController.sendMessage({ type: "tournament", action: "enter" });
@@ -33,7 +53,6 @@ const Tournament = () => {
       socketController._ws.current.close();
     };
   }, []);
-
 
   const onPlayerJoined = (data) => {
     console.log(data);
@@ -105,6 +124,7 @@ const Tournament = () => {
       const temp = await apiTounrament.enter();
       setPlayers(temp);
       setHost(temp[0]);
+      console.log(temp);
     } catch (err) {
       alert(err);
       console.log(err);
@@ -118,8 +138,8 @@ const Tournament = () => {
   if (host == "") {
     return (
       <div>
-        <Loading type="tournament" />{" "}
-        <button onClick={outTournament}>나가기</button>{" "}
+        <Loading type="tournament" />
+        <button onClick={outTournament}>나가기</button>
       </div>
     );
   }

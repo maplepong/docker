@@ -8,7 +8,9 @@ const UserStatus = (props) => {
     <div id="container-UserStatus">
       <div id="info-line">
         <div id="info" style="flex-direction: column;">
-          <div class="usernickname">{localStorage.nickname}</div>
+          <div class="usernickname">
+            {localStorage.nickname ? localStorage.nickname : "error"}
+          </div>
           <div class="level">level 42</div>
         </div>
         <img
