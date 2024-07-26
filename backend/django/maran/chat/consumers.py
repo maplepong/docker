@@ -591,6 +591,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             'bracket': participant_nicknames
                         }
                     )
+            elif type == 'tournament-quarterfinal-end':
+                tournament = await sync_to_async(Tournament.objects.first)()
+                if tournament and tournament.is_active:
+                    participants = await sync_to_async(tournament.get_participants)()
+                    participant_nicknames = [user.nickname for user in participants]
+                    user_index = participant_nicknames.index(sender_nickname)
+                    if user_index in [0, 1]:
+                        message = "Semifinal game1 is over"
+                    elif user_index in [2, 3]:
+                        message = "Semifinal game2 is over"
+                    await self.channel_layer.group_send(
+                        'tournament_group',
+                        {
+                            'type': 'tournament-quarterfinal-end',
+                            'status': 'tournament-quarterfinal-end',
+                            'message': message,
+                            'sender': sender.nickname
+                        }
+                    )
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid JSON'
@@ -694,6 +713,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'message': message,
             'sender': 'system',
             'bracket': bracket
+        }))
+
+    async def tournament_quarterfinal_end(self, event):
+        status = event['status']
+        message = event['message']
+        sender = event['sender']
+
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_quarterfinal_end',
+            'status': status,
+            'message': message,
+            'sender': sender
         }))
 
     @database_sync_to_async
