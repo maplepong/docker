@@ -131,6 +131,9 @@ const Navbar = () => {
             <Link to="setting">
               <button style="margin: 5px;">설정</button>
             </Link>
+            <Link to="home">
+              <button style="margin: 5px;">home</button>
+            </Link>
           </div>
         </div>
       </div>
