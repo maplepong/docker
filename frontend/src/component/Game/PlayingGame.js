@@ -1,5 +1,5 @@
 /* @jsx myReact.createElement */
-import myReact, { useState, useEffect } from "../../core/myReact.js";
+import myReact, { useState, useEffect, useRef } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
 import api from "../../core/Api.js";
 
@@ -8,8 +8,8 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   let upPressed, downPressed;
   let flag = false;
   let playerPaddle, aiPaddle, ball, ballDirection;
-  let userscore = 0;
-  let enemyscore = 0;
+  let userscore = useRef(0);
+  let enemyscore = useRef(0);
 
   useEffect(() => {
     if (!gameinfo || !gameSocket.current) {
@@ -28,12 +28,12 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
       const camera = new THREE.PerspectiveCamera(
         75,
-        window.innerWidth / window.innerHeight,
+        480 / 320,
         0.1,
         1000
       );
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(480, 320);
 
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(5, 5, 5).normalize();
@@ -65,10 +65,11 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       aiPaddle.position.x = 2;
       scene.add(aiPaddle);
 
-      ballDirection = new THREE.Vector3(0.0, 0.0, 0);
-
-      let leftscore = 0;
-      let rightscore = 0;
+      if (localStorage.getItem("nickname") === gameinfo.owner) {
+        ballDirection = new THREE.Vector3(0.01, 0.01, 0);
+      } else {
+        ballDirection = new THREE.Vector3(-0.01, 0.01, 0);
+      }
 
       const fontLoader = new THREE.FontLoader();
       let font;
@@ -78,7 +79,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         function (loadedFont) {
           font = loadedFont;
           drawText(
-            leftscore.toString() + " : " + rightscore.toString(),
+            userscore.current.toString() + " : " + enemyscore.current.toString(),
             -0.6,
             0,
             0xffffff
@@ -104,11 +105,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         scene.add(textMesh);
       }
 
-      function resetBall() {
-        ball.position.set(0, 0, 0);
-        ballDirection.set(0.0, 0.0, 0);
-      }
-
       function updateBall() {
         ball.position.add(ballDirection);
 
@@ -122,25 +118,21 @@ const PingPong = ({ gameinfo, gameSocket }) => {
             ballDirection.x = -ballDirection.x;
             sendGameState();
           } else {
-            rightscore++;
-            //updateScore(1, 0);
+            updateScore(1, 0);
             sendGameState();
-            drawText(leftscore.toString() + " : " + rightscore.toString(),-0.6,0,0xff0000);
-            resetBall();
+            drawText(userscore.current.toString() + " : " + enemyscore.current.toString(),-0.6,0,0xff0000);
           }
         }
 
         if (ball.position.x + ballRadius >=aiPaddle.position.x - paddleWidth / 2) {
-          if (ball.position.y >= aiPaddle.position.y - paddleHeight / 2 && 
+          if (ball.position.y >= aiPaddle.position.y - paddleHeight / 2 &&
             ball.position.y <= aiPaddle.position.y + paddleHeight / 2) {
             ballDirection.x = -ballDirection.x;
             sendGameState();
           } else {
-            leftscore++;
-            //updateScore(0, 1);
+            updateScore(0, 1);
             sendGameState();
-            drawText(leftscore.toString() + " : " + rightscore.toString(),-0.6,0,0x0000ff);
-            resetBall();
+            drawText(userscore.current.toString() + " : " + enemyscore.current.toString(),-0.6,0,0x0000ff);
           }
         }
       }
@@ -162,7 +154,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       function animate() {
         requestAnimationFrame(animate);
 
-        //updateBall();
+        updateBall();
 
         updatePlayerPaddle();
 
@@ -202,26 +194,30 @@ const PingPong = ({ gameinfo, gameSocket }) => {
           if (socketball && !isowner) {
               ball.position.x = socketball.x;
               ball.position.y = socketball.y;
-              ballDirection.x = ball.dx;
-              ballDirection.y = ball.dy;
+              ballDirection.x = socketball.dx;
+              ballDirection.y = socketball.dy;
           }
           if (paddle) {
               aiPaddle.position.y = paddle.y;
           }
           if (uscore && !isowner) {
-              userscore = uscore.y;
-              enemyscore = uscore.x;
+              userscore.current = uscore.y;
+              enemyscore.current = uscore.x;
           }
       }
   }
 
+    function resetBall() {
+      ball.position.set(0, 0, 0);
+    }
+
     function updateScore(leftAdd, rightAdd) {//스코어 업데이트
-      userscore += leftAdd;
-      enemyscore += rightAdd;
+      userscore.current += leftAdd;
+      enemyscore.current += rightAdd;
       sendGameState();
-      if (userscore < 3 && enemyscore < 3) resetBall();
+      if (userscore.current < 3 && enemyscore.current < 3) resetBall();
       else {
-          api.sendGameResult(userscore,enemyscore,localStorage.getItem("nickname"));
+          api.sendGameResult(userscore.current,enemyscore.current,localStorage.getItem("nickname"));
           gameSocket.current.close();
           window.history.back();
       }
@@ -231,9 +227,9 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   function sendGameState() {
     if (gameSocket.current && gameSocket.current.readyState === WebSocket.OPEN) {
         const data = {
-            socketball: { x: -ball.position.x, y: -ball.position.y, dx: -ballDirection.x, dy: -ballDirection.y},
+            socketball: { x: -ball.position.x, y: ball.position.y, dx: -ballDirection.x, dy: ballDirection.y},
             paddle: { x: -playerPaddle.position.x, y: playerPaddle.position.y},
-            uscore: { x: userscore, y : enemyscore}
+            uscore: { x: userscore.current, y : enemyscore.current}
         };
         gameSocket.current.send(JSON.stringify({ data: data, type: "game_update", nickname: localStorage.getItem("nickname") }));
     }
@@ -257,7 +253,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
   return (
     <div id="score">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
     </div>
   );
 };
