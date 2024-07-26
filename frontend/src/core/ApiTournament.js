@@ -12,15 +12,13 @@ const apiTounrament = {
         console.log(res);
         if (res.status === 201) {
           //방장
-          return [localStorage.getItem("nickname")];
-        } else if (res.status === 200) {
+          return {players: [localStorage.getItem("nickname")], status: res.status};
+        } else  {
           const temp = [];
           res.data.participants.forEach((player) => {
             temp.push(player.nickname);
           });
-          return temp;
-        } else {
-          throw new Error("error");
+          return {players: temp, status: res.status};
         }
       })
       .catch((error) => {
@@ -40,9 +38,6 @@ const apiTounrament = {
       .catch((err) => {
         console.log(err);
       });
-    atch((err) => {
-      console.log(err);
-    });
   },
 };
 

@@ -6,13 +6,15 @@ import socketController from "../../core/socket.js";
 import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
+import status from "./TournamentStatus.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
   const [host, setHost] = useState("");
   const [waitingTime, setWaitingTime] = useState(60); // 대기 시간
-  const [gameStarted, setGameStarted] = useState(false);
+  const [gameStatus, setGameStatus] = useState(status.LOADING);
   const maxPlayers = 4;
+  console.log("players", players);
 
   useEffect(() => {
     socketController.initSocket();
@@ -45,6 +47,13 @@ const Tournament = () => {
           onGameEnd(data);
         },
       },
+      //host 변경
+      {
+        type: "tournament-host-change",
+        func: function (data) {
+          onGameEnd(data);
+        },
+      },
     ]);
     // 방에 입장 요청
     socketController.sendMessage({ type: "tournament", action: "enter" });
@@ -52,38 +61,31 @@ const Tournament = () => {
     return () => {
       socketController._ws.current.close();
     };
-  }, []);
+  });
+  
 
   const onPlayerJoined = (data) => {
-    console.log(data);
-    setPlayers((prevPlayers) => [...prevPlayers, data.nickname]);
-    if (!host) {
-      setHost(data.nickname); // 첫 번째 입장자가 방장
+    console.log("playerJoined", data);
+    if (players.includes(data.nickname)) {
+      console.log(...players, data.nickname, "player alreay exists");
+      return;
     }
+    setPlayers([...players, data.nickname]);
+    console.log(...players, data.nickname, "player");
   };
 
   const onPlayerLeft = (data) => {
+    console.log("playerLeft", data);
     setPlayers((prevPlayers) => {
       const newPlayers = prevPlayers.filter(
         (player) => player !== data.nickname
       );
-      if (data.nickname === host && newPlayers.length > 0) {
-        // 방장이 나갔을 경우 새로운 방장을 랜덤으로 선정
-        const newHost =
-          newPlayers[Math.floor(Math.random() * newPlayers.length)];
-        setHost(newHost);
-        console.log(`New host is: ${newHost}`);
-      }
       return newPlayers;
     });
   };
 
-  const onRoomFull = (data) => {
-    console.log("Room is full. Game can start now.");
-  };
-
   const onTournamentStart = (data) => {
-    setGameStarted(true);
+    setGameStatus(status.STARTED);
   };
 
   const onGameEnd = (data) => {
@@ -114,6 +116,7 @@ const Tournament = () => {
   console.log("host", host);
 
   const outTournament = () => {
+    socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
   };
 
@@ -121,10 +124,15 @@ const Tournament = () => {
   useEffect(async () => {
     document.onpopstate = outTournament;
     try {
-      const temp = await apiTounrament.enter();
-      setPlayers(temp);
-      setHost(temp[0]);
-      console.log(temp);
+      const data = await apiTounrament.enter();
+      console.log("got data", data);
+      if (data.status !== 208) {
+        socketController.sendMessage({ type: "tournament_in" });
+      }
+      setPlayers(data.players);
+      setHost(data.players[0]);
+
+      setGameStatus(status.READY);
     } catch (err) {
       alert(err);
       console.log(err);
@@ -134,25 +142,40 @@ const Tournament = () => {
       document.removeEventListener("popstate", outTournament);
     };
   }, []);
+  socketController.initSocket();
 
-  if (host == "") {
-    return (
-      <div>
-        <Loading type="tournament" />
-        <button onClick={outTournament}>나가기</button>
-      </div>
-    );
+  const braket = [
+    ["player1", "player2"],
+    ["player3", "player4"],
+  ];
+
+  switch (gameStatus) {
+    case status.READY:
+      return (
+        <div id={"tournament"}>
+          <WaitingTournament
+            handleStartGame={handleStartGame}
+            players={players}
+            host={host}
+          />
+          <button onClick={outTournament}>나가기</button>
+        </div>
+      );
+    case status.STARTED || status.BETWEEN_ROUND || status.FINISHED: {
+      return <TournamentSchedule braket={braket} status={gameStatus} />;
+    }
+    case status.ROUND_ONE || status.ROUND_TWO: {
+      return <GameRoom id={gameId} />;
+    }
+    default: {
+      return (
+        <div>
+          <Loading type="tournament" />
+          <button onClick={outTournament}>나가기</button>
+        </div>
+      );
+    }
   }
-  return (
-    <div id={"tournament"}>
-      <WaitingTournament
-        handleStartGame={handleStartGame}
-        players={players}
-        host={host}
-        gameStarted={gameStarted}
-      />
-    </div>
-  );
 };
 
 export default Tournament;
