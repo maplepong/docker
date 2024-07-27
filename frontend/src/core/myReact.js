@@ -141,7 +141,7 @@ function createMyReact() {
     },
 
     // global 구조: {
-    // fibers : {fiber: fiber, setState: setState}[];
+    // setState: setState;
     // value : value;
     // }
     // 리턴 값: global, setGlobal
@@ -149,26 +149,21 @@ function createMyReact() {
       const currentFiber = window.currentFiberNode;
       //이미 초기화된 전역 값
       if (this.globalState[key]) {
-        // 해당 컴포넌트에선 아직 초기화 안됐을 경우
-        if (!this.globalState[key].fibers.find(data => data.fiber === currentFiber)){
-          const temp = useState(this.globalState[key].value);
-          this.globalState[key].fibers.push({fiber: currentFiber, setState: temp[1]});
-        }
+        // setstate 새 컴포넌트 것으로 변경
+        const temp = useState(this.globalState[key].value);
+        this.globalState[key].setState = temp[1];
       }
       // 초기화 안된 전역 값
       else {
         const temp = useState(initValue);
-        this.globalState[key] = {fibers: [{fiber: currentFiber, setState: temp[1]}], value: initValue};
+        this.globalState[key] = {setState: temp[1], value: initValue};
       }
 
       const setGlobalState = (value) => {
+        console.log(this.globalState)
         if (this.globalState[key].value === value) return;
         this.globalState[key].value = value;
-        this.globalState[key].fibers.forEach((data, i) => {
-          console.log(fiber.ownerDocument);
-          if (!data.fiber) this.globalState[key].fibers[i].erase();
-          else data.setState(value);
-        });
+        this.globalState[key].setState(value);
         
       }
       return [this.globalState[key].value, setGlobalState]
