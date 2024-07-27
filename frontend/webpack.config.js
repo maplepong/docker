@@ -9,7 +9,7 @@ const webpack = require("webpack");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.js", //1파일시작위치-입력
+  entry: "./src/_app.js", //1파일시작위치-입력
   output: {
     //2출력
     path: path.resolve(__dirname, "dist"), //__dirname: 현재위치

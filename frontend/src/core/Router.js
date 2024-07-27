@@ -1,7 +1,8 @@
 /* @jsx createElement */
 import createElement from "./createElement.js";
 import myReact from "../core/myReact.js";
-import App from "../app.js";
+import App from "../_app.js";
+import Index from "../index.js"
 import Undefined from "../component/Undefined.js";
 import Home from "../component/Home.js";
 import Welcome from "../component/Welcome.js";
@@ -19,9 +20,11 @@ import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
 import PingPong from "../component/Game/PlayingGame.js";
 import Tournament from "../component/Tournament/Tournament.js";
+import '../css/common.css';
+
 
 const pathList = {
-  "/": <App />,
+  "/": <Index />,
   userinfo: <UserInfoPage />,
   login: <Login />,
   home: <Home />,
@@ -62,11 +65,11 @@ export default function router() {
     path === "api-login" ||
     path === "api-signup"
   ) {
-    myReact.render(<div>{component}</div>, "newPage");
+    myReact.render(<div id="app">{component}</div>, "newPage");
   } else {
     // myReact.render(component, "newPage"); //test develope
     myReact.render(
-      <div>
+      <div id="app">
         {component}
         <Navbar />
       </div>,

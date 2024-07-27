@@ -46,49 +46,7 @@ const Login = () => {
   }
 
   return (
-    <div id="container">
-    <div id="login-box">
-      <div id="infos">
-        <div>
-          <div class="info">
-            <input id="input-username" placeholder="ID"></input>
-          </div>
-          <div class="info">
-            <input id="input-password" placeholder="password" type="password"></input>
-          </div>
-          <div id="otp-block" style="display:none;">
-            <p style="color:white;">당신의 Email에서 QR 코드를 확인하고</p>
-            <p style="color:white;">Google Authenticator를 통해</p>
-            <p style="color:white;">입력받은 번호 6자리를 보내주세요.</p>
-            <input id="input-otp"></input>
-            <button style="margin:5px;" onclick={checkOtp}>
-              확인
-            </button>
-          </div>
-        </div>
-        <div id="login">
-          <button onclick={login}>로그인</button>
-        </div>
-      </div>
-      <div id="other-btns">
-        <div>
-          <Link to="home">
-            <button class="btns">Home</button>
-          </Link>
-        </div>
-        <div>
-          <Link to="signup">
-            <button class="btns">회원가입</button>
-          </Link>
-        </div>
-        <div>
-          <Link to="api-login">
-            <button class="btns">42 API 로그인</button>
-          </Link>
-        </div>
-      </div>
-    </div>
-    </div>
+    </
   );
 };
 
