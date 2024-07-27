@@ -6,7 +6,7 @@ import socketController from "../../core/socket.js";
 import { requestJoinGame } from "../../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = myReact.useGlobalState("chat", []);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");

@@ -11,7 +11,12 @@ function TestRef() {
 	
 
 	const [state, setState] = useState(0);
+
+	const [global, setGlobal] = myReact.useGlobalState("test", 0);
 	
+	function handleGlobal () {
+		setGlobal(global + 1);
+	}
 	
 	return  (
 		<div>
@@ -21,6 +26,10 @@ function TestRef() {
 			Click me!
 		</button>
 		<p>useref {ref.current} times</p>
+		<button onClick={handleGlobal}> 
+			global!
+		</button>
+		<p>global {global} times</p>
 		</div>
 	)
 }

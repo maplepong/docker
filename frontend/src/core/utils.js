@@ -20,9 +20,10 @@ export function isEmptyObj(para){
 export function isEmptyArray(para){
 	if (Array.isArray(para)){
 		if (para.length === 0) {
-			
+			return true;
 		}
 	}
+	return false;
 }
 
 //equal test for array 
