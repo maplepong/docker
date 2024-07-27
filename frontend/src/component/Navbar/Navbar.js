@@ -6,7 +6,7 @@ import myReact, {
   useRef,
 } from "../../core/myReact.js";
 import Chat from "./Chat.js";
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 import UserStatus from "./UserStatus.js";
 import FriendList from "./FriendList.js";
 import socketController from "../../core/socket.js";
@@ -34,8 +34,14 @@ const Navbar = () => {
 
   const onConnect = (data) => {
     console.log("ws connnected data :", data.friends);
+    if (!data.friends || data.friends.length === 0) {
+      return;
+    }
     data.friends.forEach((friend) => {
-      friendList[friend.nickname] = friend.status === "on" ? true : false;
+      friendList[friend.nickname] = {
+        nickname: friend.nickname,
+        status: friend.status === "on" ? true : false,
+      };
     });
 
     friendsCount.current = data.friends.length;
@@ -44,8 +50,8 @@ const Navbar = () => {
   const onUpdate = (data) => {
     console.log("ws update data :", data);
     data.status = data.status === "on" ? true : false;
-    friendList[data.sender] = data.status;
-    friendsCount = Object.keys(friendList).length;
+    friendList[data.sender] = { nickname: data.sender, status: data.status };
+    friendsCount.current = Object.keys(friendList).length;
     setFriendList(friendList);
   };
 
@@ -62,13 +68,20 @@ const Navbar = () => {
       socketController.initSocket();
       const friendRequests = await api.getRequestFriendList(); // [{nickname: .. , id :..}]
       const friends = await api.getFriendList();
-      const temp = {};
-      friends.forEach((req) => {
-        temp[req.nickname] = false;
-      });
-      friendsCount.current = friends.length;
+      if (friends.length != 0) {
+        const temp = {};
+        friends.forEach((req) => {
+          temp[req.nickname] = {
+            nickname: req.nickname,
+            status: friendList[req.nickname]
+              ? friendList[req.nickname].status
+              : false,
+          };
+        });
+        friendsCount.current = friends.length;
+        setFriendList(temp);
+      }
       setFriendRequests(friendRequests);
-      setFriendList(temp);
       setData(response);
     }
     return () => {
@@ -76,17 +89,30 @@ const Navbar = () => {
     };
   }, []);
 
-  if (friendsCount !== Object.keys(friendList).length) {
-    socketController.sendMessage({ type: "connect" });
-  }
+  // if (
+  //   friendsCount !== Object.keys(friendList).length &&
+  //   socketController.isConnected()
+  // ) {
+  //   socketController.sendMessage({ type: "connect" });
+  //   console.log("connect sended");
+  // }
 
   console.log("friendsCount ", friendsCount);
+
+  const refreshFriend = () => {
+    socketController.sendMessage({ type: "connect" });
+    console.log("connect sended");
+  };
 
   return (
     <nav>
       <Chat socket={null}></Chat>
       <div style="display: flex; flex-direction: row; width: 100%; height: auto;">
-        <FriendList friendList={friendList} friendRequests={friendRequests} />
+        <FriendList
+          friendList={friendList}
+          friendRequests={friendRequests}
+          refresh={refreshFriend}
+        />
         <div style="flex-direction: column; margin: 5px;">
           <UserStatus data={data} />
           <div style="display: flex;">
@@ -104,6 +130,9 @@ const Navbar = () => {
             </Link>
             <Link to="setting">
               <button style="margin: 5px;">설정</button>
+            </Link>
+            <Link to="home">
+              <button style="margin: 5px;">home</button>
             </Link>
           </div>
         </div>

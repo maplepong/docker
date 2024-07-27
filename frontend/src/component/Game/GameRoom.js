@@ -7,7 +7,7 @@ import "../../css/GameRoom.css";
 import "../../css/Pingpong.css";
 import PingPong from "./PlayingGame.js";
 import SocketController from "../../core/socket.js";
-import LoadingGame from "./LoadingGame.js";
+import Loading from "../Loading.js";
 import WaitingGame from "./WaitingGame.js";
 
 const GameRoom = () => {
@@ -192,7 +192,7 @@ const GameRoom = () => {
       exitGame={exitGame}
     />
   ) : (
-    <LoadingGame />
+    <Loading type="game"/>
   );
 };
 

@@ -4,11 +4,6 @@
 import axios from "axios";
 import myReact, { Link } from "./core/myReact.js";
 import myReactDOM from "./core/myReactDOM.js";
-import {
-  requestLogin,
-  requestFriendList,
-  requestUserInfo,
-} from "./core/Api.js";
 import FriendList from "./component/Navbar/FriendList.js";
 import RequestFriend from "./component/RequestFriend.js";
 import { useState, useEffect } from "./core/myReact.js";
@@ -17,7 +12,7 @@ import SignUp from "./component/SignUp.js";
 import "./css/index.css";
 import "./css/friend.css";
 import Test from "./component/Test.js";
-import api from "./core/Api_.js";
+import api from "./core/Api.js";
 import Navbar from "./component/Navbar/Navbar.js";
 
 const setAxios = () => {

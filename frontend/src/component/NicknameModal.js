@@ -1,5 +1,5 @@
 /* @jsx myReact.createElement */
-import api from "../core/Api_.js";
+import api from "../core/Api.js";
 import myReact, { Link } from "../core/myReact.js";
 import "../css/NicknameModal.css";
 
