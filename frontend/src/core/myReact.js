@@ -29,6 +29,7 @@ function createMyReact() {
     fiberRoot: null, //root of fiberNode
     currentFiberNode: null,
     isUpdateScheduled: false,
+    globalState: {},
 
     // renderFiberRoot : function () {
     // // createElement하는 시점, 특히 라우터에서 import되는 타이밍에 렌더하지 않게 방지
@@ -138,6 +139,40 @@ function createMyReact() {
       history.pushState({}, "", param);
       router();
     },
+
+    // global 구조: {
+    // fibers : {fiber: fiber, setState: setState}[];
+    // value : value;
+    // }
+    // 리턴 값: global, setGlobal
+    useGlobalState: function (key, initValue){
+      const currentFiber = window.currentFiberNode;
+      //이미 초기화된 전역 값
+      if (this.globalState[key]) {
+        // 해당 컴포넌트에선 아직 초기화 안됐을 경우
+        if (!this.globalState[key].fibers.find(data => data.fiber === currentFiber)){
+          const temp = useState(this.globalState[key].value);
+          this.globalState[key].fibers.push({fiber: currentFiber, setState: temp[1]});
+        }
+      }
+      // 초기화 안된 전역 값
+      else {
+        const temp = useState(initValue);
+        this.globalState[key] = {fibers: [{fiber: currentFiber, setState: temp[1]}], value: initValue};
+      }
+
+      const setGlobalState = (value) => {
+        if (this.globalState[key].value === value) return;
+        this.globalState[key].value = value;
+        this.globalState[key].fibers.forEach((data, i) => {
+          console.log(fiber.ownerDocument);
+          if (!data.fiber) this.globalState[key].fibers[i].erase();
+          else data.setState(value);
+        });
+        
+      }
+      return [this.globalState[key].value, setGlobalState]
+    }
   };
 }
 
@@ -164,7 +199,7 @@ export function useState(initValue) {
     //console.log("setState err-value same-",value);
     fiber.changedState.push({ i, value });
     // myReact.enrenderQueue.append(["stateChange", fiber, i]);
-    fiber.changed = true;
+    // fiber.changed = true; 
     batchUpdates(fiber);
     // scheduleUpdate(fiber);
     // console.log("렌더를 합니다")
