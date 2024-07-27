@@ -5,7 +5,6 @@ import { exist, isEqualObj } from "./utils.js";
 import router from "./Router.js";
 
 export function Link(props) {
-  // //console.log(props)
   const tag = "a";
   const href = props["to"];
   if (exist(href)) delete props["to"];
@@ -135,9 +134,6 @@ function createMyReact() {
       } else {
         param = location.origin + "/" + param;
       }
-      // if (param !== "/") path = "/" + param;
-      // else path = "/";
-      // path = location.origin + path;
       console.log("redirect call", param);
       history.pushState({}, "", param);
       router();
@@ -178,23 +174,12 @@ export function useState(initValue) {
   return [fiber.state[i], (v) => setState(v)];
 }
 
-function scheduleUpdate(fiber) {
-  // myReact.enrenderQueue.push(fiber);
-  // if (!myReact.isUpdateScheduled){
-  // 	myReact.isUpdateScheduled = true;
-  // 	setTimeout(() => {myReact.render(null, "reRender")}, 20);
-  // }
-  batchUpdates(fiber);
-}
-
 /*
 	callback -> return f is cleanup function, use carefully
 	cleanup calls when :
 	1. idk..... will update this later
 */
 export function useEffect(callback, deps) {
-  //console.log("useEffect called: callback", callback);
-  //console.log("useEffect called: deps", deps);
   const fiber = window.currentFiberNode;
   const i = fiber.effectPosition;
   fiber.effectPosition++;
@@ -223,17 +208,13 @@ export function useEffect(callback, deps) {
 	save cleanUp as a 3rd value.
 	
 	*/
-  // if (fiber.useEffect[i])
-  // 	console.log("useEffect deps old", fiber.useEffect[i].deps)
-  // console.log("useEffect deps new", deps)
-  // console.log("isEqual", isEqualObj(fiber.useEffect[i].deps, deps), fiber.useEffect[i].deps, deps);
   if (deps !== undefined && isEqualObj(fiber.useEffect[i].deps, deps)) {
-    //console.log("!!!!!!!!!!!!!!----------------------snocallback");
     return;
   }
+
   //if deps not changed || include both are empth array [], just return
 
-  // calling callback :s
+  // calling callback
   // 1. deps === undefined
   // 2. deps === [] (but first call)
   // 3. deps changed

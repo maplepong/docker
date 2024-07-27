@@ -21,7 +21,7 @@ import PingPong from "../component/Game/PlayingGame.js";
 import Tournament from "../component/Tournament/Tournament.js";
 
 const pathList = {
-  "/": <Login />,
+  "/": <App />,
   userinfo: <UserInfoPage />,
   login: <Login />,
   home: <Home />,
@@ -47,7 +47,7 @@ export default function router() {
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
   if (gameIdMatch) {
     const gameId = gameIdMatch[1];
-    component = <GameRoom gamdId={gameId}/>;
+    component = <GameRoom />;
   } else {
     component = pathList[path];
   }
@@ -55,7 +55,22 @@ export default function router() {
   // console.log("component", component);
   if (component === undefined) {
     myReact.render(<Undefined />, "newPage");
+  } else if (
+    path === "login" ||
+    path === "/" ||
+    path === "signup" ||
+    path === "api-login" ||
+    path === "api-signup"
+  ) {
+    myReact.render(<div>{component}</div>, "newPage");
   } else {
-    myReact.render(<App children={component} />, "newPage");
+    // myReact.render(component, "newPage"); //test develope
+    myReact.render(
+      <div>
+        {component}
+        <Navbar />
+      </div>,
+      "newPage"
+    );
   }
 }
