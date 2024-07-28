@@ -8,9 +8,9 @@ class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     host = models.ForeignKey(User, related_name='hosted_tournaments', on_delete=models.CASCADE, null=True, blank=True)
     is_active = models.BooleanField(default=False)  # 토너먼트 진행 여부 확인 필드
-    semifinal_game1 = models.ForeignKey(Game, related_name="semifinal_1", on_delete=models.CASCADE, null=True, blank=True)
-    semifinal_game2 = models.ForeignKey(Game, related_name="semifinal_2", on_delete=models.CASCADE, null=True, blank=True)
-    final_game_id = models.ForeignKey(Game, related_name="final", on_delete=models.CASCADE, null=True, blank=True)
+    semifinal_game1 = models.ForeignKey(Game, related_name="semifinal_1", on_delete=models.SET_NULL, null=True, blank=True)
+    semifinal_game2 = models.ForeignKey(Game, related_name="semifinal_2", on_delete=models.SET_NULL, null=True, blank=True)
+    final_game_id = models.ForeignKey(Game, related_name="final", on_delete=models.SET_NULL, null=True, blank=True)
     end_game_count = models.PositiveBigIntegerField(default=0)
     
     def get_participants(self):
