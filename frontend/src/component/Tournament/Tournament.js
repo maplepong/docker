@@ -14,6 +14,7 @@ const Tournament = () => {
   const [waitingTime, setWaitingTime] = useState(60); // 대기 시간
   const [gameStatus, setGameStatus] = useState(status.LOADING);
   const maxPlayers = 4;
+  const gameId = useRef(null);
   console.log("players", players);
 
   useEffect(() => {
@@ -84,6 +85,18 @@ const Tournament = () => {
   };
 
   const onTournamentStart = (data) => {
+    apiInstance
+      .post("tournament/get_braket")
+      .then((res) => {
+        console.log(res.data);
+        setBraket(res.data);
+        gameId.current = res.data.gameId;
+        setGameStatus(status.ROUND_ONE);
+      })
+      .catch((err) => {
+        alert(err);
+        outTournament();
+      });
     setGameStatus(status.STARTED);
   };
 
@@ -109,7 +122,7 @@ const Tournament = () => {
       alert("Not enough players to start the game.");
       return;
     }
-    socketController.sendMessage({ type: "tournament", action: "start" });
+    socketController.sendMessage({ type: "tournament_start" });
   };
   console.log("players", players);
   console.log("host", host);
