@@ -187,26 +187,53 @@ def start_semifinal(request):
         tournament.save()
     return JsonResponse({'message': 'semifinal started successfully'}, status=status.HTTP_200_OK)
 
+def test(request):
+    if Tournament.objects.exists():
+        tournament = Tournament.objects.first()
+        nickname_lst = []
+        participants = tournament.get_participants()
+        for idx, participant in enumerate(participants):
+            nickname_lst.append(participant.nickname)
+        response_data = {
+            "bracket": nickname_lst
+        }
+        return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+from django.db import connection
+
 @api_view(["GET"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def get_bracket(request):
     user_nickname = request.user.nickname  # 인증된 사용자의 닉네임 가져오기
     if not Tournament.objects.exists():
-        return JsonResponse({'error': 'Tournament room does not exist.'}, status=status.HTTP_404_NOT_FOUND)    
+        return JsonResponse({'error': 'Tournament room does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
     tournament = Tournament.objects.first()
     if tournament.is_active != True:
         return JsonResponse({'error': 'Tournament has not started yet.'}, status=status.HTTP_400_BAD_REQUEST)
+    
     nickname_lst = []
-    participants = tournament.get_participants()
     myGameid = None  # 초기화
-    for idx, participant in enumerate(participants):
-        nickname_lst.append(participant.nickname)
-        if participant.nickname == user_nickname:
+
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            SELECT u.nickname
+            FROM user_user u
+            JOIN tournament_tournament_participants tp ON u.id = tp.user_id
+            WHERE tp.tournament_id = %s
+            ORDER BY tp.id ASC
+        ''', [tournament.id])
+        rows = cursor.fetchall()
+
+    for idx, (nickname,) in enumerate(rows):
+        nickname_lst.append(nickname)
+        if nickname == user_nickname:
             if idx in [0, 1]:
                 myGameid = tournament.semifinal_game1.id if tournament.semifinal_game1 else None
             elif idx in [2, 3]:
                 myGameid = tournament.semifinal_game2.id if tournament.semifinal_game2 else None
+    
     response_data = {
         "message": "Get bracket successfully",
         "bracket": nickname_lst,
@@ -231,20 +258,19 @@ def end_semifinal(request):
     
     if not winner_nickname or not loser_nickname or not semifinal_gameid:
         return JsonResponse({'error': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # 진 사람을 participants에서 내보내기
     try:
+        # 방장이 탈락한 경우 다른 사람을 방장으로 설정
         loser = User.objects.get(nickname=loser_nickname)
+        if tournament.host == loser:
+            new_host = User.objects.get(nickname=winner_nickname)
+            if new_host:
+                tournament.host = new_host
+                tournament.save()
         tournament.participants.remove(loser)
     except User.DoesNotExist:
         return JsonResponse({'error': 'Loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-    
-    # 방장이 탈락한 경우 다른 사람을 방장으로 설정
-    if tournament.host == loser:
-        new_host = tournament.participants.first()
-        if new_host:
-            tournament.host = new_host
-            tournament.save()
     
     # end_game_count 증가
     tournament.end_game_count += 1
