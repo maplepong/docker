@@ -1,6 +1,7 @@
 /* @jsx myReact.createElement */
 //// TEST PAGE for useState, useEffect
 import myReact, { useState, useEffect, Link } from "../core/myReact.js";
+import api from "../core/Api.js";
 
 const Test = () => {
 
@@ -33,6 +34,14 @@ const Test = () => {
 	//redirect example
 	const re = () => { myReact.redirect("welcome");}
 
+	const image = async(player) => {
+		const response = await api.userImage("GET", "", player);
+		console.log(response);
+		return response.image;
+	}
+	const [userImg, setUserImg] = useState("");
+	
+	
 
 	//onClick말고다른거Test
 	const onOtherTest = () => { console.log("onchange success")}
@@ -55,6 +64,14 @@ const Test = () => {
 					<option value="ok">ok</option>
 					<option value="no">no</option>
 					</select>
+			</div>
+			<div>
+				<input type="text" id="nickname"></input>
+				<button onclick={async () => {
+					const input = document.querySelector("#nickname");
+					setUserImg(await image(input.value));
+				}}>Test userImage</button>
+				<image src={userImg} style={{width:"300px", height:"300px"}}/>
 			</div>
 			<button onClick={re}>Test redirect</button>
 	    </div>

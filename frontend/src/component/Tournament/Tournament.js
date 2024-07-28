@@ -62,7 +62,6 @@ const Tournament = () => {
       socketController._ws.current.close();
     };
   });
-  
 
   const onPlayerJoined = (data) => {
     console.log("playerJoined", data);
@@ -168,6 +167,7 @@ const Tournament = () => {
       return <GameRoom id={gameId} />;
     }
     default: {
+      //status.LOADING
       return (
         <div>
           <Loading type="tournament" />

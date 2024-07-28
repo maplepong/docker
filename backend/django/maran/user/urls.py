@@ -18,7 +18,7 @@ urlpatterns = [
     path("valid-check", valid.duplicate_check),
     path("information", views.userinfo),
     path("change-password", views.change_password),
-    path("image", image.image),
+    path("image/<str:nickname>", image.image),
     path("api/token/refresh", auth.TokenRefreshView.as_view()),
     path("friend-list", friend.friend_list),
     path("friend/<str:nickname>", friend.friend),

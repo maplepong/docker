@@ -464,8 +464,24 @@ const api = {
         return error;
       });
   },
-  userImage(type, src) {
+  userImage(type, src, nickname) {
     setToken();
+    if (nickname) {
+      if (type !== "GET") return Error("권한을 벗어난 요청입니다.");
+      return apiInstance
+        .request({
+          method: type,
+          url: "user/image/" + nickname,
+        })
+        .then((response) => {
+          console.log(nickname + "의 사진을 " + type + "했습니다.");
+          return response.data;
+        })
+        .catch((error) => {
+          console.log(nickname + "의 사진을 " + type + "하지 못했습니다.");
+          return error;
+        });
+    }
     if (type === "POST") {
       if (!src) {
         console.error("api image post:: no image provided");

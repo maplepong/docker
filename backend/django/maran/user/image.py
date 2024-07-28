@@ -67,34 +67,40 @@ def get_image(client, user, method):
 @api_view(["GET", "POST", "DELETE"])
 @permission_classes((IsAuthenticated, ))
 @authentication_classes((JWTAuthentication,))
-def image(request):
-	user = request.user
-	s3 = get_s3_client()
-	if request.method == "DELETE":
-		image_filename = user.image
-		# S3 버킷에서 이미지 삭제
-		if image_filename != "default.png":
-			try:
-				s3.delete_object(
-					Bucket=AWS_STORAGE_BUCKET_NAME, Key=f"images/{image_filename}"
-				)
-			except Exception as e:
-				return Response({"error": str(e)}, status=500)
-		else:
-			return Response({"error": "No image to delete"}, status=400)
-		user.image = "default.png"
-		user.save()
-		return Response({"message": "Image deleted successfully"}, status=200)
-	if request.method == "POST":
-		file = request.FILES.get("image")
-		if file:
-			if upload_to_s3(s3, user, file):
-				user.save()
+def image(request, nickname):
+		if nickname != None and nickname != "":
+			if request.method == "GET":
+				user = get_object_or_404(User, nickname=nickname)
 			else:
-				return Response({"error": "Failed to upload image"}, status=500)
+				return Response({"error": "401 Unauthorized"}, status=401)
 		else:
-			return Response({"error": "Invalid credentials"}, status=400)
-	return get_image(s3, user, request.method)
+			user = request.user
+		s3 = get_s3_client()
+		if request.method == "DELETE":
+			image_filename = user.image
+			# S3 버킷에서 이미지 삭제
+			if image_filename != "default.png":
+				try:
+					s3.delete_object(
+						Bucket=AWS_STORAGE_BUCKET_NAME, Key=f"images/{image_filename}"
+					)
+				except Exception as e:
+					return Response({"error": str(e)}, status=500)
+			else:
+				return Response({"error": "No image to delete"}, status=400)
+			user.image = "default.png"
+			user.save()
+			return Response({"message": "Image deleted successfully"}, status=200)
+		if request.method == "POST":
+			file = request.FILES.get("image")
+			if file:
+				if upload_to_s3(s3, user, file):
+					user.save()
+				else:
+					return Response({"error": "Failed to upload image"}, status=500)
+			else:
+				return Response({"error": "Invalid credentials"}, status=400)
+		return get_image(s3, user, request.method)
 
 def upload_to_s3(client, user, file_object):
     try:
