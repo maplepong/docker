@@ -10,13 +10,13 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
   console.log(players);
   console.log(host);
 
-  const userImages = players.map(async (player) => {
-    const response = await api.userImages("GET", "", player);
-    console.log(response);
-    return response.image;
-  });
+  // const userImages = players.map(async (player) => {
+  //   const response = await api.userImages("GET", "", player);
+  //   console.log(response);
+  //   return response.image;
+  // });
 
-  console.log(userImages);
+  // console.log(userImages);
   return (
     <div>
       <div>
@@ -33,7 +33,7 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               {players.map((player, index) => (
                 <span key={index} className="users">
-                  <img src={userImages.index} alt="User Avatar" />
+                  {/* <img src={userImages.index} alt="User Avatar" /> */}
                   <p>{player}</p>
                 </span>
               ))}

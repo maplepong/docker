@@ -1,5 +1,5 @@
 /* @jsx myReact.createElement */
-import myReact, { useEffect, useState } from "../../core/myReact.js";
+import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import WaitingTournament from "./TournamentWaiting.js";
 import TournamentSchedule from "./TournamentSchedule.js";
 import socketController from "../../core/socket.js";
@@ -84,8 +84,8 @@ const Tournament = () => {
     });
   };
 
-  const onTournamentStart = (data) => {
-    apiInstance
+  const onTournamentStart = async(data) => {
+    await apiInstance
       .post("tournament/get_braket")
       .then((res) => {
         console.log(res.data);
@@ -112,7 +112,7 @@ const Tournament = () => {
     console.log("Tournament ended. Result:", data.result);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     const currentUser = localStorage.getItem("nickname");
     if (host !== currentUser) {
       alert("Only the host can start the game.");
@@ -122,6 +122,17 @@ const Tournament = () => {
       alert("Not enough players to start the game.");
       return;
     }
+    await apiInstance
+      .request({ method: "POST", url: "tournament/start_semifinal" })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        alert(err);
+        // outTournament();
+        return;
+      });
+    
     socketController.sendMessage({ type: "tournament_start" });
   };
   console.log("players", players);
