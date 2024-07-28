@@ -11,6 +11,7 @@ class Tournament(models.Model):
     semifinal_game1 = models.ForeignKey(Game, related_name="semifinal_1", on_delete=models.CASCADE, null=True, blank=True)
     semifinal_game2 = models.ForeignKey(Game, related_name="semifinal_2", on_delete=models.CASCADE, null=True, blank=True)
     final_game_id = models.ForeignKey(Game, related_name="final", on_delete=models.CASCADE, null=True, blank=True)
+    end_game_count = models.PositiveBigIntegerField(default=0)
     
     def get_participants(self):
         return self.participants.all()
