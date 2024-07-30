@@ -3,7 +3,7 @@ import myReact, { useState, useEffect, useRef } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
 import api from "../../core/Api.js";
 
-const PingPong = ({ gameinfo, gameSocket }) => {
+const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
   let isowner = false;
   let upPressed, downPressed;
   let flag = false;
@@ -244,7 +244,12 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         localStorage.getItem("nickname")
       );
       gameSocket.current.close();
-      myReact.redirect("home");
+      gameResult.current = {
+        userscore: userscore.current,
+        enemyscore: enemyscore.current,
+      };
+      setStatus(3); //status.finished
+      // myReact.redirect("home");
     }
     return;
   }

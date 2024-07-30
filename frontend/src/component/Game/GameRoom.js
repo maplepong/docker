@@ -10,8 +10,15 @@ import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
 import WaitingGame from "./WaitingGame.js";
 
+const status = {
+  loading: 0,
+  waiting: 1,
+  playing: 2,
+  finished: 3,
+};
+
 const GameRoom = () => {
-  const [ready, setReady] = useState(false);
+  // const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
@@ -26,6 +33,8 @@ const GameRoom = () => {
     owner_info: {},
     player_info: {},
   });
+  const [gameStatus, setGameStatus] = useState(status.loading);
+  const gameResult = useRef(null);
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {
@@ -58,6 +67,7 @@ const GameRoom = () => {
               (player) => player.nickname !== updatedGameInfo.owner
             );
             setGameInfo(updatedGameInfo);
+            setGameStatus(status.waiting);
           } else {
             console.error("Failed to fetch game info:", data);
           }
@@ -111,7 +121,7 @@ const GameRoom = () => {
           });
         } else if (data.type === "game_start") {
           console.log("game_start");
-          setReady(true);
+          setGameStatus(status.playing);
         } else if (data.type === "client_left") {
           console.log("client_left");
 
@@ -180,21 +190,53 @@ const GameRoom = () => {
     myReact.redirect("lobby");
   };
 
-  return ready ? (
-    <div className="game-container">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
-      <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
-    </div>
-  ) : gameInfo.id ? (
-    <WaitingGame
-      gameInfo={gameInfo}
-      startGame={startGame}
-      exitGame={exitGame}
-      sendGameInvite={sendGameInvite}
-    />
-  ) : (
-    <Loading type="game"/>
-  );
+  // return ready ? (
+  //   <div className="game-container">
+  //     <canvas id="myCanvas" width="480" height="320"></canvas>
+  //     <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
+  //   </div>
+  // ) : gameInfo.id ? (
+  //   <WaitingGame
+  //     gameInfo={gameInfo}
+  //     startGame={startGame}
+  //     exitGame={exitGame}
+  //     sendGameInvite={sendGameInvite}
+  //   />
+  // ) : (
+  //   <Loading type="game"/>
+  // );
+  switch (gameStatus) {
+    case status.waiting:
+      return (
+        <WaitingGame
+          gameInfo={gameInfo}
+          startGame={startGame}
+          exitGame={exitGame}
+          sendGameInvite={sendGameInvite}
+        />
+      );
+    case status.playing:
+      return (
+        <div className="game-container">
+          <canvas id="myCanvas" width="800" height="640"></canvas>
+          <PingPong
+            gameinfo={gameInfo}
+            gameSocket={gameSocket}
+            gameResult={gameResult}
+            setStatus={setGameStatus}
+          />
+        </div>
+      );
+    case status.finished:
+      return (
+        <div>
+          <p>게임이 종료되었습니다.</p>
+          <p>{gameResult.current}</p>
+        </div>
+      );
+    default:
+      return <Loading type="game" />;
+  }
 };
 
 export default GameRoom;
