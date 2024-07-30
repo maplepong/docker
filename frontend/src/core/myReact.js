@@ -29,6 +29,7 @@ function createMyReact() {
     fiberRoot: null, //root of fiberNode
     currentFiberNode: null,
     isUpdateScheduled: false,
+    willUnmount: [],
     globalState: {},
 
     // renderFiberRoot : function () {
@@ -64,23 +65,30 @@ function createMyReact() {
       // 2. if cleanup exist -> save it to the useState. it will be used in unmount
       // 3. empty the callback arr
       // f ->  {callback, fiber.willUnmount}
-      this.callback.forEach((f) => {
-        f.willUnmount.forEach((cleanup) => cleanup());
-        f.willUnmount = [];
-        const cleanup = f.callback();
-        cleanup ? f.willUnmount.push(cleanup) : null;
+      this.callback.forEach(async (cb) => {
+        // console.log("callback cb", cb);
+        cb.fiber.willUnmount?.forEach((cleanup) => cleanup());
+        cb.fiber.willUnmount = [];
+        const cleanup = await cb.callback();
+        cleanup ? this.willUnmount.push(cleanup) : null; // erase시 call
+        cleanup ? cb.fiber.willUnmount.push(cleanup) : null; // rerender시 call
+        // console.log("callback f", cb);
       });
       // console.log("Render finished, callback arr is ", this.callback);
+      if (this.willUnmount.length)
+        console.log("Render finished, willUnmount arr is ", this.willUnmount);
       this.callback = [];
     },
 
+    // 전체 다 지움
     erase: function erase() {
       this.fiberRoot = null;
       this.enrenderComponent = [];
       this.enrenderQueue = [];
-      this.callback.forEach((f) => {
-        f.willUnmount.forEach((cleanup) => cleanup());
+      this.willUnmount.forEach((f) => {
+        f();
       });
+      this.willUnmount = [];
       this.callback = [];
     },
 
@@ -145,7 +153,7 @@ function createMyReact() {
     // value : value;
     // }
     // 리턴 값: global, setGlobal
-    useGlobalState: function (key, initValue){
+    useGlobalState: function (key, initValue) {
       const currentFiber = window.currentFiberNode;
       //이미 초기화된 전역 값
       if (this.globalState[key]) {
@@ -156,18 +164,17 @@ function createMyReact() {
       // 초기화 안된 전역 값
       else {
         const temp = useState(initValue);
-        this.globalState[key] = {setState: temp[1], value: initValue};
+        this.globalState[key] = { setState: temp[1], value: initValue };
       }
 
       const setGlobalState = (value) => {
-        console.log(this.globalState)
+        console.log(this.globalState);
         if (this.globalState[key].value === value) return;
         this.globalState[key].value = value;
         this.globalState[key].setState(value);
-        
-      }
-      return [this.globalState[key].value, setGlobalState]
-    }
+      };
+      return [this.globalState[key].value, setGlobalState];
+    },
   };
 }
 
@@ -194,7 +201,7 @@ export function useState(initValue) {
     //console.log("setState err-value same-",value);
     fiber.changedState.push({ i, value });
     // myReact.enrenderQueue.append(["stateChange", fiber, i]);
-    // fiber.changed = true; 
+    // fiber.changed = true;
     batchUpdates(fiber);
     // scheduleUpdate(fiber);
     // console.log("렌더를 합니다")
@@ -248,7 +255,7 @@ export function useEffect(callback, deps) {
   // 1. deps === undefined
   // 2. deps === [] (but first call)
   // 3. deps changed
-  myReact.callback.push({ callback, willUnmount: fiber.willUnmount });
+  myReact.callback.push({ callback, fiber: fiber });
   fiber.useEffect[i].deps = deps;
 }
 

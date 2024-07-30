@@ -34,6 +34,13 @@ const App = () => {
 
   document.addEventListener("DOMContentLoaded", () => checkLogin());
 
+  useEffect(() => {
+    console.log("test useEffect")
+    return () => {
+      console.log("test callback");
+    };
+  });
+
   return (
     <div class="app">
       <Link to="">
