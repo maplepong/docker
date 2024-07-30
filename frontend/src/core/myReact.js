@@ -30,6 +30,7 @@ function createMyReact() {
     fiberRoot: null, //root of fiberNode
     currentFiberNode: null,
     isUpdateScheduled: false,
+    willUnmount: [],
 
     // renderFiberRoot : function () {
     // // createElement하는 시점, 특히 라우터에서 import되는 타이밍에 렌더하지 않게 방지
@@ -64,23 +65,29 @@ function createMyReact() {
       // 2. if cleanup exist -> save it to the useState. it will be used in unmount
       // 3. empty the callback arr
       // f ->  {callback, fiber.willUnmount}
-      this.callback.forEach((f) => {
-        f.willUnmount.forEach((cleanup) => cleanup());
-        f.willUnmount = [];
-        const cleanup = f.callback();
-        cleanup ? f.willUnmount.push(cleanup) : null;
+      this.callback.forEach(async (cb) => {
+        // console.log("callback cb", cb);
+        cb.fiber.willUnmount?.forEach((cleanup) => cleanup());
+        cb.fiber.willUnmount = [];
+        const cleanup = await cb.callback();
+        cleanup ? this.willUnmount.push(cleanup) : null; // erase시 call
+        cleanup ? cb.fiber.willUnmount.push(cleanup) : null; // rerender시 call
+        // console.log("callback f", cb);
       });
       // console.log("Render finished, callback arr is ", this.callback);
+      if(this.willUnmount.length) console.log("Render finished, willUnmount arr is ", this.willUnmount);
       this.callback = [];
     },
 
+    // 전체 다 지움
     erase: function erase() {
       this.fiberRoot = null;
       this.enrenderComponent = [];
       this.enrenderQueue = [];
-      this.callback.forEach((f) => {
-        f.willUnmount.forEach((cleanup) => cleanup());
+      this.willUnmount.forEach((f) => {
+        f();
       });
+      this.willUnmount = [];
       this.callback = [];
     },
 
@@ -237,7 +244,7 @@ export function useEffect(callback, deps) {
   // 1. deps === undefined
   // 2. deps === [] (but first call)
   // 3. deps changed
-  myReact.callback.push({ callback, willUnmount: fiber.willUnmount });
+  myReact.callback.push({ callback, fiber: fiber });
   fiber.useEffect[i].deps = deps;
 }
 
