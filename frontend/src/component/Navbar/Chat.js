@@ -126,7 +126,9 @@ const Chat = () => {
           {messages.map((msg, index) => (
             <div key={index} class={msg.type + " message-container"}>
               <div class="chat-line">
-                <NicknameModal nickname={msg.sender + " : "} />
+                {msg.sender === "system" ? null : (
+                  <NicknameModal nickname={msg.sender} />
+                )}
                 <p class="message">{msg.message}</p>
               </div>
               {msg.type === "invite" && msg.gameId ? (
