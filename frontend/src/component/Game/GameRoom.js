@@ -10,12 +10,12 @@ import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
 import WaitingGame from "./WaitingGame.js";
 
-const GameRoom = () => {
+const GameRoom = (tournamentGameId) => {
   const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
-    id: "",
+    id: tournamentGameId || "",
     name: "",
     current_players_num: "",
     owner: "",
@@ -43,7 +43,7 @@ const GameRoom = () => {
       SocketController.initSocket();
 
       const path = window.location.pathname;
-      const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
+      const gameIdMatch = tournamentGameId || path.match(/^\/gameroom\/(\d+)$/);
 
       if (gameIdMatch) {
         const gameId = gameIdMatch[1];
@@ -185,14 +185,12 @@ const GameRoom = () => {
       <canvas id="myCanvas" width="480" height="320"></canvas>
       <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
     </div>
-  ) : gameInfo.id ? (
+  ) : (
     <WaitingGame
       gameInfo={gameInfo}
       startGame={startGame}
       exitGame={exitGame}
     />
-  ) : (
-    <Loading type="game"/>
   );
 };
 

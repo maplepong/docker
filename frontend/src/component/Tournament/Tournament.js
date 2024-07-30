@@ -7,6 +7,7 @@ import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
+import GameRoom from "../Game/GameRoom.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
@@ -15,6 +16,7 @@ const Tournament = () => {
   const [gameStatus, setGameStatus] = useState(status.LOADING);
   const maxPlayers = 4;
   const gameId = useRef(null);
+  const [bracket, setBracket] = useState([]);
   console.log("players", players);
 
   useEffect(() => {
@@ -84,12 +86,12 @@ const Tournament = () => {
     });
   };
 
-  const onTournamentStart = async(data) => {
+  const onTournamentStart = async (data) => {
     await apiInstance
-      .post("tournament/get_braket")
+      .get("tournament/get_bracket")
       .then((res) => {
         console.log(res.data);
-        setBraket(res.data);
+        setBracket(res.data);
         gameId.current = res.data.gameId;
         setGameStatus(status.ROUND_ONE);
       })
@@ -132,7 +134,7 @@ const Tournament = () => {
         // outTournament();
         return;
       });
-    
+
     socketController.sendMessage({ type: "tournament_start" });
   };
   console.log("players", players);
@@ -167,10 +169,9 @@ const Tournament = () => {
   }, []);
   socketController.initSocket();
 
-  const braket = [
-    ["player1", "player2"],
-    ["player3", "player4"],
-  ];
+  function startGame() {
+    setGameStatus(status.ROUND_ONE);
+  }
 
   switch (gameStatus) {
     case status.READY:
@@ -185,7 +186,13 @@ const Tournament = () => {
         </div>
       );
     case status.STARTED || status.BETWEEN_ROUND || status.FINISHED: {
-      return <TournamentSchedule braket={braket} status={gameStatus} />;
+      return (
+        <TournamentSchedule
+          bracket={bracket}
+          status={gameStatus}
+          startGame={startGame}
+        />
+      );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
       return <GameRoom id={gameId} />;

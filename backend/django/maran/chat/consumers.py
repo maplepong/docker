@@ -551,7 +551,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and await sync_to_async(tournament.participants.count)() == 4:
-                    host = tournament.host
+                    host = await sync_to_async(lambda: tournament.host)()
                     if host:
                         host_channel_name = await sync_to_async(self.redis.get)(f"user_channel_{host.nickname}")
                         if host_channel_name:
@@ -580,15 +580,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             elif type == 'tournament_start':
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and tournament.is_active:
-                    participants = await sync_to_async(tournament.get_participants)()
-                    participant_nicknames = [user.nickname for user in participants]
                     await self.channel_layer.group_send(
                         'tournament_group',
                         {
                             'type':'tournament_start',
-                            'message': "Tournament started",
-                            'sender': 'system',
-                            'bracket': participant_nicknames
+                          # 'message': "Tournament started",
+                            # 'sender': 'system',
                         }
                     )
             elif type == 'tournament-end':
@@ -712,14 +709,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def tournament_start(self, event):
-        bracket = event['bracket']
-        message = event['message']
-
         await self.send(text_data=json.dumps({
             'type': 'tournament_start',
-            'message': message,
-            'sender': 'system',
-            'bracket': bracket
         }))
 
     async def tournament_semifinal_end(self, event):
