@@ -26,12 +26,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       const scene = new THREE.Scene();
       scene.background = new THREE.Color("skyblue");
 
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        480 / 320,
-        0.1,
-        1000
-      );
+      const camera = new THREE.PerspectiveCamera(75, 480 / 320, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
       renderer.setSize(480, 320);
 
@@ -66,9 +61,9 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       scene.add(aiPaddle);
 
       if (localStorage.getItem("nickname") === gameinfo.owner) {
-        ballDirection = new THREE.Vector3(0.01, 0.01, 0);
+        ballDirection = new THREE.Vector3(0.04, 0.04, 0);
       } else {
-        ballDirection = new THREE.Vector3(-0.01, 0.01, 0);
+        ballDirection = new THREE.Vector3(-0.04, 0.04, 0);
       }
 
       const fontLoader = new THREE.FontLoader();
@@ -79,7 +74,9 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         function (loadedFont) {
           font = loadedFont;
           drawText(
-            userscore.current.toString() + " : " + enemyscore.current.toString(),
+            userscore.current.toString() +
+              " : " +
+              enemyscore.current.toString(),
             -0.6,
             0,
             0xffffff
@@ -112,27 +109,51 @@ const PingPong = ({ gameinfo, gameSocket }) => {
           ballDirection.y = -ballDirection.y;
           sendGameState();
         }
-        if (ball.position.x - ballRadius < playerPaddle.position.x + paddleWidth / 2) {
-          if (ball.position.y > playerPaddle.position.y - paddleHeight / 2 &&
-            ball.position.y < playerPaddle.position.y + paddleHeight / 2) {
+        if (
+          ball.position.x - ballRadius <
+          playerPaddle.position.x + paddleWidth / 2
+        ) {
+          if (
+            ball.position.y > playerPaddle.position.y - paddleHeight / 2 &&
+            ball.position.y < playerPaddle.position.y + paddleHeight / 2
+          ) {
             ballDirection.x = -ballDirection.x;
             sendGameState();
           } else {
             updateScore(1, 0);
             sendGameState();
-            drawText(userscore.current.toString() + " : " + enemyscore.current.toString(),-0.6,0,0xff0000);
+            drawText(
+              userscore.current.toString() +
+                " : " +
+                enemyscore.current.toString(),
+              -0.6,
+              0,
+              0xff0000
+            );
           }
         }
 
-        if (ball.position.x + ballRadius >=aiPaddle.position.x - paddleWidth / 2) {
-          if (ball.position.y >= aiPaddle.position.y - paddleHeight / 2 &&
-            ball.position.y <= aiPaddle.position.y + paddleHeight / 2) {
+        if (
+          ball.position.x + ballRadius >=
+          aiPaddle.position.x - paddleWidth / 2
+        ) {
+          if (
+            ball.position.y >= aiPaddle.position.y - paddleHeight / 2 &&
+            ball.position.y <= aiPaddle.position.y + paddleHeight / 2
+          ) {
             ballDirection.x = -ballDirection.x;
             sendGameState();
           } else {
             updateScore(0, 1);
             sendGameState();
-            drawText(userscore.current.toString() + " : " + enemyscore.current.toString(),-0.6,0,0x0000ff);
+            drawText(
+              userscore.current.toString() +
+                " : " +
+                enemyscore.current.toString(),
+              -0.6,
+              0,
+              0x0000ff
+            );
           }
         }
       }
@@ -142,14 +163,13 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
       function updatePlayerPaddle() {
         if (upPressed) {
-            playerPaddle.position.y += 0.1;
-            sendGameState();
+          playerPaddle.position.y += 0.1;
+          sendGameState();
         } else if (downPressed) {
-            playerPaddle.position.y -= 0.1;
-            sendGameState();
+          playerPaddle.position.y -= 0.1;
+          sendGameState();
         }
       }
-
 
       function animate() {
         requestAnimationFrame(animate);
@@ -173,7 +193,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
           nickname: localStorage.getItem("nickname"),
         });
         console.log("gameSocket closed");
-        window.history.back();
+        myReact.redirect("home"); //변경 필요
       };
 
       return () => {
@@ -186,52 +206,71 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   }, [gameinfo, gameSocket.current]);
 
   function handleSocketMessage(message) {
-      if (message.type === "paddle_move") {
-          const { data } = message;
-          aiPaddle = data.x;
-      } else if (message.type === "game_update") {
-          const { socketball, paddle, uscore } = message.data;
-          if (socketball && !isowner) {
-              ball.position.x = socketball.x;
-              ball.position.y = socketball.y;
-              ballDirection.x = socketball.dx;
-              ballDirection.y = socketball.dy;
-          }
-          if (paddle) {
-              aiPaddle.position.y = paddle.y;
-          }
-          if (uscore && !isowner) {
-              userscore.current = uscore.y;
-              enemyscore.current = uscore.x;
-          }
+    if (message.type === "paddle_move") {
+      const { data } = message;
+      aiPaddle = data.x;
+    } else if (message.type === "game_update") {
+      const { socketball, paddle, uscore } = message.data;
+      if (socketball && !isowner) {
+        ball.position.x = socketball.x;
+        ball.position.y = socketball.y;
+        ballDirection.x = socketball.dx;
+        ballDirection.y = socketball.dy;
       }
+      if (paddle) {
+        aiPaddle.position.y = paddle.y;
+      }
+      if (uscore && !isowner) {
+        userscore.current = uscore.y;
+        enemyscore.current = uscore.x;
+      }
+    }
   }
 
-    function resetBall() {
-      ball.position.set(0, 0, 0);
-    }
+  function resetBall() {
+    ball.position.set(0, 0, 0);
+  }
 
-    function updateScore(leftAdd, rightAdd) {//스코어 업데이트
-      userscore.current += leftAdd;
-      enemyscore.current += rightAdd;
-      sendGameState();
-      if (userscore.current < 3 && enemyscore.current < 3) resetBall();
-      else {
-          api.sendGameResult(userscore.current,enemyscore.current,localStorage.getItem("nickname"));
-          gameSocket.current.close();
-          window.history.back();
-      }
-      return ;
+  function updateScore(leftAdd, rightAdd) {
+    //스코어 업데이트
+    userscore.current += leftAdd;
+    enemyscore.current += rightAdd;
+    sendGameState();
+    if (userscore.current < 3 && enemyscore.current < 3) resetBall();
+    else {
+      api.sendGameResult(
+        userscore.current,
+        enemyscore.current,
+        localStorage.getItem("nickname")
+      );
+      gameSocket.current.close();
+      myReact.redirect("home");
+    }
+    return;
   }
 
   function sendGameState() {
-    if (gameSocket.current && gameSocket.current.readyState === WebSocket.OPEN) {
-        const data = {
-            socketball: { x: -ball.position.x, y: ball.position.y, dx: -ballDirection.x, dy: ballDirection.y},
-            paddle: { x: -playerPaddle.position.x, y: playerPaddle.position.y},
-            uscore: { x: userscore.current, y : enemyscore.current}
-        };
-        gameSocket.current.send(JSON.stringify({ data: data, type: "game_update", nickname: localStorage.getItem("nickname") }));
+    if (
+      gameSocket.current &&
+      gameSocket.current.readyState === WebSocket.OPEN
+    ) {
+      const data = {
+        socketball: {
+          x: -ball.position.x,
+          y: ball.position.y,
+          dx: -ballDirection.x,
+          dy: ballDirection.y,
+        },
+        paddle: { x: -playerPaddle.position.x, y: playerPaddle.position.y },
+        uscore: { x: userscore.current, y: enemyscore.current },
+      };
+      gameSocket.current.send(
+        JSON.stringify({
+          data: data,
+          type: "game_update",
+          nickname: localStorage.getItem("nickname"),
+        })
+      );
     }
   }
 
@@ -251,10 +290,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
     }
   }
 
-  return (
-    <div id="score">
-    </div>
-  );
+  return <div id="score"></div>;
 };
 
 export default PingPong;
