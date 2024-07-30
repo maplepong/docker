@@ -5,7 +5,6 @@ import { exist, isEqualObj } from "./utils.js";
 import router from "./Router.js";
 
 export function Link(props) {
-  // //console.log(props)
   const tag = "a";
   const href = props["to"];
   if (exist(href)) delete props["to"];
@@ -31,6 +30,7 @@ function createMyReact() {
     currentFiberNode: null,
     isUpdateScheduled: false,
     willUnmount: [],
+    globalState: {},
 
     // renderFiberRoot : function () {
     // // createElement하는 시점, 특히 라우터에서 import되는 타이밍에 렌더하지 않게 방지
@@ -75,7 +75,8 @@ function createMyReact() {
         // console.log("callback f", cb);
       });
       // console.log("Render finished, callback arr is ", this.callback);
-      if(this.willUnmount.length) console.log("Render finished, willUnmount arr is ", this.willUnmount);
+      if (this.willUnmount.length)
+        console.log("Render finished, willUnmount arr is ", this.willUnmount);
       this.callback = [];
     },
 
@@ -142,12 +143,37 @@ function createMyReact() {
       } else {
         param = location.origin + "/" + param;
       }
-      // if (param !== "/") path = "/" + param;
-      // else path = "/";
-      // path = location.origin + path;
       console.log("redirect call", param);
       history.pushState({}, "", param);
       router();
+    },
+
+    // global 구조: {
+    // setState: setState;
+    // value : value;
+    // }
+    // 리턴 값: global, setGlobal
+    useGlobalState: function (key, initValue) {
+      const currentFiber = window.currentFiberNode;
+      //이미 초기화된 전역 값
+      if (this.globalState[key]) {
+        // setstate 새 컴포넌트 것으로 변경
+        const temp = useState(this.globalState[key].value);
+        this.globalState[key].setState = temp[1];
+      }
+      // 초기화 안된 전역 값
+      else {
+        const temp = useState(initValue);
+        this.globalState[key] = { setState: temp[1], value: initValue };
+      }
+
+      const setGlobalState = (value) => {
+        console.log(this.globalState);
+        if (this.globalState[key].value === value) return;
+        this.globalState[key].value = value;
+        this.globalState[key].setState(value);
+      };
+      return [this.globalState[key].value, setGlobalState];
     },
   };
 }
@@ -175,7 +201,7 @@ export function useState(initValue) {
     //console.log("setState err-value same-",value);
     fiber.changedState.push({ i, value });
     // myReact.enrenderQueue.append(["stateChange", fiber, i]);
-    fiber.changed = true;
+    // fiber.changed = true;
     batchUpdates(fiber);
     // scheduleUpdate(fiber);
     // console.log("렌더를 합니다")
@@ -185,23 +211,12 @@ export function useState(initValue) {
   return [fiber.state[i], (v) => setState(v)];
 }
 
-function scheduleUpdate(fiber) {
-  // myReact.enrenderQueue.push(fiber);
-  // if (!myReact.isUpdateScheduled){
-  // 	myReact.isUpdateScheduled = true;
-  // 	setTimeout(() => {myReact.render(null, "reRender")}, 20);
-  // }
-  batchUpdates(fiber);
-}
-
 /*
 	callback -> return f is cleanup function, use carefully
 	cleanup calls when :
 	1. idk..... will update this later
 */
 export function useEffect(callback, deps) {
-  //console.log("useEffect called: callback", callback);
-  //console.log("useEffect called: deps", deps);
   const fiber = window.currentFiberNode;
   const i = fiber.effectPosition;
   fiber.effectPosition++;
@@ -230,17 +245,13 @@ export function useEffect(callback, deps) {
 	save cleanUp as a 3rd value.
 	
 	*/
-  // if (fiber.useEffect[i])
-  // 	console.log("useEffect deps old", fiber.useEffect[i].deps)
-  // console.log("useEffect deps new", deps)
-  // console.log("isEqual", isEqualObj(fiber.useEffect[i].deps, deps), fiber.useEffect[i].deps, deps);
   if (deps !== undefined && isEqualObj(fiber.useEffect[i].deps, deps)) {
-    //console.log("!!!!!!!!!!!!!!----------------------snocallback");
     return;
   }
+
   //if deps not changed || include both are empth array [], just return
 
-  // calling callback :s
+  // calling callback
   // 1. deps === undefined
   // 2. deps === [] (but first call)
   // 3. deps changed

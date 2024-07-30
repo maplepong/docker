@@ -23,7 +23,7 @@ const TournamentWaiting = ({handleStartGame, players, host, gameStarted}) => {
         >
           <div style={{ display: "block" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              {players.slice(0, 4).map((player, index) => (
+              {players.map((player, index) => (
                 <span key={index} className="users">
                   <img src="../css/img/logo.png" alt="User Avatar" />
                   <p>{player}</p>
