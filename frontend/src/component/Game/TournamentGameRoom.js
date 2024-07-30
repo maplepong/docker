@@ -14,18 +14,7 @@ const GameRoom = (tournamentGameId) => {
   const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
-  const [gameInfo, setGameInfo] = useState({
-    id: "",
-    name: "",
-    current_players_num: "",
-    owner: "",
-    password: "",
-    players: [],
-    status: "",
-    isGameReady: false,
-    owner_info: {},
-    player_info: {},
-  });
+
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {

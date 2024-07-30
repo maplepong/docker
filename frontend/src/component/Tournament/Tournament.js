@@ -93,7 +93,6 @@ const Tournament = () => {
         console.log(res.data);
         setBracket(res.data.bracket);
         gameId.current = res.data.myGameid;
-        setGameStatus(status.ROUND_ONE);
       })
       .catch((err) => {
         alert(err);
@@ -143,6 +142,7 @@ const Tournament = () => {
   const outTournament = () => {
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
+    myReact.redirect("home");
   };
 
   //방 입장
@@ -195,7 +195,12 @@ const Tournament = () => {
       );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      return <GameRoom id={gameId.current} />;
+      if (gameInfo){
+        return <GameRoom id={gameId.current} />;
+      }
+      else {
+        return <Loading type="game" />;
+      }
     }
     default: {
       //status.LOADING
