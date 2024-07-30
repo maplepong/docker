@@ -91,8 +91,8 @@ const Tournament = () => {
       .get("tournament/get_bracket")
       .then((res) => {
         console.log(res.data);
-        setBracket(res.data);
-        gameId.current = res.data.gameId;
+        setBracket(res.data.bracket);
+        gameId.current = res.data.myGameid;
         setGameStatus(status.ROUND_ONE);
       })
       .catch((err) => {
@@ -195,7 +195,7 @@ const Tournament = () => {
       );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      return <GameRoom id={gameId} />;
+      return <GameRoom id={gameId.current} />;
     }
     default: {
       //status.LOADING
