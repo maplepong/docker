@@ -70,7 +70,7 @@ def invite_tournament(request):
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def handle_invite(request):
-    request_nickname = User.objects.get(nickname=request.data.get("nickname"))
+    request_nickname = request.data.get("nickname")
     user = request.user
     if request.method == "POST":
         try:
@@ -112,33 +112,32 @@ def handle_invite(request):
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def tournament_invite_list(request):
-    if request.method == "GET":
-        sends_requests = TournamentInviteRequest.objects.filter(from_user=request.user)
-        receives_requests = TournamentInviteRequest.objects.filter(to_user=request.user)
-        
-        if not sends_requests and not receives_requests:
-            return JsonResponse({'error': 'User does not have any invite'}, status=status.HTTP_204_NO_CONTENT)
-        
-        sends = [
-            {
-                "from_user": tournament_request.from_user.nickname,
-                "to_user": tournament_request.to_user.nickname,
-            }
-            for tournament_request in sends_requests
-        ]
-        receives = [
-            {
-                "from_user": tournament_request.from_user.nickname,
-                "to_user": tournament_request.to_user.nickname,
-            }
-            for tournament_request in receives_requests
-        ]
-
-        data = {
-            "sends": sends,
-            "receives": receives,
+    sends_requests = TournamentInviteRequest.objects.filter(from_user=request.user)
+    receives_requests = TournamentInviteRequest.objects.filter(to_user=request.user)
+    
+    if not sends_requests and not receives_requests:
+        return JsonResponse({'error': 'User does not have any invite'}, status=status.HTTP_204_NO_CONTENT)
+    
+    sends = [
+        {
+            "from_user": tournament_request.from_user.nickname,
+            "to_user": tournament_request.to_user.nickname,
         }
-        return JsonResponse(data, status=status.HTTP_200_OK)
+        for tournament_request in sends_requests
+    ]
+    receives = [
+        {
+            "from_user": tournament_request.from_user.nickname,
+            "to_user": tournament_request.to_user.nickname,
+        }
+        for tournament_request in receives_requests
+    ]
+
+    data = {
+        "sends": sends,
+        "receives": receives,
+    }
+    return JsonResponse(data, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
@@ -188,27 +187,130 @@ def start_semifinal(request):
         tournament.save()
     return JsonResponse({'message': 'semifinal started successfully'}, status=status.HTTP_200_OK)
 
+def test(request):
+    if Tournament.objects.exists():
+        tournament = Tournament.objects.first()
+        nickname_lst = []
+        participants = tournament.get_participants()
+        for idx, participant in enumerate(participants):
+            nickname_lst.append(participant.nickname)
+        response_data = {
+            "bracket": nickname_lst
+        }
+        return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+from django.db import connection
+
 @api_view(["GET"])
 @permission_classes((IsAuthenticated,))
 @authentication_classes((JWTAuthentication,))
 def get_bracket(request):
+    user_nickname = request.user.nickname  # 인증된 사용자의 닉네임 가져오기
     if not Tournament.objects.exists():
-        return JsonResponse({'error': 'Tournament room is not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Tournament room does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
     tournament = Tournament.objects.first()
     if tournament.is_active != True:
-        return JsonResponse({'error': 'Tournament are not started yet.'}, status=status.HTTP_400_BAD_REQUEST)
-    # if tournament.participants.count() != 4:
-        # return JsonResponse({'error': 'Less than 4 participants'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'Tournament has not started yet.'}, status=status.HTTP_400_BAD_REQUEST)
+    
     nickname_lst = []
-    participants = tournament.get_participants()
-    for participant in participants:
-        nickname_lst.append(participant.nickname)
+    myGameid = None  # 초기화
+
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            SELECT u.nickname
+            FROM user_user u
+            JOIN tournament_tournament_participants tp ON u.id = tp.user_id
+            WHERE tp.tournament_id = %s
+            ORDER BY tp.id ASC
+        ''', [tournament.id])
+        rows = cursor.fetchall()
+
+    for idx, (nickname,) in enumerate(rows):
+        nickname_lst.append(nickname)
+        if nickname == user_nickname:
+            if idx in [0, 1]:
+                myGameid = tournament.semifinal_game1.id if tournament.semifinal_game1 else None
+            elif idx in [2, 3]:
+                myGameid = tournament.semifinal_game2.id if tournament.semifinal_game2 else None
     
     response_data = {
         "message": "Get bracket successfully",
-        "nicknames": nickname_lst
+        "bracket": nickname_lst,
+        "myGameid": myGameid
     }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def end_semifinal(request):
+    if not Tournament.objects.exists():
+        return JsonResponse({'error': 'Tournament room does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    tournament = Tournament.objects.first()
+    if not tournament.is_active:
+        return JsonResponse({'error': 'Tournament is not active.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    winner_nickname = request.data.get("winner_nickname")
+    loser_nickname = request.data.get("loser_nickname")
+    semifinal_gameid = request.data.get("semifinal_gameid")
+    
+    if not winner_nickname or not loser_nickname or not semifinal_gameid:
+        return JsonResponse({'error': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 진 사람을 participants에서 내보내기
+    try:
+        # 방장이 탈락한 경우 다른 사람을 방장으로 설정
+        loser = User.objects.get(nickname=loser_nickname)
+        if tournament.host == loser:
+            new_host = User.objects.get(nickname=winner_nickname)
+            if new_host:
+                tournament.host = new_host
+                tournament.save()
+        tournament.participants.remove(loser)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # end_game_count 증가
+    tournament.end_game_count += 1
+    tournament.save()
+
+    # 준결승 게임 객체 삭제
+    try:
+        semifinal_game = Game.objects.get(id=semifinal_gameid)
+        semifinal_game.delete()
+    except Game.DoesNotExist:
+        return JsonResponse({'error': 'Semifinal game does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if tournament.end_game_count < 2:
+        return JsonResponse({'message': 'Other semifinal game still in progress'}, status=status.HTTP_200_OK)
+    
+    # 결승 게임방 생성 및 participants에 남은 인원들을 추가
+    if tournament.end_game_count == 2:
+        remaining_participants = list(tournament.get_participants())
+        if len(remaining_participants) == 2:
+            final_game = Game.objects.create(
+                name="final_game",
+                creator=remaining_participants[0],
+                status=0
+            )
+            final_game.players.add(remaining_participants[0], remaining_participants[1])
+            final_game.save()
+            
+            tournament.final_game_id = final_game
+            tournament.save()
+            
+            return JsonResponse({
+                'message': 'Final game is set up.',
+                'final_game_id': final_game.id,
+                'participants': [
+                    remaining_participants[0].nickname,
+                    remaining_participants[1].nickname
+                ]
+            }, status=status.HTTP_200_OK)
+    
+    return JsonResponse({'error': 'Unexpected error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(["DELETE"])
 @permission_classes((IsAuthenticated,))
@@ -238,13 +340,44 @@ def out_tournament(request):
         remaining_participants = tournament.participants.all()
         if remaining_participants.exists():
             tournament.host = remaining_participants.first()
+            return JsonResponse({'message': 'Tournament host changed.'}, status=status.HTTP_200_OK)
         else:
             tournament.delete()
-            return JsonResponse({'message': '토너먼트 방이 삭제되었습니다.'}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'Tournament room deleted.'}, status=status.HTTP_200_OK)
     
     tournament.save()
 
     return JsonResponse({'message': 'Out of tournament room'}, status=status.HTTP_200_OK)
+
+@api_view(["DELETE"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def end_tournament(request):
+    if not Tournament.objects.exists():
+        return JsonResponse({'error': 'Tournament room does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    tournament = Tournament.objects.first()
+    if not tournament.is_active:
+        return JsonResponse({'error': 'Tournament is not active.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    winner_nickname = request.data.get("winner_nickname")
+    
+    if not winner_nickname:
+        return JsonResponse({'error': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        winner = User.objects.get(nickname=winner_nickname)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Winner does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # 토너먼트 객체 삭제
+    tournament.delete()
+    
+    return JsonResponse({
+        'message': 'Tournament has ended.',
+        'winner': winner_nickname
+    }, status=status.HTTP_200_OK)
+
 
 # 예시로 상세보기 뷰를 작성합니다.
 def tournament_detail(request, tournament_id):

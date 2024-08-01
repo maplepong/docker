@@ -39,6 +39,18 @@ const apiTounrament = {
         console.log(err);
       });
   },
+  start_semifianl: async function () {
+    return await apiInstance
+      .request({ method: "POST", url: "tournament/start_semifinal" })
+      .then((res) => {
+        console.log(res);
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+        return err;
+      });
+  }
 };
 
 export default apiTounrament;

@@ -1,5 +1,5 @@
 /* @jsx myReact.createElement */
-import myReact, { useEffect, useState } from "../../core/myReact.js";
+import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import WaitingTournament from "./TournamentWaiting.js";
 import TournamentSchedule from "./TournamentSchedule.js";
 import socketController from "../../core/socket.js";
@@ -7,6 +7,7 @@ import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
+import GameRoom from "../Game/GameRoom.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
@@ -14,6 +15,8 @@ const Tournament = () => {
   const [waitingTime, setWaitingTime] = useState(60); // 대기 시간
   const [gameStatus, setGameStatus] = useState(status.LOADING);
   const maxPlayers = 4;
+  const gameId = useRef(null);
+  const [bracket, setBracket] = useState([]);
   console.log("players", players);
 
   useEffect(() => {
@@ -62,7 +65,6 @@ const Tournament = () => {
       socketController._ws.current.close();
     };
   });
-  
 
   const onPlayerJoined = (data) => {
     console.log("playerJoined", data);
@@ -84,7 +86,18 @@ const Tournament = () => {
     });
   };
 
-  const onTournamentStart = (data) => {
+  const onTournamentStart = async (data) => {
+    await apiInstance
+      .get("tournament/get_bracket")
+      .then((res) => {
+        console.log(res.data);
+        setBracket(res.data.bracket);
+        gameId.current = res.data.myGameid;
+      })
+      .catch((err) => {
+        alert(err);
+        outTournament();
+      });
     setGameStatus(status.STARTED);
   };
 
@@ -100,7 +113,7 @@ const Tournament = () => {
     console.log("Tournament ended. Result:", data.result);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     const currentUser = localStorage.getItem("nickname");
     if (host !== currentUser) {
       alert("Only the host can start the game.");
@@ -110,7 +123,18 @@ const Tournament = () => {
       alert("Not enough players to start the game.");
       return;
     }
-    socketController.sendMessage({ type: "tournament", action: "start" });
+    await apiInstance
+      .request({ method: "POST", url: "tournament/start_semifinal" })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        alert(err);
+        // outTournament();
+        return;
+      });
+
+    socketController.sendMessage({ type: "tournament_start" });
   };
   console.log("players", players);
   console.log("host", host);
@@ -146,10 +170,9 @@ const Tournament = () => {
   }, []);
   socketController.initSocket();
 
-  const braket = [
-    ["player1", "player2"],
-    ["player3", "player4"],
-  ];
+  function startGame() {
+    setGameStatus(status.ROUND_ONE);
+  }
 
   switch (gameStatus) {
     case status.READY:
@@ -164,12 +187,24 @@ const Tournament = () => {
         </div>
       );
     case status.STARTED || status.BETWEEN_ROUND || status.FINISHED: {
-      return <TournamentSchedule braket={braket} status={gameStatus} />;
+      return (
+        <TournamentSchedule
+          bracket={bracket}
+          status={gameStatus}
+          startGame={startGame}
+        />
+      );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      return <GameRoom id={gameId} />;
+      if (gameInfo){
+        return <GameRoom id={gameId.current} />;
+      }
+      else {
+        return <Loading type="game" />;
+      }
     }
     default: {
+      //status.LOADING
       return (
         <div>
           <Loading type="tournament" />

@@ -551,7 +551,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and await sync_to_async(tournament.participants.count)() == 4:
-                    host = tournament.host
+                    host = await sync_to_async(lambda: tournament.host)()
                     if host:
                         host_channel_name = await sync_to_async(self.redis.get)(f"user_channel_{host.nickname}")
                         if host_channel_name:
@@ -580,17 +580,40 @@ class ChatConsumer(AsyncWebsocketConsumer):
             elif type == 'tournament_start':
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and tournament.is_active:
-                    participants = await sync_to_async(tournament.get_participants)()
-                    participant_nicknames = [user.nickname for user in participants]
                     await self.channel_layer.group_send(
                         'tournament_group',
                         {
                             'type':'tournament_start',
-                            'message': "Tournament started",
-                            'sender': 'system',
-                            'bracket': participant_nicknames
+                          # 'message': "Tournament started",
+                            # 'sender': 'system',
                         }
                     )
+            elif type == 'tournament-end':
+                tournament = await sync_to_async(Tournament.objects.first)()
+                if tournament and tournament.is_active:
+                    participants = await sync_to_async(tournament.get_participants)()
+                    participant_nicknames = [user.nickname for user in participants]
+                    if len(participant_nicknames) == 4:
+                        await self.channel_layer.group_send(
+                            'tournament_group',
+                            {
+                                'type': 'tournament-end',
+                                'status': 'tournament-semifinal-end',
+                                'message': message,
+                                'sender': sender.nickname
+                            }
+                        )
+                    elif len(participant_nicknames) == 2:
+                            await self.channel_layer.group_send(
+                            'tournament_group',
+                            {
+                                'type': 'tournament-end',
+                                'status': 'tournament-final-end',
+                                'message': message,
+                                'sender': sender.nickname
+                            }
+                        )
+
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid JSON'
@@ -686,14 +709,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def tournament_start(self, event):
-        bracket = event['bracket']
-        message = event['message']
-
         await self.send(text_data=json.dumps({
             'type': 'tournament_start',
+        }))
+
+    async def tournament_semifinal_end(self, event):
+        status = event['status']
+        message = event['message']
+        sender = event['sender']
+
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_semifinal_end',
+            'status': status,
             'message': message,
-            'sender': 'system',
-            'bracket': bracket
+            'sender': sender
         }))
 
     @database_sync_to_async

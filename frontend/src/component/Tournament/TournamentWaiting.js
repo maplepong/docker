@@ -4,11 +4,19 @@ import myReact, { useEffect, useState } from "../../core/myReact.js";
 // import router from "../../Router.js";
 // import GameList from "../Game/GameList.js";
 import "../../css/tournament.css";
+import { api } from "../../core/Api.js";
 
-const TournamentWaiting = ({handleStartGame, players, host, gameStarted}) => {
-  
+const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
   console.log(players);
   console.log(host);
+
+  // const userImages = players.map(async (player) => {
+  //   const response = await api.userImages("GET", "", player);
+  //   console.log(response);
+  //   return response.image;
+  // });
+
+  // console.log(userImages);
   return (
     <div>
       <div>
@@ -25,7 +33,7 @@ const TournamentWaiting = ({handleStartGame, players, host, gameStarted}) => {
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               {players.map((player, index) => (
                 <span key={index} className="users">
-                  <img src="../css/img/logo.png" alt="User Avatar" />
+                  {/* <img src={userImages.index} alt="User Avatar" /> */}
                   <p>{player}</p>
                 </span>
               ))}
