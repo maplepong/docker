@@ -9,12 +9,33 @@ import PingPong from "./PlayingGame.js";
 import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
 import WaitingGame from "./WaitingGame.js";
+import ResultGame from "./ResultGame.js";
 
-const GameRoom = (tournamentGameId) => {
-  const [ready, setReady] = useState(false);
+const status = {
+  loading: 0,
+  waiting: 1,
+  playing: 2,
+  finished: 3,
+};
+
+const GameRoom = () => {
+  // const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
-
+  const [gameInfo, setGameInfo] = useState({
+    id: "",
+    name: "",
+    current_players_num: "",
+    owner: "",
+    password: "",
+    players: [],
+    status: "",
+    isGameReady: false,
+    owner_info: {},
+    player_info: {},
+  });
+  const [gameStatus, setGameStatus] = useState(status.loading);
+  const gameResult = useRef(null);
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {
@@ -47,6 +68,7 @@ const GameRoom = (tournamentGameId) => {
               (player) => player.nickname !== updatedGameInfo.owner
             );
             setGameInfo(updatedGameInfo);
+            setGameStatus(status.waiting);
           } else {
             console.error("Failed to fetch game info:", data);
           }
@@ -100,7 +122,7 @@ const GameRoom = (tournamentGameId) => {
           });
         } else if (data.type === "game_start") {
           console.log("game_start");
-          setReady(true);
+          setGameStatus(status.playing);
         } else if (data.type === "client_left") {
           console.log("client_left");
 
@@ -169,18 +191,52 @@ const GameRoom = (tournamentGameId) => {
     myReact.redirect("lobby");
   };
 
-  return ready ? (
-    <div className="game-container">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
-      <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
-    </div>
-  ) : (
-    <WaitingGame
-      gameInfo={gameInfo}
-      startGame={startGame}
-      exitGame={exitGame}
-    />
-  );
+  switch (gameStatus) {
+    case status.waiting:
+      return (
+        <WaitingGame
+          gameInfo={gameInfo}
+          startGame={startGame}
+          exitGame={exitGame}
+          sendGameInvite={sendGameInvite}
+        />
+      );
+    case status.playing:
+      return (
+        <div className="game-container">
+          <canvas id="myCanvas" width="800" height="640"></canvas>
+          <PingPong
+            gameinfo={gameInfo}
+            gameSocket={gameSocket}
+            gameResult={gameResult}
+            setStatus={setGameStatus}
+          />
+        </div>
+      );
+    case status.finished:
+      const isUserWin =
+        gameResult.current.userScore > gameResult.current.enemyScore;
+      console.log("player", gameInfo.players);
+      const opponent =
+        gameInfo.owner === localStorage.getItem("nickname")
+          ? gameInfo.player
+          : gameInfo.owner;
+      const data = {
+        game_id: gameInfo.id,
+        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
+        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
+        loser_score: isUserWin
+          ? gameResult.current.enemyScore
+          : gameResult.current.userScore,
+        winner_score: isUserWin
+          ? gameResult.current.userScore
+          : gameResult.current.enemyScore,
+      };
+      console.log("data", data);
+      return <ResultGame gameResult={data} />;
+    default:
+      return <Loading type="game" />;
+  }
 };
 
 export default GameRoom;

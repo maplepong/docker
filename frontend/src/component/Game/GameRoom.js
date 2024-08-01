@@ -191,21 +191,6 @@ const GameRoom = () => {
     myReact.redirect("lobby");
   };
 
-  // return ready ? (
-  //   <div className="game-container">
-  //     <canvas id="myCanvas" width="480" height="320"></canvas>
-  //     <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
-  //   </div>
-  // ) : gameInfo.id ? (
-  //   <WaitingGame
-  //     gameInfo={gameInfo}
-  //     startGame={startGame}
-  //     exitGame={exitGame}
-  //     sendGameInvite={sendGameInvite}
-  //   />
-  // ) : (
-  //   <Loading type="game"/>
-  // );
   switch (gameStatus) {
     case status.waiting:
       return (
