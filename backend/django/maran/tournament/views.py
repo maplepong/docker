@@ -31,7 +31,8 @@ def new_tournament(request):
         tournament.participants.add(user)
 
         participants = list(tournament.participants.values('id', 'nickname'))
-        return JsonResponse({'message': 'Enter tournament room.', 'participants': participants}, status=status.HTTP_200_OK)
+        host = tournament.host.nickname
+        return JsonResponse({'message': 'Enter tournament room.', 'participants': participants, 'host':host}, status=status.HTTP_200_OK)
     else:
         # 새로운 토너먼트 방 생성
         tournament = Tournament.objects.create(host=user)
