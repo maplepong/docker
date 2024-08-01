@@ -558,16 +558,12 @@ const api = {
         return err;
       });
   },
-  sendGameResult(leftscore, rightscore, nickname) {
+  sendGameResult(data) {
     return apiInstance
       .request({
-        url: "game/result",
+        url: "update_game_result",
         method: "POST",
-        data: {
-          left: leftscore,
-          right: rightscore,
-          nickname: nickname,
-        },
+        data: data,
       })
       .then((res) => {
         if (res.status === 201) {

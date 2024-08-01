@@ -24,8 +24,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       playerPaddle.position.x + three.paddleWidth / 2
     ) {
       if (
-        ball.position.y >
-          playerPaddle.position.y - three.paddleHeight / 2 &&
+        ball.position.y > playerPaddle.position.y - three.paddleHeight / 2 &&
         ball.position.y < playerPaddle.position.y + three.paddleHeight / 2
       ) {
         ballDirection.x = -ballDirection.x;
@@ -34,9 +33,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         updateScore(1, 0);
         sendGameState();
         drawText(
-          userscore.current.toString() +
-            " : " +
-            enemyscore.current.toString(),
+          userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.6,
           0,
           0xff0000
@@ -58,9 +55,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         updateScore(0, 1);
         sendGameState();
         drawText(
-          userscore.current.toString() +
-            " : " +
-            enemyscore.current.toString(),
+          userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.6,
           0,
           0x0000ff
@@ -80,18 +75,17 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
   }
 
   function animate() {
-    if(userscore.current < 3 && enemyscore.current < 3) {
+    if (userscore.current < 3 && enemyscore.current < 3) {
       window.requestAnimationFrame(animate);
-      
+
       updateBall();
-      
+
       updatePlayerPaddle();
-      
+
       three.renderer.render(three.scene, three.camera);
     }
   }
 
-  
   const cancel = () => {
     window.cancelAnimationFrame(animate);
     document.removeEventListener("keydown", keyDownHandler);
@@ -113,8 +107,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     three.textMesh.position.set(x, y, 0);
     three.scene.add(three.textMesh);
   }
-
-
 
   useEffect(() => {
     if (!gameinfo || !gameSocket.current) {
@@ -205,7 +197,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           nickname: localStorage.getItem("nickname"),
         });
         console.log("gameSocket closed");
-        setStatus(3) //변경 필요
+        setStatus(3); //변경 필요
       };
       animate();
       return () => {
@@ -250,11 +242,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     sendGameState();
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
-      api.sendGameResult(
-        userscore.current,
-        enemyscore.current,
-        localStorage.getItem("nickname")
-      );
       gameSocket.current ? gameSocket.current.close() : null;
       gameResult.current = {
         userscore: userscore.current,
@@ -262,7 +249,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       };
       // if (stopRef.current) stopRef.current();
       cancel();
-      window.cancelAnimationFrame(animate);
+      // window.cancelAnimationFrame(animate);
       setStatus(3); //status.finished
       // myReact.redirect("home");
     }
