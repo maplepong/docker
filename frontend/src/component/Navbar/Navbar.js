@@ -97,7 +97,7 @@ const Navbar = () => {
   //   console.log("connect sended");
   // }
 
-  console.log("friendsCount ", friendsCount);
+  // console.log("friendsCount ", friendsCount);
 
   const refreshFriend = () => {
     socketController.sendMessage({ type: "connect" });

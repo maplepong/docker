@@ -140,6 +140,7 @@ const Tournament = () => {
   console.log("host", host);
 
   const outTournament = () => {
+    setGameStatus(status.LOADING);
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
     myReact.redirect("home");
