@@ -9,6 +9,7 @@ import PingPong from "./PlayingGame.js";
 import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
 import WaitingGame from "./WaitingGame.js";
+import ResultGame from "./ResultGame.js";
 
 const status = {
   loading: 0,
@@ -228,12 +229,26 @@ const GameRoom = () => {
         </div>
       );
     case status.finished:
-      return (
-        <div>
-          <p>게임이 종료되었습니다.</p>
-          <p>{gameResult.current}</p>
-        </div>
-      );
+      const isUserWin =
+        gameResult.current.userScore > gameResult.current.enemyScore;
+      console.log("player", gameInfo.players);
+      const opponent =
+        gameInfo.owner === localStorage.getItem("nickname")
+          ? gameInfo.player
+          : gameInfo.owner;
+      const data = {
+        game_id: gameInfo.id,
+        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
+        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
+        loser_score: isUserWin
+          ? gameResult.current.enemyScore
+          : gameResult.current.userScore,
+        winner_score: isUserWin
+          ? gameResult.current.userScore
+          : gameResult.current.enemyScore,
+      };
+      console.log("data", data);
+      return <ResultGame gameResult={data} />;
     default:
       return <Loading type="game" />;
   }
