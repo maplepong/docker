@@ -34,7 +34,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         sendGameState();
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
-          -0.6,
+          -0.3,
           0,
           0xff0000
         );
@@ -56,7 +56,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         sendGameState();
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
-          -0.6,
+          -0.3,
           0,
           0x0000ff
         );
@@ -105,6 +105,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     const textMaterial = new THREE.MeshBasicMaterial({ color: color });
     three.textMesh = new THREE.Mesh(textGeometry, textMaterial);
     three.textMesh.position.set(x, y, 0);
+    three.textMesh.rotation.set(0, 0, -1.5);
     three.scene.add(three.textMesh);
   }
 
@@ -123,15 +124,19 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       three.scene = new THREE.Scene();
       three.scene.background = new THREE.Color("skyblue");
 
-      three.camera = new THREE.PerspectiveCamera(75, 480 / 320, 0.1, 1000);
+      const axesHelper = new THREE.AxesHelper(3)
+      three.scene.add(axesHelper)
+
+
+      three.camera = new THREE.PerspectiveCamera(75, 640 / 640, 0.1, 1000);
       three.renderer = new THREE.WebGLRenderer({ canvas: canvas });
-      three.renderer.setSize(480, 320);
+      three.renderer.setSize(640, 640);
 
       three.light = new THREE.DirectionalLight(0xffffff, 1);
       three.light.position.set(5, 5, 5).normalize();
       three.scene.add(three.light);
 
-      three.camera.position.set(0, -2.5, 5);
+      three.camera.position.set(-4, 0, 3);
       three.camera.lookAt(0, 0, 0);
 
       three.ballRadius = 0.2;
@@ -148,19 +153,20 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         0.2
       );
       three.paddleMaterial = new THREE.MeshPhongMaterial({ color: 0xffc0cb });
+      three.enemyMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
 
       playerPaddle = new THREE.Mesh(three.paddleGeometry, three.paddleMaterial);
       playerPaddle.position.x = -2;
       three.scene.add(playerPaddle);
 
-      aiPaddle = new THREE.Mesh(three.paddleGeometry, three.paddleMaterial);
+      aiPaddle = new THREE.Mesh(three.paddleGeometry, three.enemyMaterial);
       aiPaddle.position.x = 2;
       three.scene.add(aiPaddle);
 
       if (localStorage.getItem("nickname") === gameinfo.owner) {
-        ballDirection = new THREE.Vector3(0.04, 0.04, 0);
+        ballDirection = new THREE.Vector3(0.02, 0.02, 0);
       } else {
-        ballDirection = new THREE.Vector3(-0.04, 0.04, 0);
+        ballDirection = new THREE.Vector3(-0.02, 0.02, 0);
       }
 
       three.fontLoader = new THREE.FontLoader();
@@ -228,6 +234,22 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         userscore.current = uscore.y;
         enemyscore.current = uscore.x;
       }
+    }
+  }
+
+  function keyDownHandler(e) {
+    if (e.key === "A" || e.key === "a") {
+      upPressed = true;
+    } else if (e.key === "D" || e.key === "d") {
+      downPressed = true;
+    }
+  }
+
+  function keyUpHandler(e) {
+    if (e.key === "A" || e.key === "a") {
+      upPressed = false;
+    } else if (e.key === "D" || e.key === "d") {
+      downPressed = false;
     }
   }
 

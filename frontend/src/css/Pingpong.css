@@ -2,6 +2,7 @@ canvas {
   background-image: url("../../public/asset/background/bg6.jpeg");
   width: 100%;
   height: 100%;
+  rotate: -90deg;
 }
 button {
   display: block;
