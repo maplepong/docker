@@ -1,5 +1,3 @@
-// let gameSocket = null;
-
 /* @jsx myReact.createElement */
 import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import { requestGameInfo, requestExitGame } from "../../core/ApiGame.js";
@@ -18,8 +16,7 @@ const status = {
   finished: 3,
 };
 
-const GameRoom = () => {
-  // const [ready, setReady] = useState(false);
+const GameRoom = (gameId) => {
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
@@ -52,31 +49,23 @@ const GameRoom = () => {
     const fetchGameInfo = async () => {
       SocketController.initSocket();
 
-      const path = window.location.pathname;
-      const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
-
-      if (gameIdMatch) {
-        const gameId = gameIdMatch[1];
-        try {
-          const data = await requestGameInfo(gameId);
-          if (data.status === 200) {
-            const updatedGameInfo = data.data;
-            updatedGameInfo.owner_info = updatedGameInfo.players.find(
-              (player) => player.nickname === updatedGameInfo.owner
-            );
-            updatedGameInfo.player_info = updatedGameInfo.players.find(
-              (player) => player.nickname !== updatedGameInfo.owner
-            );
-            setGameInfo(updatedGameInfo);
-            setGameStatus(status.waiting);
-          } else {
-            console.error("Failed to fetch game info:", data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch game info:", error);
+      try {
+        const data = await requestGameInfo(gameId);
+        if (data.status === 200) {
+          const updatedGameInfo = data.data;
+          updatedGameInfo.owner_info = updatedGameInfo.players.find(
+            (player) => player.nickname === updatedGameInfo.owner
+          );
+          updatedGameInfo.player_info = updatedGameInfo.players.find(
+            (player) => player.nickname !== updatedGameInfo.owner
+          );
+          setGameInfo(updatedGameInfo);
+          setGameStatus(status.waiting);
+        } else {
+          console.error("Failed to fetch game info:", data);
         }
-      } else {
-        console.error("Invalid gameIdMatch:", gameIdMatch);
+      } catch (error) {
+        console.error("Failed to fetch game info:", error);
       }
     };
 

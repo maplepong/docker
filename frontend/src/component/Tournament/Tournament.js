@@ -7,7 +7,7 @@ import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
-import GameRoom from "../Game/GameRoom.js";
+import GameRoom from "../Game/TournamentGameRoom.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
@@ -61,9 +61,10 @@ const Tournament = () => {
     // 방에 입장 요청
     socketController.sendMessage({ type: "tournament", action: "enter" });
     // 클린업 함수로 컴포넌트 언마운트 시 소켓 해제
-    return () => {
-      socketController._ws.current.close();
-    };
+    // return () => {
+    //   if (_ws.current) socketController._ws.current.close();
+    //   _ws.current = null;
+    // };
   });
 
   const onPlayerJoined = (data) => {
