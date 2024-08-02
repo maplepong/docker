@@ -1,7 +1,7 @@
 /* @jsx myReact.createElement */
 import myReact from "../../core/myReact.js";
 
-const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
+const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
   return (
     <div class="bg">
       <div class="room">

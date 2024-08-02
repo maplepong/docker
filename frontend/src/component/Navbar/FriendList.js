@@ -2,19 +2,18 @@
 import myReact, { Link } from "../../core/myReact.js";
 import { useState, useEffect } from "../../core/myReact.js";
 import "../../css/friend.css";
-import api from "../../core/Api_.js";
+import api from "../../core/Api.js";
 import NicknameModal from "../NicknameModal.js";
 import RequestFriend from "../RequestFriend.js";
-// import { requestFriendList } from "../core/Api.js";
 
 const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
   console.log("friendList..", friendList);
-  Object.entries(friendList).map(([key, value]) => {console.log( "key : " + key + "value : " + value)});
 
   return (
     <div id="box" style="margin: 15px;">
+      <button onclick={() => props.refresh()}>새로고침</button>
       <span id="manage">친구 관리</span>
       <RequestFriend />
       <hr className="line" />
@@ -84,11 +83,11 @@ const FriendList = (props) => {
         <span id="request">내 친구들</span>
         <ul>
           {friendList && Object.keys(friendList).length > 0 ? (
-            Object.entries(friendList).map(([key, value]) => (
+            Object.keys(friendList).map(key => (
               <div>
-                <li class="exchange" >
-                  <NicknameModal nickname={key} />
-                  <p>{value ? "접속중" : "비접속"}</p>
+                <li class="exchange">
+                  <NicknameModal nickname={friendList[key].nickname} />
+                  <p>{friendList[key].status ? "접속중" : "비접속"}</p>
                 </li>
               </div>
             ))

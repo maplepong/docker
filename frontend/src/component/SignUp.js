@@ -1,6 +1,6 @@
 /* @jsx myReact.createElement */
 import myReact from "../core/myReact.js";
-import api, { requestSignup, requestValidCheck } from "../core/Api_.js";
+import api, { requestSignup, requestValidCheck } from "../core/Api.js";
 import "../css/Signup.css"
 import { Link } from "../core/myReact.js";
 import router from "../core/Router.js";

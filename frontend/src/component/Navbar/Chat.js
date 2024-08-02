@@ -6,7 +6,7 @@ import socketController from "../../core/socket.js";
 import { requestJoinGame } from "../../core/ApiGame.js";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = myReact.useGlobalState("chat", []);
 
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
@@ -126,7 +126,9 @@ const Chat = () => {
           {messages.map((msg, index) => (
             <div key={index} class={msg.type + " message-container"}>
               <div class="chat-line">
-                <NicknameModal nickname={msg.sender + " : "} />
+                {msg.sender === "system" ? null : (
+                  <NicknameModal nickname={msg.sender} />
+                )}
                 <p class="message">{msg.message}</p>
               </div>
               {msg.type === "invite" && msg.gameId ? (

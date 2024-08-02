@@ -117,11 +117,9 @@ const SocketController = () => {
       if (this._ws.current) this._ws.current.close();
     },
 
-    isConnected: () => {
-      return this._ws.current.readyState === OPEN;
+    isConnected: function isConnected() {
+      return this._ws.current && this._ws.current.readyState === 1;
     },
-
-    // function setSocket
   };
 };
 
