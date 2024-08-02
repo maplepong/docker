@@ -18,6 +18,9 @@ import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
 import PingPong from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
+import TournamentWaiting from "../component/Tournament/TournamentWaiting.js";
+import TournamentSchedule from "../component/Tournament/TournamentSchedule.js";
+import TournamentGameRoom from "../component/Game/TournamentGameRoom.js";
 
 const pathList = {
   "/": <App />,
@@ -34,7 +37,12 @@ const pathList = {
   lobby: <Lobby />,
   test: <Test />,
   localgame: <PingPong />,
-  tournament: <Tournament />,
+  // tournament: <Tournament />,
+  tournament: {
+    lobby: <TournamentWaiting />,
+    schedule: <TournamentSchedule />,
+    gameroom: <TournamentGameRoom />,
+  }
 };
 
 export default function router() {
@@ -46,6 +54,9 @@ export default function router() {
   if (gameIdMatch) {
     const gameId = gameIdMatch[1];
     component = <GameRoom />;
+  } else if (path==="tournament") {
+    const subPath = window.location.pathname.split("/")[2];
+    component = pathList[path][subPath];
   } else {
     component = pathList[path];
   }

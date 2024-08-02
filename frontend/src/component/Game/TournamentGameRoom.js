@@ -16,7 +16,7 @@ const status = {
   finished: 3,
 };
 
-const GameRoom = (gameIdRef) => {
+const TournamentGameRoom = (gameIdRef) => {
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
@@ -229,4 +229,4 @@ const GameRoom = (gameIdRef) => {
   }
 };
 
-export default GameRoom;
+export default TournamentGameRoom;
