@@ -31,7 +31,8 @@ def new_tournament(request):
         tournament.participants.add(user)
 
         participants = list(tournament.participants.values('id', 'nickname'))
-        return JsonResponse({'message': 'Enter tournament room.', 'participants': participants}, status=status.HTTP_200_OK)
+        host = tournament.host.nickname
+        return JsonResponse({'message': 'Enter tournament room.', 'participants': participants, 'host':host}, status=status.HTTP_200_OK)
     else:
         # 새로운 토너먼트 방 생성
         tournament = Tournament.objects.create(host=user)
@@ -262,6 +263,7 @@ def end_semifinal(request):
     # 진 사람을 participants에서 내보내기
     try:
         # 방장이 탈락한 경우 다른 사람을 방장으로 설정
+        winner = User.objects.get(nickname=winner_nickname)
         loser = User.objects.get(nickname=loser_nickname)
         if tournament.host == loser:
             new_host = User.objects.get(nickname=winner_nickname)
@@ -270,7 +272,7 @@ def end_semifinal(request):
                 tournament.save()
         tournament.participants.remove(loser)
     except User.DoesNotExist:
-        return JsonResponse({'error': 'Loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Winner orLoser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     # end_game_count 증가
     tournament.end_game_count += 1
@@ -361,6 +363,13 @@ def end_tournament(request):
         return JsonResponse({'error': 'Tournament is not active.'}, status=status.HTTP_400_BAD_REQUEST)
 
     winner_nickname = request.data.get("winner_nickname")
+    final_gameid = request.data.get("final_gameid")
+
+    try:
+        final_game = Game.objects.get(id=final_gameid)
+        final_game.delete()
+    except Game.DoesNotExist:
+        return JsonResponse({'error': 'Final game does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     if not winner_nickname:
         return JsonResponse({'error': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)

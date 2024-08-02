@@ -27,4 +27,5 @@ urlpatterns = [
     path("block-user", friend.block_user),
     path("unblock-user", friend.unblock_user),
     path("blocked-list", friend.get_blocked_users),
+    path("game-record", views.game_record),
 ]
