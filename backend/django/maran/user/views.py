@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import (
     api_view,
@@ -279,3 +279,24 @@ def change_password(request):
     user.save()
     return Response(user.serialize())
 
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def game_record(request):
+    user = request.user
+
+    # 유저의 모든 게임 기록을 최신순으로 가져옵니다.
+    game_records = user.game_history.order_by('-game_date')
+
+    # 게임 기록을 serialize 합니다.
+    record_list = []
+    for record in game_records:
+        record_list.append({
+            'opponent': record.opponent,
+            'user_score': record.user_score,
+            'opponent_score': record.opponent_score,
+            'result': record.result,
+            'game_date': record.game_date.strftime('%Y-%m-%d %H:%M:%S')
+        })
+
+    return JsonResponse({'game_records': record_list}, status=status.HTTP_200_OK)
