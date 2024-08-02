@@ -84,9 +84,6 @@ const Navbar = () => {
       setFriendRequests(friendRequests);
       setData(response);
     }
-    return () => {
-      socketController._ws.current.close();
-    };
   }, []);
 
   // if (
