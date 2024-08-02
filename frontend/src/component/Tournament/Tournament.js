@@ -197,15 +197,9 @@ const Tournament = () => {
       );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      if (gameInfo){
-        return <GameRoom id={gameId.current} />;
-      }
-      else {
-        return <Loading type="game" />;
-      }
+      return <GameRoom id={gameId.current} />;
     }
-    default: {
-      //status.LOADING
+    case status.LOADING: {
       return (
         <div>
           <Loading type="tournament" />

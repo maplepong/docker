@@ -16,7 +16,7 @@ const status = {
   finished: 3,
 };
 
-const GameRoom = (gameId) => {
+const GameRoom = (gameIdRef) => {
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
@@ -33,6 +33,7 @@ const GameRoom = (gameId) => {
   });
   const [gameStatus, setGameStatus] = useState(status.loading);
   const gameResult = useRef(null);
+  const gameId = gameIdRef.current;
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {

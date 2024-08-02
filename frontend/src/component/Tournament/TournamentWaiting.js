@@ -10,13 +10,6 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
   console.log(players);
   console.log(host);
 
-  // const userImages = players.map(async (player) => {
-  //   const response = await api.userImages("GET", "", player);
-  //   console.log(response);
-  //   return response.image;
-  // });
-
-  // console.log(userImages);
   return (
     <div>
       <div>
