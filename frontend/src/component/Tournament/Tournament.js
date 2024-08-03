@@ -92,14 +92,14 @@ const Tournament = () => {
       .get("tournament/get_bracket")
       .then((res) => {
         console.log(res.data);
-        setBracket(res.data.bracket);
         gameId.current = res.data.myGameid;
+        setBracket(res.data.bracket);
+        setGameStatus(status.STARTED);
       })
       .catch((err) => {
         alert(err);
         outTournament();
       });
-    setGameStatus(status.STARTED);
   };
 
   const onGameEnd = (data) => {
@@ -172,7 +172,7 @@ const Tournament = () => {
   socketController.initSocket();
 
   function startGame() {
-    setGameStatus(status.ROUND_ONE);
+    console.log(startGame);
   }
 
   switch (gameStatus) {
@@ -197,11 +197,7 @@ const Tournament = () => {
       );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      if (gameInfo) {
-        return <GameRoom id={gameId.current} />;
-      } else {
-        return <Loading type="game" />;
-      }
+      return <GameRoom id={gameId.current} />;
     }
     default: {
       //status.LOADING
