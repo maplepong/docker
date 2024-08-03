@@ -78,13 +78,13 @@ const Tournament = () => {
   };
 
   const onPlayerLeft = (data) => {
-    console.log("playerLeft", data);
-    setPlayers((prevPlayers) => {
-      const newPlayers = prevPlayers.filter(
-        (player) => player !== data.nickname
-      );
-      return newPlayers;
-    });
+    const idx = players.indexOf(data.nickname);
+    if (idx === -1) {
+      return;
+    }
+    players.splice(idx, 1);
+    console.log("player leftL:", players);
+    setPlayers([...players]);
   };
 
   const onTournamentStart = async (data) => {
@@ -197,10 +197,9 @@ const Tournament = () => {
       );
     }
     case status.ROUND_ONE || status.ROUND_TWO: {
-      if (gameInfo){
+      if (gameInfo) {
         return <GameRoom id={gameId.current} />;
-      }
-      else {
+      } else {
         return <Loading type="game" />;
       }
     }
