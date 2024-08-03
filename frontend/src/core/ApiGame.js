@@ -80,11 +80,11 @@ const requestCreateGame = async (room_title, password) => {
         },
       })
       .then((response) => {
+        result = response;
         if (typeof result === "undefined" || result.status != 201) {
           console.log("room create Error");
         console.log(result);
-        return;}
-        result = response;
+        return result;}
         console.log("Response:", response);
       })
       .catch((error) => {

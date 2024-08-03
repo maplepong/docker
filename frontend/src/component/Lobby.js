@@ -134,7 +134,7 @@ const Lobby = (props) => {
                         </div>
                         <input type="password" id="room-password" name="room-password" placeholder="비밀번호 입력"></input>
                         <div id="modal-buttons">
-                            <input type="button" id="cancelbtn" value="취소"></input>
+                            <input type="button" id="cancelbtn" onClick={openModal} value="취소"></input>
                             <input type="button" id="confirmbtn" onClick={create_game} value="확인"></input>
                         </div>
                     </form>
