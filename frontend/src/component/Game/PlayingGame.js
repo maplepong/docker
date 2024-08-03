@@ -271,9 +271,22 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
       gameSocket.current ? gameSocket.current.close() : null;
+      const isUserWin = userscore.current > enemyscore.current;
+      const winner = isUserWin
+        ? localStorage.getItem("nickname")
+        : gameinfo.opponent;
+      const loser = !isUserWin
+        ? localStorage.getItem("nickname")
+        : gameinfo.opponent;
+      const winner_score = isUserWin ? userscore.current : enemyscore.current;
+      const loser_score = !isUserWin ? userscore.current : enemyscore.current;
       gameResult.current = {
-        userscore: userscore.current,
-        enemyscore: enemyscore.current,
+        game_id: gameinfo.id,
+        winner_score: winner_score,
+        loser_score: loser_score,
+        isUserWin: isUserWin,
+        winner: winner,
+        loser: loser,
       };
 
       console.log("gameResult", gameResult.current);

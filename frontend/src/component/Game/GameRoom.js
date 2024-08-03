@@ -33,6 +33,7 @@ const GameRoom = () => {
     isGameReady: false,
     owner_info: {},
     player_info: {},
+    opponent: "",
   });
   const [gameStatus, setGameStatus] = useState(status.loading);
   const gameResult = useRef(null);
@@ -67,6 +68,11 @@ const GameRoom = () => {
             updatedGameInfo.player_info = updatedGameInfo.players.find(
               (player) => player.nickname !== updatedGameInfo.owner
             );
+            if (updatedGameInfo.players.length === 2) {
+              updatedGameInfo.opponent = updatedGameInfo.players.find(
+                (player) => player.nickname !== localStorage.getItem("nickname")
+              ).nickname;
+            }
             setGameInfo(updatedGameInfo);
             setGameStatus(status.waiting);
           } else {
@@ -119,6 +125,7 @@ const GameRoom = () => {
             ...gameInfo,
             isGameReady: true,
             player_info: data.player_info,
+            opponent: gameInfo.opponent || data.player_info.nickname,
           });
         } else if (data.type === "game_start") {
           console.log("game_start");
@@ -214,26 +221,8 @@ const GameRoom = () => {
         </div>
       );
     case status.finished:
-      const isUserWin =
-        gameResult.current.userScore > gameResult.current.enemyScore;
-      console.log("player", gameInfo.players);
-      const opponent =
-        gameInfo.owner === localStorage.getItem("nickname")
-          ? gameInfo.player
-          : gameInfo.owner;
-      const data = {
-        game_id: gameInfo.id,
-        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
-        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
-        loser_score: isUserWin
-          ? gameResult.current.enemyScore
-          : gameResult.current.userScore,
-        winner_score: isUserWin
-          ? gameResult.current.userScore
-          : gameResult.current.enemyScore,
-      };
-      console.log("data", data);
-      return <ResultGame gameResult={data} />;
+      console.log("gameResult", gameResult.current);
+      return <ResultGame gameResult={gameResult.current} />;
     default:
       return <Loading type="game" />;
   }

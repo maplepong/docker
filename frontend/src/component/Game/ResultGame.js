@@ -7,14 +7,14 @@ const ResultGame = (gameResult) => {
     await api.sendGameResult(gameResult).catch((err) => {
       alert(err);
     });
-    console.log("게임 결과 전송 완료");
   });
+  console.log(gameResult.gameResult);
 
   return (
     <div>
       <p>게임이 종료되었습니다.</p>
-      <p>winner:{gameResult.winner}</p>
-      <p>loser:{gameResult.loser}</p>
+      <p>winner:{gameResult.gameResult.winner}</p>
+      <p>loser:{gameResult.gameResult.loser}</p>
       <Link to="lobby">
         <button>로비로 이동</button>
       </Link>

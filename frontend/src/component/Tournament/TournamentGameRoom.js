@@ -34,6 +34,7 @@ const TournamentGameRoom = () => {
     isGameReady: false,
     owner_info: {},
     player_info: {},
+    opponent: "",
   });
   const [gameStatus, setGameStatus] = useState(status.loading);
   const [gameResult, setGameResult] = myReact.useGlobalState(
@@ -49,26 +50,8 @@ const TournamentGameRoom = () => {
       }, 1000);
     }
     if (gameStatus === status.finished) {
-      const isUserWin =
-        gameResultRef.current.userScore > gameResultRef.current.enemyScore;
-      console.log("player", gameInfo.players);
-      const opponent =
-        gameInfo.owner === localStorage.getItem("nickname")
-          ? gameInfo.player
-          : gameInfo.owner;
-      const data = {
-        game_id: gameInfo.id,
-        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
-        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
-        loser_score: isUserWin
-          ? gameResultRef.current.enemyScore
-          : gameResultRef.current.userScore,
-        winner_score: isUserWin
-          ? gameResultRef.current.userScore
-          : gameResultRef.current.enemyScore,
-      };
-      console.log("GameResult", data);
-      setGameResult(data);
+      console.log("GameResult", gameResult.current);
+      setGameResult(gameResultRef.current);
       setGameStatus(status.return);
     }
   }, [gameStatus]);
@@ -103,6 +86,11 @@ const TournamentGameRoom = () => {
             updatedGameInfo.player_info = updatedGameInfo.players.find(
               (player) => player.nickname !== updatedGameInfo.owner
             );
+            if (updatedGameInfo.players.length === 2) {
+              updatedGameInfo.opponent = updatedGameInfo.players.find(
+                (player) => player.nickname !== localStorage.getItem("nickname")
+              ).nickname;
+            }
             setGameInfo(updatedGameInfo);
             setGameStatus(status.waiting);
           } else {
@@ -155,13 +143,13 @@ const TournamentGameRoom = () => {
             ...gameInfo,
             isGameReady: true,
             player_info: data.player_info,
+            opponent: gameInfo.opponent || data.player_info.nickname,
           });
         } else if (data.type === "game_start") {
           console.log("game_start");
           setGameStatus(status.playing);
         } else if (data.type === "client_left") {
           console.log("client_left");
-
           if (gameInfo.owner === localStorage.getItem("nickname")) {
             console.log("나는 오너");
             setGameInfo({
