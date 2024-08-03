@@ -74,22 +74,25 @@ const requestCreateGame = async (room_title, password) => {
   formData.append("password", password);
   console.log("request Create Game");
   return await apiInstance
-      .post("game/new", formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`,
-        },
-      })
-      .then((response) => {
-        result = response;
-        if (typeof result === "undefined" || result.status != 201) {
-          console.log("room create Error");
+    .post("game/new", formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.accessToken}`,
+      },
+    })
+    .then((response) => {
+      result = response;
+      if (typeof result === "undefined" || result.status != 201) {
+        console.log("room create Error");
         console.log(result);
-        return result;}
-        console.log("Response:", response);
-      })
-      .catch((error) => {
-        console.error("Error create game room:", error);
-      });
+        return result;
+      }
+      console.log("Response:", response);
+      return result;
+    })
+    .catch((error) => {
+      console.error("Error create game room:", error);
+      return error;
+    });
 };
 
 const requestExitGame = async (gameId) => {
