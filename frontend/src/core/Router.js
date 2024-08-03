@@ -46,8 +46,7 @@ export default function router() {
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
   if (path === "tournament") {
     component = <TournamentGameRoom />;
-  }
-  if (gameIdMatch) {
+  } else if (gameIdMatch) {
     const gameId = gameIdMatch[1];
     component = <GameRoom />;
   } else {

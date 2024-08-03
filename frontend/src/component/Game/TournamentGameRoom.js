@@ -35,7 +35,10 @@ const TournamentGameRoom = () => {
     player_info: {},
   });
   const [gameStatus, setGameStatus] = useState(status.loading);
-  const [gameResult, setGameResult] = myReact.useGlobalsate("gameResult", null);
+  const [gameResult, setGameResult] = myReact.useGlobalState(
+    "gameResult",
+    null
+  );
   const gameResultRef = useRef(null);
 
   const sendGameInvite = (gameId, nickname) => {
