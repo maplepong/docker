@@ -44,7 +44,9 @@ const TournamentGameRoom = () => {
 
   useEffect(() => {
     if (gameStatus === status.return) {
-      myReact.redirect("tournament");
+      setTimeout(() => {
+        myReact.redirect("tournament-waiting");
+      }, 1000);
     }
     if (gameStatus === status.finished) {
       const isUserWin =

@@ -23,9 +23,10 @@ const Tournament = () => {
     null
   );
   const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
-  const [gameStatus, setGameStatus] = useState(initState);
+  const [tournamentStatus, setTournamentStatus] = useState(initState);
 
   console.log("players", players);
+  console.log("Result", gameResult, "status", tournamentStatus);
 
   useEffect(() => {
     socketController.initSocket();
@@ -102,7 +103,7 @@ const Tournament = () => {
         console.log(res.data);
         gameId.current = res.data.myGameid;
         setBracket(res.data.bracket);
-        setGameStatus(status.STARTED);
+        setTournamentStatus(status.STARTED);
       })
       .catch((err) => {
         alert(err);
@@ -149,33 +150,35 @@ const Tournament = () => {
   console.log("host", host);
 
   const outTournament = () => {
-    setGameStatus(status.LOADING);
+    setTournamentStatus(status.LOADING);
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
     myReact.redirect("home");
   };
 
-  //방 입장
+  // 상태에 따른 init
   useEffect(async () => {
-    document.onpopstate = outTournament;
-    try {
-      const data = await apiTounrament.enter();
-      console.log("got data", data);
-      if (data.status !== 208) {
-        socketController.sendMessage({ type: "tournament_in" });
-      }
-      setPlayers(data.players);
-      setHost(data.players[0]);
+    if (tournamentStatus === status.LOADING) {
+      document.onpopstate = outTournament;
+      try {
+        const data = await apiTounrament.enter();
+        console.log("got data", data);
+        if (data.status !== 208) {
+          socketController.sendMessage({ type: "tournament_in" });
+        }
+        setPlayers(data.players);
+        setHost(data.players[0]);
 
-      setGameStatus(status.READY);
-    } catch (err) {
-      alert(err);
-      console.log(err);
-      // myReact.redirect("home");
+        setTournamentStatus(status.READY);
+      } catch (err) {
+        alert(err);
+        console.log(err);
+        // myReact.redirect("home");
+      }
+      return () => {
+        document.removeEventListener("popstate", outTournament);
+      };
     }
-    return () => {
-      document.removeEventListener("popstate", outTournament);
-    };
   }, []);
   socketController.initSocket();
 
@@ -185,7 +188,7 @@ const Tournament = () => {
     return;
   }
 
-  switch (gameStatus) {
+  switch (tournamentStatus) {
     case status.READY:
       return (
         <div id={"tournament"}>
@@ -201,7 +204,7 @@ const Tournament = () => {
       return (
         <TournamentSchedule
           bracket={bracket}
-          status={gameStatus}
+          status={tournamentStatus}
           startGame={startGame}
         />
       );

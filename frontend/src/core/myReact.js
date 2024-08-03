@@ -145,9 +145,7 @@ function createMyReact() {
       }
       console.log("redirect call", param);
       history.pushState({}, "", param);
-      requestAnimationFrame(() => {
-        router();
-      });
+      router();
     },
 
     // global 구조: {
