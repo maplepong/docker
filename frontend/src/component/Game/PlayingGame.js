@@ -230,10 +230,10 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      if (uscore && !isowner) {
-        userscore.current = uscore.y;
-        enemyscore.current = uscore.x;
-      }
+      // if (uscore && !isowner) {
+      //   userscore.current = uscore.y;
+      //   enemyscore.current = uscore.x;
+      // }
     }
   }
 
@@ -261,7 +261,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     //스코어 업데이트
     userscore.current += leftAdd;
     enemyscore.current += rightAdd;
-    sendGameState();
+    //sendGameState();
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
       gameSocket.current ? gameSocket.current.close() : null;
