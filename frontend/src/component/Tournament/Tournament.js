@@ -151,7 +151,7 @@ const Tournament = () => {
   console.log("host", host);
 
   const outTournament = () => {
-    setTournamentStatus(status.LOADING);
+    setPlayers([]);
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
     myReact.redirect("home");
