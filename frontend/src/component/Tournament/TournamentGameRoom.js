@@ -68,7 +68,7 @@ const TournamentGameRoom = () => {
           : gameResultRef.current.enemyScore,
       };
       console.log("GameResult", data);
-      setGameResult(gameResultRef.current);
+      setGameResult(data);
       setGameStatus(status.return);
     }
   }, [gameStatus]);
