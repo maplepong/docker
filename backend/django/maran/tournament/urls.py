@@ -11,4 +11,5 @@ urlpatterns = [
     path('start_semifinal', views.start_semifinal, name='start_semifinal'),
     path('get_bracket', views.get_bracket, name="get_bracket"),
     path('out_tournament', views.out_tournament, name='out_tournament'),
+    path('end_tournament', views.end_tournament, name='end_tournament'),
 ]
