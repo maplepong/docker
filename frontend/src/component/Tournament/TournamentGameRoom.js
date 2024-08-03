@@ -5,17 +5,18 @@ import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import { requestGameInfo, requestExitGame } from "../../core/ApiGame.js";
 import "../../css/GameRoom.css";
 import "../../css/Pingpong.css";
-import PingPong from "./PlayingGame.js";
+import PingPong from "../Game/PlayingGame.js";
 import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
-import WaitingGame from "./WaitingGame.js";
-import ResultGame from "./ResultGame.js";
+import WaitingGame from "../Game/WaitingGame.js";
+import ResultGame from "../Game/ResultGame.js";
 
 const status = {
   loading: 0,
   waiting: 1,
   playing: 2,
   finished: 3,
+  return: 4, // 토너먼트로 돌아가기
 };
 
 const TournamentGameRoom = () => {
@@ -40,6 +41,35 @@ const TournamentGameRoom = () => {
     null
   );
   const gameResultRef = useRef(null);
+
+  useEffect(() => {
+    if (gameStatus === status.return) {
+      myReact.redirect("tournament");
+    }
+    if (gameStatus === status.finished) {
+      const isUserWin =
+        gameResultRef.current.userScore > gameResultRef.current.enemyScore;
+      console.log("player", gameInfo.players);
+      const opponent =
+        gameInfo.owner === localStorage.getItem("nickname")
+          ? gameInfo.player
+          : gameInfo.owner;
+      const data = {
+        game_id: gameInfo.id,
+        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
+        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
+        loser_score: isUserWin
+          ? gameResultRef.current.enemyScore
+          : gameResultRef.current.userScore,
+        winner_score: isUserWin
+          ? gameResultRef.current.userScore
+          : gameResultRef.current.enemyScore,
+      };
+      console.log("GameResult", data);
+      setGameResult(gameResultRef.current);
+      setGameStatus(status.return);
+    }
+  }, [gameStatus]);
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {
@@ -217,31 +247,13 @@ const TournamentGameRoom = () => {
           />
         </div>
       );
-    case status.finished:
-      const isUserWin =
-        gameResultRef.current.userScore > gameResultRef.current.enemyScore;
-      console.log("player", gameInfo.players);
-      const opponent =
-        gameInfo.owner === localStorage.getItem("nickname")
-          ? gameInfo.player
-          : gameInfo.owner;
-      const data = {
-        game_id: gameInfo.id,
-        winner: isUserWin ? localStorage.getItem("nickname") : opponent,
-        loser: isUserWin ? opponent : localStorage.getItem("nickname"),
-        loser_score: isUserWin
-          ? gameResultRef.current.enemyScore
-          : gameResultRef.current.userScore,
-        winner_score: isUserWin
-          ? gameResultRef.current.userScore
-          : gameResultRef.current.enemyScore,
-      };
-      console.log("data", data);
-      setGameResult(gameResultRef.current);
-      myReact.redirect("tournament");
-      return <ResultGame gameResult={data} />;
     default:
-      return <Loading type="game" />;
+      return (
+        <div>
+          <p>game Status: {gameStatus}</p>
+          <Loading type="game" />
+        </div>
+      );
   }
 };
 

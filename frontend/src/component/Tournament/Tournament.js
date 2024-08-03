@@ -7,7 +7,7 @@ import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
-import GameRoom from "../Game/TournamentGameRoom.js";
+import GameRoom from "./TournamentGameRoom.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);

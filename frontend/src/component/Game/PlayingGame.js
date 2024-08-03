@@ -4,6 +4,13 @@ import "../../css/Pingpong.css";
 import api from "../../core/Api.js";
 import { keyDownHandler, keyUpHandler } from "./utils.js";
 
+const status = {
+  loading: 0,
+  waiting: 1,
+  playing: 2,
+  finished: 3,
+};
+
 const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
   let isowner = false;
   let upPressed, downPressed;
@@ -124,9 +131,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       three.scene = new THREE.Scene();
       three.scene.background = new THREE.Color("skyblue");
 
-      const axesHelper = new THREE.AxesHelper(3)
-      three.scene.add(axesHelper)
-
+      const axesHelper = new THREE.AxesHelper(3);
+      three.scene.add(axesHelper);
 
       three.camera = new THREE.PerspectiveCamera(75, 640 / 640, 0.1, 1000);
       three.renderer = new THREE.WebGLRenderer({ canvas: canvas });
@@ -272,7 +278,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       // if (stopRef.current) stopRef.current();
       cancel();
       // window.cancelAnimationFrame(animate);
-      setStatus(3); //status.finished
+      setStatus(status.finished); //status.finished
       // myReact.redirect("home");
     }
     return;
