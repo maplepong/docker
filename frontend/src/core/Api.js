@@ -596,6 +596,18 @@ const api = {
         return error;
       });
   },
+  getGameRecord() {
+    setToken();
+    return apiInstance
+      .request({
+        method: "GET",
+        url: "user/game-record",
+      })
+      .then((response) => {
+        console.log("게임기록을 불러왔습니다.");
+        return response;
+      })
+  },
 };
 
 export { apiInstance };
