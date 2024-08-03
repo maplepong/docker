@@ -200,7 +200,9 @@ const Tournament = () => {
           <button onClick={outTournament}>나가기</button>
         </div>
       );
-    case status.STARTED || status.BETWEEN_ROUND || status.FINISHED: {
+    case status.STARTED:
+    case status.BETWEEN_ROUND:
+    case status.FINISHED: {
       return (
         <TournamentSchedule
           bracket={bracket}
@@ -209,7 +211,8 @@ const Tournament = () => {
         />
       );
     }
-    case status.ROUND_ONE || status.ROUND_TWO: {
+    case status.ROUND_ONE:
+    case status.ROUND_TWO: {
       return <GameRoom id={gameId.current} />;
     }
     default: {
