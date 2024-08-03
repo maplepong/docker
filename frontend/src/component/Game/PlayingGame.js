@@ -275,6 +275,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         userscore: userscore.current,
         enemyscore: enemyscore.current,
       };
+
+      console.log("gameResult", gameResult.current);
       // if (stopRef.current) stopRef.current();
       cancel();
       // window.cancelAnimationFrame(animate);
