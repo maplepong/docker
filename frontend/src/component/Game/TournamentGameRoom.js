@@ -239,7 +239,7 @@ const TournamentGameRoom = () => {
       console.log("data", data);
       setGameResult(gameResultRef.current);
       myReact.redirect("tournament");
-      return null;
+      return <ResultGame gameResult={data} />;
     default:
       return <Loading type="game" />;
   }
