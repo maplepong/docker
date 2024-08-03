@@ -13,10 +13,18 @@ const Tournament = () => {
   const [players, setPlayers] = useState([]);
   const [host, setHost] = useState("");
   const [waitingTime, setWaitingTime] = useState(60); // 대기 시간
-  const [gameStatus, setGameStatus] = useState(status.LOADING);
+
   const maxPlayers = 4;
   const gameId = useRef(null);
   const [bracket, setBracket] = useState([]);
+
+  const [gameResult, setGameResult] = myReact.useGlobalState(
+    "gameResult",
+    null
+  );
+  const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
+  const [gameStatus, setGameStatus] = useState(initState);
+
   console.log("players", players);
 
   useEffect(() => {
@@ -173,6 +181,8 @@ const Tournament = () => {
 
   function startGame() {
     console.log(startGame);
+    myReact.redirect("tournament/" + gameId.current);
+    return;
   }
 
   switch (gameStatus) {

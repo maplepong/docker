@@ -18,6 +18,7 @@ import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
 import PingPong from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
+import TournamentGameRoom from "../component/Game/TournamentGameRoom.js";
 
 const pathList = {
   "/": <App />,
@@ -34,15 +35,18 @@ const pathList = {
   lobby: <Lobby />,
   test: <Test />,
   localgame: <PingPong />,
-  tournament: <Tournament />,
+  "tournament-waiting": <Tournament />,
 };
 
 export default function router() {
   var path;
   let component;
   path = window.location.pathname.split("/")[1] || window.location.pathname;
-  // console.log(window.location.pathname.split("/")[1]);
+  console.log("router", window.location.pathname.split("/")[1]);
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
+  if (path === "tournament") {
+    component = <TournamentGameRoom />;
+  }
   if (gameIdMatch) {
     const gameId = gameIdMatch[1];
     component = <GameRoom />;

@@ -1,3 +1,5 @@
+// let gameSocket = null;
+
 /* @jsx myReact.createElement */
 import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import { requestGameInfo, requestExitGame } from "../../core/ApiGame.js";
@@ -16,7 +18,8 @@ const status = {
   finished: 3,
 };
 
-const GameRoom = (gameId) => {
+const TournamentGameRoom = () => {
+  // const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameInfo, setGameInfo] = useState({
@@ -32,7 +35,8 @@ const GameRoom = (gameId) => {
     player_info: {},
   });
   const [gameStatus, setGameStatus] = useState(status.loading);
-  const gameResult = useRef(null);
+  const [gameResult, setGameResult] = myReact.useGlobalsate("gameResult", null);
+  const gameResultRef = useRef(null);
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {
@@ -49,23 +53,31 @@ const GameRoom = (gameId) => {
     const fetchGameInfo = async () => {
       SocketController.initSocket();
 
-      try {
-        const data = await requestGameInfo(gameId);
-        if (data.status === 200) {
-          const updatedGameInfo = data.data;
-          updatedGameInfo.owner_info = updatedGameInfo.players.find(
-            (player) => player.nickname === updatedGameInfo.owner
-          );
-          updatedGameInfo.player_info = updatedGameInfo.players.find(
-            (player) => player.nickname !== updatedGameInfo.owner
-          );
-          setGameInfo(updatedGameInfo);
-          setGameStatus(status.waiting);
-        } else {
-          console.error("Failed to fetch game info:", data);
+      const path = window.location.pathname;
+      const gameIdMatch = path.match(/^\/tournament\/(\d+)$/);
+
+      if (gameIdMatch) {
+        const gameId = gameIdMatch[1];
+        try {
+          const data = await requestGameInfo(gameId);
+          if (data.status === 200) {
+            const updatedGameInfo = data.data;
+            updatedGameInfo.owner_info = updatedGameInfo.players.find(
+              (player) => player.nickname === updatedGameInfo.owner
+            );
+            updatedGameInfo.player_info = updatedGameInfo.players.find(
+              (player) => player.nickname !== updatedGameInfo.owner
+            );
+            setGameInfo(updatedGameInfo);
+            setGameStatus(status.waiting);
+          } else {
+            console.error("Failed to fetch game info:", data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch game info:", error);
         }
-      } catch (error) {
-        console.error("Failed to fetch game info:", error);
+      } else {
+        console.error("Invalid gameIdMatch:", gameIdMatch);
       }
     };
 
@@ -197,14 +209,14 @@ const GameRoom = (gameId) => {
           <PingPong
             gameinfo={gameInfo}
             gameSocket={gameSocket}
-            gameResult={gameResult}
+            gameResult={gameResultRef}
             setStatus={setGameStatus}
           />
         </div>
       );
     case status.finished:
       const isUserWin =
-        gameResult.current.userScore > gameResult.current.enemyScore;
+        gameResultRef.current.userScore > gameResultRef.current.enemyScore;
       console.log("player", gameInfo.players);
       const opponent =
         gameInfo.owner === localStorage.getItem("nickname")
@@ -215,17 +227,19 @@ const GameRoom = (gameId) => {
         winner: isUserWin ? localStorage.getItem("nickname") : opponent,
         loser: isUserWin ? opponent : localStorage.getItem("nickname"),
         loser_score: isUserWin
-          ? gameResult.current.enemyScore
-          : gameResult.current.userScore,
+          ? gameResultRef.current.enemyScore
+          : gameResultRef.current.userScore,
         winner_score: isUserWin
-          ? gameResult.current.userScore
-          : gameResult.current.enemyScore,
+          ? gameResultRef.current.userScore
+          : gameResultRef.current.enemyScore,
       };
       console.log("data", data);
-      return <ResultGame gameResult={data} />;
+      setGameResult(gameResultRef.current);
+      myReact.redirect("tournament");
+      return null;
     default:
       return <Loading type="game" />;
   }
 };
 
-export default GameRoom;
+export default TournamentGameRoom;
