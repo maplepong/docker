@@ -204,7 +204,7 @@ export function useState(initValue) {
     // fiber.changed = true;
     batchUpdates(fiber);
     // scheduleUpdate(fiber);
-    // console.log("렌더를 합니다")
+    console.log("렌더를 합니다")
     // myReact.render(null, "reRender");
     //render, how I can get the infomation of current page?
   };

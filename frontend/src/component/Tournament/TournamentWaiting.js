@@ -23,28 +23,30 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
     document.location.includes("tournament") ? null : await outTournament();
     document.removeEventListener("popstate", handlePopState);
   }
+
+
+
   useEffect(async () => {
     document.addEventListener("popstate", handlePopState); 
     try {
       const data = await apiTounrament.enter();
-      console.log("got data", data);
-      if (data.status !== 208) {
-        socketController.sendMessage({ type: "tournament_in" });
-      }
-      setTournamentState({players: data.players, host: data.players[0]});
+      tournamentState.players = [];
+      tournamentState.host = data.host;
+      setTournamentState({players: data.participants, host: data.host});
       socketController.initSocket();
+      socketController.sendMessage({ type: "tournament_in" });
       socketController.setSocketTypes([
         {
           type: "tournament_in",
           func: 
             (data) => {
               console.log("playerJoined", data);
-              if (tournamentState.players?.includes(data.nickname)) {
+              if (tournamentState.players && tournamentState.players.includes(data.nickname)) {
                 console.log(...players, data.nickname, "player alreay exists");
                 return;
               }
-              tournamentState.players ? tournamentState.players.push(data.nickname):
-              tournamentState.players = [data.nickname];
+              if (data.nickname !== localStorage.getItem("nickname")) 
+              tournamentState.players.push(data.nickname);
               setTournamentState(tournamentState);
             }
         },
@@ -95,7 +97,7 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
     }
   }, []);
 
-  return (Object.keys(tournamentState).length ? (
+  return (tournamentState && tournamentState.host ? (
     <div>
       <div>
         <p>Tournament 이름</p>
@@ -109,16 +111,15 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
         >
           <div style={{ display: "block" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              {tournamentState?.players.map((player, index) => (
+              {tournamentState?.players ? tournamentState?.players.map((player, index) => (
                 <span key={index} className="users">
-                  {/* <img src={userImages.index} alt="User Avatar" /> */}
                   <p>{player}</p>
                 </span>
-              ))}
+              )) : <p>"error"</p>}
             </div>
           </div>
           <div>
-            <div>주최자: {host}</div>
+            <div>주최자: {tournamentState.host}</div>
             <div>최대 인원: 4명</div>
              {localStorage.getItem("nickname") === tournamentState.host ? (<div>
                 <button onClick={handleStartGame}>시작하기</button>
