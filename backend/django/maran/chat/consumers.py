@@ -305,7 +305,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             'type':'tournament_start',
                         }
                     )
-            elif type == 'tournament-end':
+            elif type == 'tournament_end':
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and tournament.is_active:
                     participants = await sync_to_async(tournament.get_participants)()
@@ -314,7 +314,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         await self.channel_layer.group_send(
                             'tournament_group',
                             {
-                                'type': 'tournament-end',
+                                'type': 'tournament_end',
                                 'status': 'tournament_semifinal_end',
                             }
                         )
@@ -323,7 +323,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         await self.channel_layer.group_send(
                             'tournament_group',
                             {
-                                'type': 'tournament-end',
+                                'type': 'tournament_end',
                                 'status': 'tournament_final_end',
                             }
                         )
