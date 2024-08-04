@@ -260,58 +260,68 @@ def end_semifinal(request):
     if not winner_nickname or not loser_nickname or not semifinal_gameid:
         return JsonResponse({'error': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 진 사람을 participants에서 내보내기
     try:
-        # 방장이 탈락한 경우 다른 사람을 방장으로 설정
+        # 사용자 객체 가져오기
         winner = User.objects.get(nickname=winner_nickname)
         loser = User.objects.get(nickname=loser_nickname)
-        if tournament.host == loser:
-            new_host = User.objects.get(nickname=winner_nickname)
-            if new_host:
-                tournament.host = new_host
-                tournament.save()
-        tournament.participants.remove(loser)
+        
+        # 준결승 게임 객체 가져오기
+        semifinal_game = Game.objects.get(id=semifinal_gameid)
+        
     except User.DoesNotExist:
-        return JsonResponse({'error': 'Winner orLoser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Winner or loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    except Game.DoesNotExist:
+        return JsonResponse({'error': 'Semifinal game does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+    game_user_lst = semifinal_game.players.all()
+    if winner not in game_user_lst:
+        return JsonResponse({"error': 'Winner user not in game id's game"}, status=status.HTTP_400_BAD_REQUEST)
+    if loser not in game_user_lst:
+        return JsonResponse({"error": "Loser user not in game id's game"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 진 사람을 participants에서 내보내기
+    if tournament.host == loser:
+        tournament.host = winner
+        tournament.save()
+    tournament.participants.remove(loser)
+
+    # 준결승 게임 객체 삭제 및 Tournament 객체 업데이트
+    semifinal_game = Game.objects.get(id=semifinal_gameid)
     
+    # Tournament 객체에서 해당 게임을 참조하는 필드를 업데이트
+    if tournament.semifinal_game1 == semifinal_game:
+        tournament.semifinal_game1 = None
+    if tournament.semifinal_game2 == semifinal_game:
+        tournament.semifinal_game2 = None
+    tournament.save()
+    
+    # 게임 객체 삭제
+    semifinal_game.delete()
+
     # end_game_count 증가
     tournament.end_game_count += 1
     tournament.save()
-
-    # 준결승 게임 객체 삭제
-    try:
-        semifinal_game = Game.objects.get(id=semifinal_gameid)
-        semifinal_game.delete()
-    except Game.DoesNotExist:
-        return JsonResponse({'error': 'Semifinal game does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     if tournament.end_game_count < 2:
-        return JsonResponse({'message': 'Other semifinal game still in progress'}, status=status.HTTP_200_OK)
+        final_game = Game.objects.create(name="final_game", creator= winner, status=0)
+        final_game.players.add(winner)
+        tournament.final_game_id = final_game
+        tournament.save()
+        return JsonResponse({
+            'message': 'First semifinal ended, final game created.',
+            'final_game_id' : final_game.id
+        }, status=status.HTTP_200_OK)
     
     # 결승 게임방 생성 및 participants에 남은 인원들을 추가
-    if tournament.end_game_count == 2:
-        remaining_participants = list(tournament.get_participants())
-        if len(remaining_participants) == 2:
-            final_game = Game.objects.create(
-                name="final_game",
-                creator=remaining_participants[0],
-                status=0
-            )
-            final_game.players.add(remaining_participants[0], remaining_participants[1])
-            final_game.save()
-            
-            tournament.final_game_id = final_game
-            tournament.save()
-            
-            return JsonResponse({
-                'message': 'Final game is set up.',
-                'final_game_id': final_game.id,
-                'participants': [
-                    remaining_participants[0].nickname,
-                    remaining_participants[1].nickname
-                ]
-            }, status=status.HTTP_200_OK)
-    
+    elif tournament.end_game_count == 2:
+        final_game = tournament.final_game_id
+        final_game.players.add(winner)
+        final_game.save()
+        
+        return JsonResponse({
+            'message': 'Final game set up.',
+            'final_game_id': final_game.id,
+        }, status=status.HTTP_200_OK)
     return JsonResponse({'error': 'Unexpected error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(["DELETE"])
