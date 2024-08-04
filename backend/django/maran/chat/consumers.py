@@ -450,7 +450,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'status': status,
         }))
 
-    async def tournament_semifinal_end(self, event):
+    async def tournament_final_end(self, event):
         status = event['status']
 
         await self.send(text_data=json.dumps({
