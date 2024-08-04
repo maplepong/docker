@@ -1,101 +1,37 @@
 /* @jsx myReact.createElement */
 import myReact, { Link } from "../../core/myReact.js";
 import { useState, useEffect } from "../../core/myReact.js";
-import "../../css/friend.css";
+import "../../css/FriendList.css";
 import api from "../../core/Api.js";
 import NicknameModal from "../NicknameModal.js";
 import RequestFriend from "../RequestFriend.js";
+import Friend from "./Friend.js";
 
 const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
-  console.log("friendList..", friendList);
 
   return (
-    <div id="box" style="margin: 15px;">
+    <div id="friend-list-container">
+      <div id="friend-list-title">
+      <h2>친구 목록</h2>
       <button onclick={() => props.refresh()}>새로고침</button>
-      <span id="manage">친구 관리</span>
-      <RequestFriend />
-      <hr className="line" />
-      <div class="content">
-        <span id="request">받은 친구 요청</span>
-        <ul>
-          {friendRequests &&
+      </div>
+      <ul id="friend-list-ul">
+      {friendRequests &&
           friendRequests.receives &&
           friendRequests.receives.length > 0 ? (
-            friendRequests.receives.map((req) => (
-              <div>
-                <li class="exchange">
-                  {req.from_user}
-                  <button
-                    class="inter"
-                    onClick={() =>
-                      api.handleFriendRequest(req.from_user, "POST")
-                    }
-                  >
-                    수락
-                  </button>
-                  <button
-                    class="inter"
-                    onClick={() =>
-                      api.handleFriendRequest(req.from_user, "DELETE")
-                    }
-                  >
-                    거절
-                  </button>
-                </li>
-              </div>
-            ))
-          ) : (
-            <span>받은 요청이 없습니다.</span>
-          )}
-        </ul>
-      </div>
-      <hr className="line" />
-      <div class="content">
-        <span id="request">보낸 친구 요청</span>
-        <ul>
-          {friendRequests &&
+            friendRequests.receives.map((req) => (<Friend nickname={req.from_user} type="request_receive" />))):  null}
+      {friendRequests &&
           friendRequests.sends &&
           friendRequests.sends.length > 0 ? (
-            friendRequests.sends.map((req) => (
-              <div>
-                <li class="exchange">
-                  {req.to_user}
-                  <button
-                    class="inter"
-                    onClick={() =>
-                      api.handleFriendRequest(req.to_user, "DELETE")
-                    }
-                  >
-                    취소
-                  </button>
-                </li>
-              </div>
-            ))
-          ) : (
-            <span>보낸 요청이 없습니다.</span>
-          )}
-        </ul>
-      </div>
-      <hr className="line" />
-      <div class="content">
-        <span id="request">내 친구들</span>
-        <ul>
-          {friendList && Object.keys(friendList).length > 0 ? (
-            Object.keys(friendList).map(key => (
-              <div>
-                <li class="exchange">
-                  <NicknameModal nickname={friendList[key].nickname} />
-                  <p>{friendList[key].status ? "접속중" : "비접속"}</p>
-                </li>
-              </div>
-            ))
-          ) : (
-            <span>친구가 없습니다.</span>
-          )}
-        </ul>
-      </div>
+            friendRequests.sends.map((req) =>  (<Friend nickname={req.from_user} type="request_send" />))):  null}
+      {friendList && friendList.length > 0 ? (
+           friendList.map(friend => (
+              <Friend nickname={friend.nickname} type="friend" status={friend.status} />
+            ))): null
+          }
+      </ul>
     </div>
   );
 };
