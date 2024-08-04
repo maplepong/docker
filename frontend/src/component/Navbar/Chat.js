@@ -11,9 +11,17 @@ const Chat = () => {
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
+    if(data.whisper === true){
+      data.type = "whisper";
+    }
     setMessages([
       ...messages,
-      { type: data.type, sender: data.sender, message: data.message },
+       {
+        sender: data.sender,
+        type: data.type,
+        message: data.message,
+        receiver: data.receiver,
+      },
     ]);
     // chat.scrollTop= chat.scrollHeight;
   };
@@ -53,24 +61,27 @@ const Chat = () => {
     "/game": { showtype: "<게임>", sendtype: "game" },
   };
   //inputType
-  let msgType = "/all";
-  let whisperTarget = "";
+  const [msgType, setMsgType] = useState("/all");
+  const whisperTarget = useRef("");
   const parseMsg = (e, currentInput) => {
     if (e.key === "Enter") {
       sendMessage(currentInput);
       e.target.value = "";
+      console.log("currentInput", msgType);
       return;
     }
-
     //귓속말 타겟
     //접속중인지 확인 불가능
-    if (msgType === "/w" && e.key === " ") {
-      whisperTarget = currentInput.trim().split(" ")[0];
-      setMessageType("/w", whisperTarget);
-      currentInput = currentInput.slice(whisperTarget.length);
+    if (msgType === "/w" && e.key === " " && whisperTarget.current === "") {
+      whisperTarget.current = currentInput.trim().split(" ")[0];
+      setMessageType("/w", whisperTarget.current);
+      currentInput = currentInput.slice(whisperTarget.current.length);
       e.target.value = "";
     }
-
+    if (msgType === "/w" && whisperTarget.current !== "" &&( e.key === "Backspace" || e.key === "Delete")) {
+    
+      whisperTarget.current = "";
+      setMessageType("/w");}
     //메시지 타입 변경 이벤트
     if (msgType === "/all") {
       var inputType = currentInput.split(" ")[0];
@@ -84,6 +95,7 @@ const Chat = () => {
     } else if (e.key === "Backspace" || e.key === "Delete") {
       if (currentInput === "") {
         setMessageType("/all");
+        whisperTarget.current = "";
       }
     }
   };
@@ -93,7 +105,7 @@ const Chat = () => {
     console.log(inputType);
     chatLabel.innerText =
       msgTypeList[inputType].showtype + (target ? ` : ${target}에게` : "");
-    msgType = inputType;
+    setMsgType(inputType);
   };
 
   const sendMessage = (message) => {
@@ -103,7 +115,7 @@ const Chat = () => {
       sender: localStorage.getItem("nickname"),
     };
     if (msgType === "/w") {
-      data.receiver = whisperTarget;
+      data.receiver = whisperTarget.current;
     }
     socketController.sendMessage(data);
   };
@@ -128,9 +140,9 @@ const Chat = () => {
               <div class="chat-line">
                 {msg.sender === "system" ? (
                   <p>{`<system> `}</p>
-                ) : (
+                ) : msg.type === "whisper" ? (<p>{msg.sender + " " + msg.receiver + "에게 : "}</p>) : (
                   <p style={{ display: "flex" }}>
-                    {msg.type === "whisper" ? "<귓속말> " : ""}
+                    
                     <NicknameModal nickname={msg.sender} />
                     {` :  `}
                   </p>

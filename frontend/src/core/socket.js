@@ -22,9 +22,8 @@ const SocketController = () => {
       const data = JSON.parse(e.data);
       console.log("ws: data :", data);
       // 귓속말 / 전체 채팅 / 초대  / 친구 접속 상태 받기 요청 (접속자 → 서버) / 친구 접속 상태 업데이트 (서버 → 다수)
-      if (!data.type) return console.error("ws: data type이 없습니다.");
+      if (!data.type) data.type = "all";
       for (const type in this._messageTypes.current) {
-        const data = JSON.parse(e.data);
         if (data.type === type) {
           this._messageTypes.current[type](data);
           return;
