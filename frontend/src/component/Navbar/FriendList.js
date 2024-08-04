@@ -13,7 +13,7 @@ const FriendList = (props) => {
 
   return (
     <div id="box" style="margin: 15px;">
-      <button onclick={() => props.refresh()}>새로고침</button>
+      <button onclick={() => props.refresh()} style="margin:10px;">새로고침</button>
       <span id="manage">친구 관리</span>
       <RequestFriend />
       <hr className="line" />

@@ -15,13 +15,13 @@ $(BUILD) :
 $(NAME) :
 	cd frontend && npm run build
 
-	docker compose -f $(FILE) up --build #--detach 
+	docker-compose -f $(FILE) up --build #--detach 
 
 clean :
-	docker compose -f $(FILE)  down --rmi all --remove-orphans -v
+	docker-compose -f $(FILE)  down --rmi all --remove-orphans -v
 
 ps		: 
-	docker compose -f $(FILE) ps -a
+	docker-compose -f $(FILE) ps -a
 
 fclean : clean
 	docker system prune --volumes --all --force
