@@ -286,32 +286,31 @@ def end_semifinal(request):
         return JsonResponse({'error': 'Semifinal game does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     if tournament.end_game_count < 2:
-        return JsonResponse({'message': 'Other semifinal game still in progress'}, status=status.HTTP_200_OK)
+        final_game = Game.objects.create(
+            name="final_game",
+            creator= winner,
+            status=0,
+        )
+        final_game.players.add(winner)
+        final_game.save()
+
+        tournament.final_game_id = final_game
+        tournament.save()
+        return JsonResponse({
+            'message': 'First semifinal ended, final game created.',
+            'final_game_id' : final_game.id
+        }, status=status.HTTP_200_OK)
     
     # 결승 게임방 생성 및 participants에 남은 인원들을 추가
-    if tournament.end_game_count == 2:
-        remaining_participants = list(tournament.get_participants())
-        if len(remaining_participants) == 2:
-            final_game = Game.objects.create(
-                name="final_game",
-                creator=remaining_participants[0],
-                status=0
-            )
-            final_game.players.add(remaining_participants[0], remaining_participants[1])
-            final_game.save()
-            
-            tournament.final_game_id = final_game
-            tournament.save()
-            
-            return JsonResponse({
-                'message': 'Final game is set up.',
-                'final_game_id': final_game.id,
-                'participants': [
-                    remaining_participants[0].nickname,
-                    remaining_participants[1].nickname
-                ]
-            }, status=status.HTTP_200_OK)
-    
+    elif tournament.end_game_count == 2:
+        final_game = tournament.final_game_id
+        final_game.players.add(winner)
+        final_game.save()
+        
+        return JsonResponse({
+            'message': 'Final game set up.',
+            'final_game_id': final_game.id,
+        }, status=status.HTTP_200_OK)
     return JsonResponse({'error': 'Unexpected error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(["DELETE"])
