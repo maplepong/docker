@@ -81,7 +81,7 @@ function updateChildren(target, newChildren, oldChildren) {
       // if (oldChildren[i] === undefined){ //일단 undefined만 처리하게 해둠. null은 의도된 값일 수 있으니까
       // 	return addChild(target, newChildren[i]);
       // }
-      if (!target.childNodes[i] || !target.childNodes[i].nodetype) {
+      if (!target.childNodes[i] && oldChildren[i]) {
         console.error("child is not node error, parent:" + target);
         console.error("newchildren" + newChildren);
         console.error("oldchildren" + oldChildren);
