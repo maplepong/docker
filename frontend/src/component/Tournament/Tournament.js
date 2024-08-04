@@ -7,17 +7,27 @@ import api, { apiInstance } from "../../core/Api.js";
 import Loading from "../Loading.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
-import GameRoom from "../Game/GameRoom.js";
+import GameRoom from "./TournamentGameRoom.js";
+import TournamentFinished from "./TournamentFinished.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
   const [host, setHost] = useState("");
   const [waitingTime, setWaitingTime] = useState(60); // 대기 시간
-  const [gameStatus, setGameStatus] = useState(status.LOADING);
+
   const maxPlayers = 4;
   const gameId = useRef(null);
   const [bracket, setBracket] = useState([]);
+
+  const [gameResult, setGameResult] = myReact.useGlobalState(
+    "gameResult",
+    null
+  );
+  const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
+  const [tournamentStatus, setTournamentStatus] = useState(initState);
+
   console.log("players", players);
+  console.log("Result", gameResult, "status", tournamentStatus);
 
   useEffect(() => {
     socketController.initSocket();
@@ -57,13 +67,20 @@ const Tournament = () => {
           onGameEnd(data);
         },
       },
+      {
+        type: "tournament_semifinal_end",
+        func: function (data) {
+          onSemifinalEnd(data);
+        },
+      },
     ]);
     // 방에 입장 요청
     socketController.sendMessage({ type: "tournament", action: "enter" });
     // 클린업 함수로 컴포넌트 언마운트 시 소켓 해제
-    return () => {
-      socketController._ws.current.close();
-    };
+    // return () => {
+    //   if (_ws.current) socketController._ws.current.close();
+    //   _ws.current = null;
+    // };
   });
 
   const onPlayerJoined = (data) => {
@@ -77,13 +94,13 @@ const Tournament = () => {
   };
 
   const onPlayerLeft = (data) => {
-    console.log("playerLeft", data);
-    setPlayers((prevPlayers) => {
-      const newPlayers = prevPlayers.filter(
-        (player) => player !== data.nickname
-      );
-      return newPlayers;
-    });
+    const idx = players.indexOf(data.nickname);
+    if (idx === -1) {
+      return;
+    }
+    players.splice(idx, 1);
+    console.log("player leftL:", players);
+    setPlayers([...players]);
   };
 
   const onTournamentStart = async (data) => {
@@ -91,14 +108,14 @@ const Tournament = () => {
       .get("tournament/get_bracket")
       .then((res) => {
         console.log(res.data);
-        setBracket(res.data.bracket);
         gameId.current = res.data.myGameid;
+        setBracket(res.data.bracket);
+        setTournamentStatus(status.STARTED);
       })
       .catch((err) => {
         alert(err);
         outTournament();
       });
-    setGameStatus(status.STARTED);
   };
 
   const onGameEnd = (data) => {
@@ -140,42 +157,88 @@ const Tournament = () => {
   console.log("host", host);
 
   const outTournament = () => {
-    setGameStatus(status.LOADING);
+    setTournamentStatus(status.LOADING);
+    setPlayers([]);
+    setHost("");
+    setBracket([]);
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
     myReact.redirect("home");
   };
 
-  //방 입장
-  useEffect(async () => {
-    document.onpopstate = outTournament;
+  const onSemifinalEnd = async (data) => {
+    console.log("semifinal end", data);
     try {
-      const data = await apiTounrament.enter();
-      console.log("got data", data);
-      if (data.status !== 208) {
-        socketController.sendMessage({ type: "tournament_in" });
-      }
-      setPlayers(data.players);
-      setHost(data.players[0]);
-
-      setGameStatus(status.READY);
+      const res = await apiTounrament.end_semifinal(gameResult);
+      console.log(res.data);
+      alert(res.data.message);
+      gameId.current = res.data.final_game_id;
+      setTournamentStatus(status + 1);
+      setBracket(res.data.participants);
     } catch (err) {
       alert(err);
-      console.log(err);
-      // myReact.redirect("home");
+      outTournament();
     }
-    return () => {
-      document.removeEventListener("popstate", outTournament);
-    };
+    return;
+  };
+
+  // 상태에 따른 init
+  useEffect(async () => {
+    switch (tournamentStatus) {
+      case status.LOADING: {
+        document.onpopstate = outTournament;
+        try {
+          const data = await apiTounrament.enter();
+          console.log("got data", data);
+          if (data.status !== 208) {
+            socketController.sendMessage({ type: "tournament_in" });
+          }
+          setPlayers(data.players);
+          setHost(data.players[0]);
+          setTournamentStatus(status.READY);
+        } catch (err) {
+          alert(err);
+          console.log(err);
+          // myReact.redirect("home");
+        }
+        return () => {
+          document.removeEventListener("popstate", outTournament);
+        };
+      }
+      case status.BETWEEN_ROUND: {
+        if (gameResult.loser === localStorage.getItem("nickname")) {
+          alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
+          outTournament();
+        } else {
+          socketController.sendMessage({
+            type: "tournament_end",
+            status: "tournament_semifinal_end",
+          });
+        }
+      }
+      case status.FINISHED: {
+        if (gameResult.winner === localStorage.getItem("nickname")) {
+          await apiTounrament.end_semifinal(gameResult);
+          socketController.sendMessage({
+            type: "tournament_end",
+            status: "tournament_final_end",
+            winner_nickname: gameResult.winner,
+          });
+        }
+      }
+    }
   }, []);
   socketController.initSocket();
 
   function startGame() {
-    setGameStatus(status.ROUND_ONE);
+    console.log(startGame);
+    myReact.redirect("tournament/" + gameId.current);
+    return;
   }
 
-  switch (gameStatus) {
-    case status.READY:
+  switch (tournamentStatus) {
+    case status.READY: {
+      console.log("tournamentState ready");
       return (
         <div id={"tournament"}>
           <WaitingTournament
@@ -186,22 +249,28 @@ const Tournament = () => {
           <button onClick={outTournament}>나가기</button>
         </div>
       );
-    case status.STARTED || status.BETWEEN_ROUND || status.FINISHED: {
+    }
+    case status.STARTED:
+    case status.BETWEEN_ROUND: {
       return (
         <TournamentSchedule
           bracket={bracket}
-          status={gameStatus}
+          status={tournamentStatus}
           startGame={startGame}
         />
       );
     }
-    case status.ROUND_ONE || status.ROUND_TWO: {
-      if (gameInfo){
-        return <GameRoom id={gameId.current} />;
-      }
-      else {
-        return <Loading type="game" />;
-      }
+    case status.FINISHED: {
+      return (
+        <TournamentFinished
+          tournamentResult={gameResult}
+          outTournament={outTournament}
+        />
+      );
+    }
+    case status.ROUND_ONE:
+    case status.ROUND_TWO: {
+      return <GameRoom id={gameId.current} />;
     }
     default: {
       //status.LOADING

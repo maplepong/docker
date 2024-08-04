@@ -558,12 +558,23 @@ const api = {
         return err;
       });
   },
-  sendGameResult(data) {
-    return apiInstance
+  async sendGameResult(result) {
+    console.log("sendGameResult", result.gameResult);
+    console.log("sendGameResult", result.gameResultloser);
+
+    const formData = new FormData();
+    formData.append("game_id", result.gameResult.game_id);
+    formData.append("winner_nickname", result.gameResult.winner);
+    formData.append("loser_nickname", result.gameResult.loser);
+    formData.append("winner_score", result.gameResult.winner_score);
+    formData.append("loser_score", result.gameResult.loser_score);
+
+    console.log(formData.keys());
+    return await apiInstance
       .request({
-        url: "update_game_result",
+        url: "game/update_game_result",
         method: "POST",
-        data: data,
+        data: formData,
       })
       .then((res) => {
         if (res.status === 201) {
@@ -594,6 +605,18 @@ const api = {
       .catch((error) => {
         console.log("게임방을 나가지 못했습니다.");
         return error;
+      });
+  },
+  getGameRecord() {
+    setToken();
+    return apiInstance
+      .request({
+        method: "GET",
+        url: "user/game-record",
+      })
+      .then((response) => {
+        console.log("게임기록을 불러왔습니다.");
+        return response;
       });
   },
 };

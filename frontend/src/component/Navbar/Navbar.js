@@ -12,7 +12,7 @@ import FriendList from "./FriendList.js";
 import socketController from "../../core/socket.js";
 
 const Navbar = () => {
-  const [data, setData] = useState({
+  const [data, setData] = myReact.useGlobalState("myinfo", {
     id: "",
     username: "",
     nickname: "",
@@ -24,13 +24,16 @@ const Navbar = () => {
     image: "",
     email: "",
   });
-  const [friendRequests, setFriendRequests] = useState({
-    sends: [],
-    receives: [],
-  });
+  const [friendRequests, setFriendRequests] = myReact.useGlobalState(
+    "friendRequest",
+    {
+      sends: [],
+      receives: [],
+    }
+  );
   const friendsCount = useRef(0);
 
-  const [friendList, setFriendList] = useState({});
+  const [friendList, setFriendList] = myReact.useGlobalState("friendList", {});
 
   const onConnect = (data) => {
     console.log("ws connnected data :", data.friends);
@@ -84,9 +87,6 @@ const Navbar = () => {
       setFriendRequests(friendRequests);
       setData(response);
     }
-    return () => {
-      socketController._ws.current.close();
-    };
   }, []);
 
   // if (

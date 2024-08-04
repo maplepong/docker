@@ -4,6 +4,13 @@ import "../../css/Pingpong.css";
 import api from "../../core/Api.js";
 import { keyDownHandler, keyUpHandler } from "./utils.js";
 
+const status = {
+  loading: 0,
+  waiting: 1,
+  playing: 2,
+  finished: 3,
+};
+
 const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
   let isowner = false;
   let upPressed, downPressed;
@@ -46,8 +53,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       aiPaddle.position.x - three.paddleWidth / 2
     ) {
       if (
-        ball.position.y >= aiPaddle.position.y - three.paddleHeight / 2 &&
-        ball.position.y <= aiPaddle.position.y + three.paddleHeight / 2
+        ball.position.y > aiPaddle.position.y - three.paddleHeight / 2 &&
+        ball.position.y < aiPaddle.position.y + three.paddleHeight / 2
       ) {
         ballDirection.x = -ballDirection.x;
         sendGameState();
@@ -124,9 +131,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       three.scene = new THREE.Scene();
       three.scene.background = new THREE.Color("skyblue");
 
-      const axesHelper = new THREE.AxesHelper(3)
-      three.scene.add(axesHelper)
-
+      const axesHelper = new THREE.AxesHelper(3);
+      three.scene.add(axesHelper);
 
       three.camera = new THREE.PerspectiveCamera(75, 640 / 640, 0.1, 1000);
       three.renderer = new THREE.WebGLRenderer({ canvas: canvas });
@@ -230,10 +236,10 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      if (uscore && !isowner) {
-        userscore.current = uscore.y;
-        enemyscore.current = uscore.x;
-      }
+      // if (uscore && !isowner) {
+      //   userscore.current = uscore.y;
+      //   enemyscore.current = uscore.x;
+      // }
     }
   }
 
@@ -261,18 +267,33 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     //스코어 업데이트
     userscore.current += leftAdd;
     enemyscore.current += rightAdd;
-    sendGameState();
+    //sendGameState();
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
       gameSocket.current ? gameSocket.current.close() : null;
+      const isUserWin = userscore.current > enemyscore.current;
+      const winner = isUserWin
+        ? localStorage.getItem("nickname")
+        : gameinfo.opponent;
+      const loser = !isUserWin
+        ? localStorage.getItem("nickname")
+        : gameinfo.opponent;
+      const winner_score = isUserWin ? userscore.current : enemyscore.current;
+      const loser_score = !isUserWin ? userscore.current : enemyscore.current;
       gameResult.current = {
-        userscore: userscore.current,
-        enemyscore: enemyscore.current,
+        game_id: gameinfo.id,
+        winner_score: winner_score,
+        loser_score: loser_score,
+        isUserWin: isUserWin,
+        winner: winner,
+        loser: loser,
       };
+
+      console.log("gameResult", gameResult.current);
       // if (stopRef.current) stopRef.current();
       cancel();
       // window.cancelAnimationFrame(animate);
-      setStatus(3); //status.finished
+      setStatus(status.finished); //status.finished
       // myReact.redirect("home");
     }
     return;

@@ -5,16 +5,57 @@ import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
 import { requestGameInfo, requestExitGame } from "../../core/ApiGame.js";
 import "../../css/GameRoom.css";
 import "../../css/Pingpong.css";
-import PingPong from "./PlayingGame.js";
+import PingPong from "../Game/PlayingGame.js";
 import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
-import WaitingGame from "./WaitingGame.js";
+import WaitingGame from "../Game/WaitingGame.js";
+import ResultGame from "../Game/ResultGame.js";
 
-const GameRoom = (tournamentGameId) => {
-  const [ready, setReady] = useState(false);
+const status = {
+  loading: 0,
+  waiting: 1,
+  playing: 2,
+  finished: 3,
+  return: 4, // 토너먼트로 돌아가기
+};
+
+const TournamentGameRoom = () => {
+  // const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
+  const [gameInfo, setGameInfo] = useState({
+    id: "",
+    name: "",
+    current_players_num: "",
+    owner: "",
+    password: "",
+    players: [],
+    status: "",
+    isGameReady: false,
+    owner_info: {},
+    player_info: {},
+    opponent: "",
+  });
+  const [gameStatus, setGameStatus] = useState(status.loading);
+  const [gameResult, setGameResult] = myReact.useGlobalState(
+    "gameResult",
+    null
+  ); // 토너먼트 컴포넌트로 결과 전달
 
+  const gameResultRef = useRef(null); // playing game에서 받아오는 용도
+
+  useEffect(() => {
+    if (gameStatus === status.return) {
+      setTimeout(() => {
+        myReact.redirect("tournament-waiting");
+      }, 1000);
+    }
+    if (gameStatus === status.finished) {
+      console.log("GameResult", gameResultRef.current);
+      setGameResult(gameResultRef.current);
+      setGameStatus(status.return);
+    }
+  }, [gameStatus]);
 
   const sendGameInvite = (gameId, nickname) => {
     const data = {
@@ -32,7 +73,7 @@ const GameRoom = (tournamentGameId) => {
       SocketController.initSocket();
 
       const path = window.location.pathname;
-      const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
+      const gameIdMatch = path.match(/^\/tournament\/(\d+)$/);
 
       if (gameIdMatch) {
         const gameId = gameIdMatch[1];
@@ -46,7 +87,13 @@ const GameRoom = (tournamentGameId) => {
             updatedGameInfo.player_info = updatedGameInfo.players.find(
               (player) => player.nickname !== updatedGameInfo.owner
             );
+            if (updatedGameInfo.players.length === 2) {
+              updatedGameInfo.opponent = updatedGameInfo.players.find(
+                (player) => player.nickname !== localStorage.getItem("nickname")
+              ).nickname;
+            }
             setGameInfo(updatedGameInfo);
+            setGameStatus(status.waiting);
           } else {
             console.error("Failed to fetch game info:", data);
           }
@@ -97,13 +144,13 @@ const GameRoom = (tournamentGameId) => {
             ...gameInfo,
             isGameReady: true,
             player_info: data.player_info,
+            opponent: gameInfo.opponent || data.player_info.nickname,
           });
         } else if (data.type === "game_start") {
           console.log("game_start");
-          setReady(true);
+          setGameStatus(status.playing);
         } else if (data.type === "client_left") {
           console.log("client_left");
-
           if (gameInfo.owner === localStorage.getItem("nickname")) {
             console.log("나는 오너");
             setGameInfo({
@@ -169,18 +216,36 @@ const GameRoom = (tournamentGameId) => {
     myReact.redirect("lobby");
   };
 
-  return ready ? (
-    <div className="game-container">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
-      <PingPong gameinfo={gameInfo} gameSocket={gameSocket} />
-    </div>
-  ) : (
-    <WaitingGame
-      gameInfo={gameInfo}
-      startGame={startGame}
-      exitGame={exitGame}
-    />
-  );
+  switch (gameStatus) {
+    case status.waiting:
+      return (
+        <WaitingGame
+          gameInfo={gameInfo}
+          startGame={startGame}
+          exitGame={exitGame}
+          sendGameInvite={sendGameInvite}
+        />
+      );
+    case status.playing:
+      return (
+        <div className="game-container">
+          <canvas id="myCanvas" width="800" height="640"></canvas>
+          <PingPong
+            gameinfo={gameInfo}
+            gameSocket={gameSocket}
+            gameResult={gameResultRef}
+            setStatus={setGameStatus}
+          />
+        </div>
+      );
+    default:
+      return (
+        <div>
+          <p>game Status: {gameStatus}</p>
+          <Loading type="game" />
+        </div>
+      );
+  }
 };
 
-export default GameRoom;
+export default TournamentGameRoom;
