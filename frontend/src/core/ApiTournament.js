@@ -1,8 +1,8 @@
 import { apiInstance } from "./Api.js";
 
 const apiTounrament = {
-  enter: function () {
-    return apiInstance
+  enter: async function () {
+    return await apiInstance
       .post("tournament/new_tournament", {
         headers: {
           Authorization: `Bearer ${localStorage.accessToken}`,

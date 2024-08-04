@@ -159,6 +159,8 @@ const Tournament = () => {
   const outTournament = () => {
     setTournamentStatus(status.LOADING);
     setPlayers([]);
+    setHost("");
+    setBracket([]);
     socketController.sendMessage({ type: "tournament_out" });
     apiTounrament.out();
     myReact.redirect("home");
@@ -216,7 +218,7 @@ const Tournament = () => {
       }
       case status.FINISHED: {
         if (gameResult.winner === localStorage.getItem("nickname")) {
-          await apiTounrament.end_final(gameResult);
+          await apiTounrament.end_semifinal(gameResult);
           socketController.sendMessage({
             type: "tournament_end",
             status: "tournament_final_end",

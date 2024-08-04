@@ -40,8 +40,9 @@ const TournamentGameRoom = () => {
   const [gameResult, setGameResult] = myReact.useGlobalState(
     "gameResult",
     null
-  );
-  const gameResultRef = useRef(null);
+  ); // 토너먼트 컴포넌트로 결과 전달
+
+  const gameResultRef = useRef(null); // playing game에서 받아오는 용도
 
   useEffect(() => {
     if (gameStatus === status.return) {
@@ -50,7 +51,7 @@ const TournamentGameRoom = () => {
       }, 1000);
     }
     if (gameStatus === status.finished) {
-      console.log("GameResult", gameResult.current);
+      console.log("GameResult", gameResultRef.current);
       setGameResult(gameResultRef.current);
       setGameStatus(status.return);
     }
