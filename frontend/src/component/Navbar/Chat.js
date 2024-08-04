@@ -126,8 +126,14 @@ const Chat = () => {
           {messages.map((msg, index) => (
             <div key={index} class={msg.type + " message-container"}>
               <div class="chat-line">
-                {msg.sender === "system" ? null : (
-                  <NicknameModal nickname={msg.sender} />
+                {msg.sender === "system" ? (
+                  <p>{`<system> `}</p>
+                ) : (
+                  <p style={{ display: "flex" }}>
+                    {msg.type === "whisper" ? "<귓속말> " : ""}
+                    <NicknameModal nickname={msg.sender} />
+                    {` :  `}
+                  </p>
                 )}
                 <p class="message">{msg.message}</p>
               </div>
@@ -148,16 +154,19 @@ const Chat = () => {
           ))}
         </div>
       </div>
-      <label for="chat-input" id="chat-label">
-        {msgTypeList[msgType].showtype}
-      </label>
-      <input
-        type="text"
-        onKeyDown={(e) => {
-          parseMsg(e, e.target.value);
-        }}
-        id="chat-input"
-      ></input>
+      <div class="chat-input-container">
+        <label for="chat-input" id="chat-label">
+          {msgTypeList[msgType].showtype}
+        </label>
+        <input
+          type="text"
+          onKeyDown={(e) => {
+            parseMsg(e, e.target.value);
+          }}
+          id="chat-input"
+          placeholder="채팅을 입력하세요..."
+        ></input>
+      </div>
     </div>
   );
 };

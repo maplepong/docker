@@ -4,13 +4,17 @@
 
 #container-chat {
   width: 100%;
-  height: auto;
+  height: max-content;
   margin: 10px;
   background-color: rgb(0, 0, 0, 0.7);
   border-radius: 10px;
   font-size: 1rem;
   padding: 10px;
   font-family: "Ramche";
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0px 4px 4px 0px rgba(255, 255, 255, 0.25) inset,
+    -4px -4px 4px 0px rgba(0, 0, 0, 0.25) inset;
 }
 
 #nav-btn-container {
@@ -30,7 +34,8 @@
 #chat {
   width: 100%;
   height: 300px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .message-container {
   color: white;
@@ -46,11 +51,26 @@
   justify-content: left;
   margin: 0;
   padding: 0;
+  gap: 10px;
+}
+
+.chat-line > p {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin: 0;
 }
 
 .message {
-  line-height: 1;
+  line-height: 1.2;
   margin-bottom: 0;
+  word-break: break-all;
+  -webkit-text-stroke-width: 1;
+  -webkit-text-stroke-color: var(--nav-background, rgba(46, 58, 66, 0.69));
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
 }
 
 #chat-label {
@@ -58,7 +78,7 @@
 }
 
 .whisper {
-  color: rgb(255, 35, 244);
+  color: #ed7fff;
 }
 
 .system,
@@ -75,4 +95,30 @@
   background: #ffa2a2;
   margin-left: 10px;
   margin: 0;
+}
+
+.chat-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  background: #3c3c3c;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+  border-radius: 10px;
+  padding: 3px;
+  height: max-content;
+}
+#chat-label {
+  width: max-content;
+  line-height: 100%;
+  height: 100%;
+  padding: 10px;
+  margin: 0;
+}
+
+#chat-input {
+  width: 85%;
+  border: none;
+  background-color: transparent;
+  color: white;
 }
