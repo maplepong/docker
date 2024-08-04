@@ -53,8 +53,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       aiPaddle.position.x - three.paddleWidth / 2
     ) {
       if (
-        ball.position.y >= aiPaddle.position.y - three.paddleHeight / 2 &&
-        ball.position.y <= aiPaddle.position.y + three.paddleHeight / 2
+        ball.position.y > aiPaddle.position.y - three.paddleHeight / 2 &&
+        ball.position.y < aiPaddle.position.y + three.paddleHeight / 2
       ) {
         ballDirection.x = -ballDirection.x;
         sendGameState();
