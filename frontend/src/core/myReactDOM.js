@@ -27,7 +27,11 @@ function addEvent(target, eventType, selector, callback) {
 }
 
 function createDOM(fNode) {
-  if (typeof fNode === "string" || typeof fNode === "number" || typeof fNode === "boolean") {
+  if (
+    typeof fNode === "string" ||
+    typeof fNode === "number" ||
+    typeof fNode === "boolean"
+  ) {
     const node = document.createTextNode(fNode);
     return node;
   }
@@ -77,6 +81,12 @@ function updateChildren(target, newChildren, oldChildren) {
       // if (oldChildren[i] === undefined){ //일단 undefined만 처리하게 해둠. null은 의도된 값일 수 있으니까
       // 	return addChild(target, newChildren[i]);
       // }
+      if (!target.childNodes[i] || !target.childNodes[i].nodetype) {
+        console.error("child is not node error, parent:" + target);
+        console.error("newchildren" + newChildren);
+        console.error("oldchildren" + oldChildren);
+        continue;
+      }
       diffDom(target, newChildren[i], oldChildren[i], i);
     }
     return;
