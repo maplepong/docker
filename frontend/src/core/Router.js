@@ -18,6 +18,7 @@ import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
 import PingPong from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
+import TournamentResult from "../component/Tournament/TournamentResult.js";
 import TournamentGameRoom from "../component/Tournament/TournamentGameRoom.js";
 
 const pathList = {
@@ -36,6 +37,7 @@ const pathList = {
   test: <Test />,
   localgame: <PingPong />,
   "tournament-waiting": <Tournament />,
+  "tournament-result": <TournamentResult />,
 };
 
 export default function router() {

@@ -46,9 +46,15 @@ const TournamentGameRoom = () => {
 
   useEffect(() => {
     if (gameStatus === status.return) {
-      setTimeout(() => {
-        myReact.redirect("tournament-waiting");
-      }, 1000);
+      if (gameInfo.name.includes("semi")) {
+        setTimeout(() => {
+          myReact.redirect("tournament-waiting");
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          myReact.redirect("tournament-result");
+        }, 1000);
+      }
     }
     if (gameStatus === status.finished) {
       console.log("GameResult", gameResultRef.current);
