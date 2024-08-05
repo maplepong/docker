@@ -306,36 +306,51 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         }
                     )
             elif type == 'tournament_end':
-                tournament = await sync_to_async(Tournament.objects.first)()
-                if tournament and tournament.is_active:
+                try:
+                    tournament = await sync_to_async(Tournament.objects.first)()
+                    if tournament and tournament.is_active:
+                        participants = await sync_to_async(tournament.get_participants)()
+                        cnt = await sync_to_async(participants.count)()
+                        if cnt == 2:
+                            await self.channel_layer.group_send(
+                                'tournament_group',
+                                {
+                                    'type': 'chat_message',
+                                    'message': 'tournament_semifinal_end',
+                                    'sender' : 'system'
+                                }
+                            )
+                    else:
+                        raise Tournament.DoesNotExist
+                except Tournament.DoesNotExist:
+                    winner_nickname = text_data_json['winner_nickname']
+                    await self.channel_layer.group_send(
+                        'tournament_group',
+                        {
+                            'type': 'tournament_final_end',
+                            'status': 'tournament_final_end',
+                        }
+                    )
+                    await self.channel_layer.group_send(
+                        "chat_group",
+                        {
+                            'type': 'chat_message',
+                            'message': winner_nickname + ' is win tournament!!',
+                            'sender': 'system'
+                        }
+                    )
+                    # 모든 참가자가 tournament_group을 나가도록 하기
                     participants = await sync_to_async(tournament.get_participants)()
-                    cnt = await sync_to_async(participants.count)()
-                    if cnt == 4 or cnt == 3:
-                        await self.channel_layer.group_send(
+                    for participant in participants:
+                        await self.channel_layer.group_discard(
                             'tournament_group',
-                            {
-                                'type': 'tournament_semifinal_end',
-                                'status': 'tournament_semifinal_end',
-                            }
+                            self.channel_name
                         )
-                    elif cnt == 2:
-                        winner_nickname = text_data_json['winner_nickname']
-                        await self.channel_layer.group_send(
-                            'tournament_group',
-                            {
-                                'type': 'tournament_final_end',
-                                'status': 'tournament_final_end',
-                            }
-                        )
-                        await self.channel_layer.group_send(
-                            "chat_group",
-                            {
-                                'type': 'chat_message',
-                                'message': winner_nickname + ' is win tournament!!',
-                                'sender': 'system'
-                            }
-                        )
-
+                    # tournament_group을 없애기
+                    await self.channel_layer.group_discard(
+                        'tournament_group',
+                        self.channel_name
+                    )
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid JSON'

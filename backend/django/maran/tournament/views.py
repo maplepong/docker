@@ -387,7 +387,7 @@ def end_tournament(request):
     try:
         winner = User.objects.get(nickname=winner_nickname)
     except User.DoesNotExist:
-        return JsonResponse({'error': 'Winner does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Winner or loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     # 토너먼트 객체 삭제
     tournament.delete()
