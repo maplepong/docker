@@ -79,6 +79,7 @@ const apiTounrament = {
       url: "tournament/end_tournament",
       data: {
         winner_nickname: result.winner,
+        loser_nickname: result.loser,
         final_gameid: result.game_id,
       },
     });
