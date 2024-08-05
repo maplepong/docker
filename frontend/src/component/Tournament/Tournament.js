@@ -170,11 +170,11 @@ const Tournament = () => {
     console.log("semifinal end", data);
     try {
       const res = await apiTounrament.end_semifinal(gameResult);
-      console.log(res.data);
-      alert(res.data.message);
-      gameId.current = res.data.final_game_id;
-      setTournamentStatus(status + 1);
-      setBracket(res.data.participants);
+      console.log("onSemifinalEnd", res);
+      alert(res.message);
+      gameId.current = res.final_game_id;
+      alert("final game id", gameId.current);
+      // setBracket(res.data.participants);
     } catch (err) {
       alert(err);
       outTournament();
@@ -205,20 +205,27 @@ const Tournament = () => {
           document.removeEventListener("popstate", outTournament);
         };
       }
-      case status.BETWEEN_ROUND: {
-        if (gameResult.loser === localStorage.getItem("nickname")) {
-          alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
-          outTournament();
-        } else {
-          socketController.sendMessage({
-            type: "tournament_end",
-            status: "tournament_semifinal_end",
-          });
-        }
-      }
+      case status.BETWEEN_ROUND: 
+          console.log("between round");
+          console.log("gameResult", gameResult);
+          if (gameResult.loser === localStorage.getItem("nickname")) {
+            alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
+            outTournament();
+          } else {
+            // socketController.sendMessage({
+            //   type: "tournament_end",
+            //   status: "tournament_semifinal_end",
+            // }); 백엔드 쪽 수정 필요
+            onSemifinalEnd({testdata: "test before backend fix"});
+          }
+        break;
       case status.FINISHED: {
         if (gameResult.winner === localStorage.getItem("nickname")) {
-          await apiTounrament.end_semifinal(gameResult);
+          // socketController.sendMessage({
+          //   type: "tournament_end",
+          //   status: "tournament_final_end",
+          // });
+          await apiTounrament.end_tournament(gameResult);
           socketController.sendMessage({
             type: "tournament_end",
             status: "tournament_final_end",

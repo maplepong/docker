@@ -66,8 +66,8 @@ const apiTounrament = {
         },
       })
       .then((res) => {
-        console.log(res);
-        return res;
+        console.log(res.data);
+        return res.data;
       })
       .catch((err) => {
         return err;
