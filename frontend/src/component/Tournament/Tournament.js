@@ -156,13 +156,17 @@ const Tournament = () => {
   console.log("players", players);
   console.log("host", host);
 
-  const outTournament = () => {
+  const outTournament = (type) => {
     setTournamentStatus(status.LOADING);
     setPlayers([]);
     setHost("");
     setBracket([]);
-    socketController.sendMessage({ type: "tournament_out" });
-    apiTounrament.out();
+    if (type === "tournament_end") {
+      alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
+    } else {
+      socketController.sendMessage({ type: "tournament_out" });
+      apiTounrament.out();
+    }
     myReact.redirect("home");
   };
 
@@ -194,7 +198,7 @@ const Tournament = () => {
             socketController.sendMessage({ type: "tournament_in" });
           }
           setPlayers(data.players);
-          setHost(data.players[0]);
+          setHost(data.host || data.players[0]);
           setTournamentStatus(status.READY);
         } catch (err) {
           alert(err);
@@ -205,19 +209,19 @@ const Tournament = () => {
           document.removeEventListener("popstate", outTournament);
         };
       }
-      case status.BETWEEN_ROUND: 
-          console.log("between round");
-          console.log("gameResult", gameResult);
-          if (gameResult.loser === localStorage.getItem("nickname")) {
-            alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
-            outTournament();
-          } else {
-            // socketController.sendMessage({
-            //   type: "tournament_end",
-            //   status: "tournament_semifinal_end",
-            // }); 백엔드 쪽 수정 필요
-            onSemifinalEnd({testdata: "test before backend fix"});
-          }
+      case status.BETWEEN_ROUND:
+        console.log("between round");
+        console.log("gameResult", gameResult);
+        if (gameResult.loser === localStorage.getItem("nickname")) {
+          alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
+          outTournament("tournament_end");
+        } else {
+          // socketController.sendMessage({
+          //   type: "tournament_end",
+          //   status: "tournament_semifinal_end",
+          // }); 백엔드 쪽 수정 필요
+          onSemifinalEnd({ testdata: "test before backend fix" });
+        }
         break;
       case status.FINISHED: {
         if (gameResult.winner === localStorage.getItem("nickname")) {
