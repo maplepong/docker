@@ -25,6 +25,7 @@ const Tournament = () => {
   );
   const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
   const [tournamentStatus, setTournamentStatus] = useState(initState);
+  const isSemifinalSet = useRef(true);
 
   console.log("players", players);
   console.log("Result", gameResult, "status", tournamentStatus);
@@ -100,6 +101,9 @@ const Tournament = () => {
     }
     players.splice(idx, 1);
     console.log("player leftL:", players);
+    if (gameResult && gameResult.loser === data.nickname) {
+      isSemifinalSet.current = true;
+    }
     setPlayers([...players]);
   };
 
@@ -170,20 +174,23 @@ const Tournament = () => {
     myReact.redirect("home");
   };
 
+  var semifinal_count_for_winner = 0;
   const onSemifinalEnd = async (data) => {
-    console.log("semifinal end", data);
-    try {
-      const res = await apiTounrament.end_semifinal(gameResult);
-      console.log("onSemifinalEnd", res);
-      alert(res.message);
-      gameId.current = res.final_game_id;
-      alert("final game id", gameId.current);
-      // setBracket(res.data.participants);
-    } catch (err) {
-      alert(err);
-      outTournament();
+    if ((isSemifinalSet.current = true || semifinal_count_for_winner > 100)) {
+      console.log("semifinal end", data);
+      try {
+        const res = await apiTounrament.end_semifinal(gameResult);
+        console.log("onSemifinalEnd", res);
+        alert(res.message);
+        gameId.current = res.final_game_id;
+      } catch (err) {
+        alert(err);
+        outTournament();
+      }
+      return;
+    } else {
+      requestAnimationFrame(() => onSemifinalEnd(data));
     }
-    return;
   };
 
   // 상태에 따른 init
@@ -213,14 +220,15 @@ const Tournament = () => {
         console.log("between round");
         console.log("gameResult", gameResult);
         if (gameResult.loser === localStorage.getItem("nickname")) {
-          alert("세미 파이널에서 탈락하셨습니다. 홈으로 돌아갑니다.");
+          socketController.sendMessage({ type: "tournament_out" });
+          alert("세미 파이널에서 탈락하셨습니다.");
           outTournament("tournament_end");
         } else {
-          // socketController.sendMessage({
-          //   type: "tournament_end",
-          //   status: "tournament_semifinal_end",
-          // }); 백엔드 쪽 수정 필요
-          onSemifinalEnd({ testdata: "test before backend fix" });
+          socketController.sendMessage({
+            type: "tournament_end",
+            status: "tournament_semifinal_end",
+          }); //백엔드 쪽 수정 필요
+          // onSemifinalEnd({ testdata: "test before backend fix" });
         }
         break;
       case status.FINISHED: {
