@@ -236,10 +236,10 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      // if (uscore && !isowner) {
-      //   userscore.current = uscore.y;
-      //   enemyscore.current = uscore.x;
-      // }
+      if (uscore && !isowner) {
+        userscore.current = uscore.y;
+        enemyscore.current = uscore.x;
+      }
     }
   }
 
