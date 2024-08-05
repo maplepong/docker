@@ -25,7 +25,6 @@ const Tournament = () => {
   );
   const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
   const [tournamentStatus, setTournamentStatus] = useState(initState);
-  const isSemifinalSet = useRef(true);
 
   console.log("players", players);
   console.log("Result", gameResult, "status", tournamentStatus);
@@ -101,9 +100,6 @@ const Tournament = () => {
     }
     players.splice(idx, 1);
     console.log("player leftL:", players);
-    if (gameResult && gameResult.loser === data.nickname) {
-      isSemifinalSet.current = true;
-    }
     setPlayers([...players]);
   };
 
@@ -174,23 +170,17 @@ const Tournament = () => {
     myReact.redirect("home");
   };
 
-  var semifinal_count_for_winner = 0;
   const onSemifinalEnd = async (data) => {
-    if ((isSemifinalSet.current = true || semifinal_count_for_winner > 100)) {
-      console.log("semifinal end", data);
-      try {
-        const res = await apiTounrament.end_semifinal(gameResult);
-        console.log("onSemifinalEnd", res);
-        alert(res.message);
-        gameId.current = res.final_game_id;
-      } catch (err) {
-        alert(err);
-        outTournament();
-      }
-      return;
-    } else {
-      requestAnimationFrame(() => onSemifinalEnd(data));
+    try {
+      const res = await apiTounrament.end_semifinal(gameResult);
+      console.log("onSemifinalEnd", res);
+      alert(res.message);
+      gameId.current = res.final_game_id;
+    } catch (err) {
+      alert(err);
+      outTournament();
     }
+    return;
   };
 
   // 상태에 따른 init
