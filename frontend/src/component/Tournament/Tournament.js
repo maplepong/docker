@@ -25,6 +25,8 @@ const Tournament = () => {
   );
   const initState = gameResult ? status.BETWEEN_ROUND : status.LOADING;
   const [tournamentStatus, setTournamentStatus] = useState(initState);
+  const initMessage = gameResult ? "준결승전 경기 완료" : "준결승전 대기중";
+  const [statusMessage, setStatusMessage] = useState(initMessage);
 
   console.log("players", players);
   console.log("Result", gameResult, "status", tournamentStatus);
@@ -65,12 +67,6 @@ const Tournament = () => {
         type: "tournament-host-change",
         func: function (data) {
           onGameEnd(data);
-        },
-      },
-      {
-        type: "tournament_semifinal_end",
-        func: function (data) {
-          onSemifinalEnd(data);
         },
       },
     ]);
@@ -170,18 +166,18 @@ const Tournament = () => {
     myReact.redirect("home");
   };
 
-  const onSemifinalEnd = async (data) => {
-    try {
-      const res = await apiTounrament.end_semifinal(gameResult);
-      console.log("onSemifinalEnd", res);
-      alert(res.message);
-      gameId.current = res.final_game_id;
-    } catch (err) {
-      alert(err);
-      outTournament();
-    }
-    return;
-  };
+  // const onSemifinalEnd = async (data) => {
+  //   try {
+  //     const res = await apiTounrament.end_semifinal(gameResult);
+  //     console.log("onSemifinalEnd", res);
+  //     alert(res.message);
+  //     gameId.current = res.final_game_id;
+  //   } catch (err) {
+  //     alert(err);
+  //     outTournament();
+  //   }
+  //   return;
+  // };
 
   // 상태에 따른 init
   useEffect(async () => {
@@ -214,11 +210,31 @@ const Tournament = () => {
           alert("세미 파이널에서 탈락하셨습니다.");
           outTournament("tournament_end");
         } else {
-          socketController.sendMessage({
-            type: "tournament_end",
-            status: "tournament_semifinal_end",
-          }); //백엔드 쪽 수정 필요
-          // onSemifinalEnd({ testdata: "test before backend fix" });
+          // socketController.sendMessage({
+          //   type: "tournament_end",
+          //   status: "tournament_semifinal_end",
+          // }); //백엔드 쪽 수정 필요
+          try {
+            const res = await apiTounrament.end_semifinal(gameResult);
+            console.log("onSemifinalEnd", res);
+            alert(res.message);
+            gameId.current = res.final_game_id;
+            // 메시지로 판단하여 두 팀 다 끝났을 경우에만 웹소켓 전송
+            if (res.message === "Final game set up.") {
+              socketController.sendMessage({
+                type: "tournament_end",
+                status: "tournament_semifinal_end",
+              });
+              setStatusMessage("준결승전 경기 완료 : 결승전을 시작하세요");
+            } else {
+              setStatusMessage(
+                "준결승전 경기 진행중 : 다음 경기를 기다리세요. 채팅을 확인하세요"
+              );
+            }
+          } catch (err) {
+            alert(err);
+            outTournament();
+          }
         }
         break;
       case status.FINISHED: {
@@ -264,7 +280,7 @@ const Tournament = () => {
       return (
         <TournamentSchedule
           bracket={bracket}
-          status={tournamentStatus}
+          status={statusMessage || "4강 대기중"}
           startGame={startGame}
         />
       );
