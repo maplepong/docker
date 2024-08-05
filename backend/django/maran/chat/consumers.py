@@ -309,21 +309,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and tournament.is_active:
                     participants = await sync_to_async(tournament.get_participants)()
-                    participant_nicknames = [user.nickname for user in participants]
-                    if len(participant_nicknames) == 4:
+                    cnt = await sync_to_async(participants.count)()
+                    if cnt == 4 or cnt == 3:
                         await self.channel_layer.group_send(
                             'tournament_group',
                             {
-                                'type': 'tournament_end',
+                                'type': 'tournament_semifinal_end',
                                 'status': 'tournament_semifinal_end',
                             }
                         )
-                    elif len(participant_nicknames) == 2:
+                    elif cnt == 2:
                         winner_nickname = text_data_json['winner_nickname']
                         await self.channel_layer.group_send(
                             'tournament_group',
                             {
-                                'type': 'tournament_end',
+                                'type': 'tournament_final_end',
                                 'status': 'tournament_final_end',
                             }
                         )
@@ -464,3 +464,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
         friends = list(user.friends.all().values('nickname', 'is_online'))
         friends_list = [{'nickname': friend['nickname'], 'status': friend['is_online']} for friend in friends]
         return friends_list
+

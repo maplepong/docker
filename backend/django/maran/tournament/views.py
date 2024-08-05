@@ -406,3 +406,4 @@ def tournament_detail(request, tournament_id):
         return HttpResponse("Tournament not found.", status=404)
     
     return render(request, 'tournament/tournament_detail.html', {'tournament': tournament})
+
