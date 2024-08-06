@@ -1,21 +1,23 @@
 /* @jsx myReact.createElement */
 import myReact, { useState, useEffect } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
+import "../../core/Router.js"
 // import api from "../../core/Api.js";
 
-const PingPong = ({ gameinfo, gameSocket }) => {
-  let isowner = false;
+const SingleGameRoom = () => {
+  return (
+    <div className="game-container">
+    <canvas id ="myCanvas" width="800" height="640"></canvas>
+    <PingPong/>
+    </div>
+  )
+}
+
+const PingPong = () => {
   let upPressed, downPressed;
   let enemyupPressed, enemydownPressed;
-  let flag = false;
 
   useEffect(() => {
-    if (!gameinfo || !gameSocket.current) {
-      console.log("something is wrong...");
-      return;
-    }
-
-    if (gameinfo.owner === localStorage.getItem("nickname")) isowner = true;
 
     const canvas = document.getElementById("myCanvas");
 
@@ -157,11 +159,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         }
       }
 
-      // document.addEventListener('mousemove', (event) => {
-      //     const relativeY = (event.clientY / window.innerHeight) * 2 - 1;
-      //     playerPaddle.position.y = -relativeY * 2;
-      // });
-
       document.addEventListener("keydown", keyDownHandler, false);
       document.addEventListener("keyup", keyUpHandler, false);
       document.addEventListener("enemykeydown", enemykeyDownHandler, false);
@@ -186,7 +183,7 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       function animate() {
         requestAnimationFrame(animate);
 
-        //updateBall();
+        updateBall();
 
         updatePlayerPaddle();
         updateaiPaddle();
@@ -194,20 +191,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         renderer.render(scene, camera);
       }
       animate();
-
-      gameSocket.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleSocketMessage(message);
-      };
-
-      gameSocket.current.onclose = () => {
-        const message = JSON.stringify({
-          type: "game_end",
-          nickname: localStorage.getItem("nickname"),
-        });
-        console.log("gameSocket closed");
-        window.history.back();
-      };
 
       return () => {
         document.removeEventListener("keydown", keyDownHandler);
@@ -218,31 +201,8 @@ const PingPong = ({ gameinfo, gameSocket }) => {
     } else {
       console.log("Canvas context not supported");
     }
-  }, [gameinfo, gameSocket.current]);
+  }, []);
 
-  // function handleSocketMessage(message) {
-  //     if (message.type === "paddle_move") {
-  //         const { data } = message;
-  //         enemyPaddleX = data.x;
-  //     } else if (message.type === "game_update") {
-  //         const { ball, paddle, uscore } = message.data;
-  //         if (ball && !isowner) {
-  //             x = ball.x;
-  //             y = ball.y;
-  //             dx = ball.dx;
-  //             dy = ball.dy;
-  //         }
-  //         if (paddle) {
-  //             enemyPaddleX = paddle.x;
-  //             console.log("cavnas", canvas.width, "paddle", paddle.x);
-  //             console.log("enemypaddle:", enemyPaddleX);
-  //         }
-  //         if (uscore && !isowner) {
-  //             userscore = uscore.y;
-  //             enemyscore = uscore.x;
-  //         }
-  //     }
-  // }
 
   function keyDownHandler(e) {
     if (e.key === "W" || e.key === "w") {
@@ -276,7 +236,6 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
   return (
     <div id="score">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
     </div>
   );
 };
