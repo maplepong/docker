@@ -16,7 +16,7 @@ import Test from "../component/Test";
 import ApiTest from "../component/ApiTest";
 import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
-import PingPong from "../component/Game/PlayingGameSingle.js";
+import SingleGameRoom from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
 
 const pathList = {
