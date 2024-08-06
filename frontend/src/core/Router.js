@@ -33,7 +33,7 @@ const pathList = {
   welcome: <Welcome />,
   lobby: <Lobby />,
   test: <Test />,
-  localgame: <PingPong />,
+  localgame: <SingleGameRoom />,
   tournament: <Tournament />,
 };
 
