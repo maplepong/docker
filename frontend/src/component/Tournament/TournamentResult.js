@@ -11,7 +11,6 @@ const TournamentResult = () => {
   useEffect(async () => {
     if (gameResult.winner === localStorage.getItem("nickname")) {
       console.log("gameResult", gameResult);
-      socketController.sendMessage({ type: "tournament_end" }); // 1. 둘중에 한명 2. api
       await apiTounrament
         .end_tournament(gameResult)
         .then((res) => {
@@ -22,6 +21,10 @@ const TournamentResult = () => {
           alert(err);
           return err;
         });
+      socketController.sendMessage({
+        type: "tournament_end",
+        winner_nickname: gameResult.winner,
+      }); // 1. 둘중에 한명 2. api
     }
     socketController.sendMessage({ type: "tournament_out" }); // 둘다 해야함
   });

@@ -9,6 +9,7 @@ import apiTounrament from "../../core/ApiTournament.js";
 import status from "./TournamentStatus.js";
 import GameRoom from "./TournamentGameRoom.js";
 import TournamentFinished from "./TournamentFinished.js";
+import { requestJoinGame } from "../../core/ApiGame.js";
 
 const Tournament = () => {
   const [players, setPlayers] = useState([]);
@@ -55,16 +56,9 @@ const Tournament = () => {
           onTournamentStart(data);
         },
       },
-      // 한 게임 끝
-      {
-        type: "tournament-game-end",
-        func: function (data) {
-          onGameEnd(data);
-        },
-      },
       //host 변경
       {
-        type: "tournament-host-change",
+        type: "tournament_host_change",
         func: function (data) {
           onGameEnd(data);
         },
@@ -118,12 +112,9 @@ const Tournament = () => {
     console.log("Game ended for players:", data.league);
   };
 
-  const onOtherTeamEnd = (data) => {
-    console.log("Other team game ended. Result:", data.result);
-  };
-
-  const onTournamentEnd = (data) => {
-    console.log("Tournament ended. Result:", data.result);
+  const onHostChange = (data) => {
+    console.log("Host changed to:", data.new_host);
+    setHost(data.new_host);
   };
 
   const handleStartGame = async () => {
@@ -255,10 +246,25 @@ const Tournament = () => {
   }, []);
   socketController.initSocket();
 
-  function startGame() {
+  async function startGame() {
     console.log(startGame);
+    await requestJoinGame(gameId.current, "").catch((err) => {
+      return alert(err.response.data.message || err.message || err);
+    });
     myReact.redirect("tournament/" + gameId.current);
-    return;
+  }
+
+  function inviteTournament() {
+    apiInstance
+      .post("tournament/invite_tournament", {
+        nickname: "milky",
+      })
+      .then((res) => {
+        alert("milky님을 초대했습니다");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   switch (tournamentStatus) {
@@ -271,6 +277,7 @@ const Tournament = () => {
             players={players}
             host={host}
           />
+          <button onClick={inviteTournament}>초대하기</button>
           <button onClick={outTournament}>나가기</button>
         </div>
       );

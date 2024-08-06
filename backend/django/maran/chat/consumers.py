@@ -296,6 +296,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'tournament_group',
                     self.channel_name
                 )
+            elif type == 'tournament_host_change':
+                tournament = await sync_to_async(Tournament.objects.first)()
+                if tournament:
+                    new_host = tournament.host
+                await self.channel_layer.group_send(
+                    'tournament_group',
+                    {
+                        'type': 'tournament_host_change',
+                        'new_host': new_host.nickname
+                    }
+                )
             elif type == 'tournament_start':
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament and tournament.is_active:
@@ -340,12 +351,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         }
                     )
                     # 모든 참가자가 tournament_group을 나가도록 하기
-                    participants = await sync_to_async(tournament.get_participants)()
-                    for participant in participants:
-                        await self.channel_layer.group_discard(
-                            'tournament_group',
-                            self.channel_name
-                        )
+                    # participants = await sync_to_async(tournament.get_participants)()
+                    # for participant in participants:
+                    #     await self.channel_layer.group_discard(
+                    #         'tournament_group',
+                    #         self.channel_name
+                    #     )
                     # tournament_group을 없애기
                     await self.channel_layer.group_discard(
                         'tournament_group',
@@ -451,7 +462,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'status': status,
             'nickname': nickname
         }))
-
+    async def tournament_host_change(self, event):
+        new_host = event['new_host']
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_host_change',
+            'new_host': new_host
+        }))
     async def tournament_start(self, event):
         await self.send(text_data=json.dumps({
             'type': 'tournament_start',
