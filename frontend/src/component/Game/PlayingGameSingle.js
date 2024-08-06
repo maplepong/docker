@@ -211,9 +211,6 @@ const PingPong = () => {
     
       animate();
 
-      return () => {
-        cancel();
-      };
     } else {
       console.log("Canvas context not supported");
     }
