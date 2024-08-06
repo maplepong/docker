@@ -2,12 +2,13 @@
 import myReact, { useState, useEffect } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
 import "../../core/Router.js"
+import { redirect } from "statuses";
 // import api from "../../core/Api.js";
 
 const SingleGameRoom = () => {
   return (
     <div className="game-container">
-    <canvas id ="myCanvas" width="800" height="640"></canvas>
+    <canvas id ="myCanvas" width="800" height="640" class="singleCanvas"></canvas>
     <PingPong/>
     </div>
   )
@@ -28,12 +29,12 @@ const PingPong = () => {
 
       const camera = new THREE.PerspectiveCamera(
         75,
-        window.innerWidth / window.innerHeight,
+        640 / 640,
         0.1,
         1000
       );
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(640, 640);
 
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(5, 5, 5).normalize();
@@ -127,6 +128,8 @@ const PingPong = () => {
             ballDirection.x = -ballDirection.x;
           } else {
             rightscore++;
+            // if (rightscore >= 3)
+            //     cancel();
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -148,6 +151,8 @@ const PingPong = () => {
             ballDirection.x = -ballDirection.x;
           } else {
             leftscore++;
+            // if (leftscore >= 3)
+            //     cancel();
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -159,10 +164,19 @@ const PingPong = () => {
         }
       }
 
+      const cancel = () => {
+        myReact.redirect("home");
+        window.cancelAnimationFrame(animate);
+        document.removeEventListener("keydown", keyDownHandler);
+        document.removeEventListener("keyup", keyUpHandler);
+        document.removeEventListener("keydown", enemykeyDownHandler);
+        document.removeEventListener("keyup", enemykeyUpHandler);
+      };
+
       document.addEventListener("keydown", keyDownHandler, false);
       document.addEventListener("keyup", keyUpHandler, false);
-      document.addEventListener("enemykeydown", enemykeyDownHandler, false);
-      document.addEventListener("enemykeyup", enemykeyUpHandler, false);
+      document.addEventListener("keydown", enemykeyDownHandler, false);
+      document.addEventListener("keyup", enemykeyUpHandler, false);
 
       function updatePlayerPaddle() {
         if (upPressed) {
@@ -181,22 +195,24 @@ const PingPong = () => {
       }
 
       function animate() {
-        requestAnimationFrame(animate);
+        if (leftscore < 3 && rightscore < 3){
+            requestAnimationFrame(animate);
 
         updateBall();
 
         updatePlayerPaddle();
         updateaiPaddle();
 
-        renderer.render(scene, camera);
-      }
+        renderer.render(scene, camera);}
+        else{
+            cancel();
+        }
+    }
+    
       animate();
 
       return () => {
-        document.removeEventListener("keydown", keyDownHandler);
-        document.removeEventListener("keyup", keyUpHandler);
-        document.removeEventListener("enemykeydown", keyDownHandler);
-        document.removeEventListener("enemykeyup", keyUpHandler);
+        cancel();
       };
     } else {
       console.log("Canvas context not supported");
@@ -204,21 +220,21 @@ const PingPong = () => {
   }, []);
 
 
+  function keyUpHandler(e) {
+    if (e.key === "q" || e.key === "Q") {
+      upPressed = false;
+    } else if (e.key === "a" || e.key === "A") {
+      downPressed = false;
+    }
+  }
   function keyDownHandler(e) {
-    if (e.key === "W" || e.key === "w") {
+    if (e.key === "q" || e.key === "Q") {
       upPressed = true;
-    } else if (e.key === "S" || e.key === "s") {
+    } else if (e.key === "a" || e.key === "A") {
       downPressed = true;
     }
   }
 
-  function keyUpHandler(e) {
-    if (e.key === "w" || e.key === "W") {
-      upPressed = false;
-    } else if (e.key === "s" || e.key === "S") {
-      downPressed = false;
-    }
-  }
   function enemykeyUpHandler(e) {
     if (e.key === "e" || e.key === "E") {
       enemyupPressed = false;
@@ -228,9 +244,9 @@ const PingPong = () => {
   }
   function enemykeyDownHandler(e) {
     if (e.key === "e" || e.key === "E") {
-      enemyupPressed = false;
+      enemyupPressed = true;
     } else if (e.key === "d" || e.key === "D") {
-      enemydownPressed = false;
+      enemydownPressed = true;
     }
   }
 
@@ -240,4 +256,4 @@ const PingPong = () => {
   );
 };
 
-export default PingPong;
+export default SingleGameRoom;

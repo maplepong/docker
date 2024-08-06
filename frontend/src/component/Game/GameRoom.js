@@ -211,7 +211,7 @@ const GameRoom = () => {
     case status.playing:
       return (
         <div className="game-container">
-          <canvas id="myCanvas" width="800" height="640"></canvas>
+          <canvas id="myCanvas" width="800" height="640" class="multiCanvas"></canvas>
           <PingPong
             gameinfo={gameInfo}
             gameSocket={gameSocket}
