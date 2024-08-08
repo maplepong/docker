@@ -1,7 +1,9 @@
 /* @jsx myReact.createElement */
-import myReact from "../../core/myReact.js";
+import myReact, { useState } from "../../core/myReact.js";
+import HandleInviteModal from "../Navbar/HandelInviteModal.js";
 
-const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
+const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite }) => {
+  const [showState, setShowState] = useState(false);
   return (
     <div class="bg">
       <div class="room">
@@ -38,8 +40,21 @@ const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
                   <input
                     type="button"
                     class="invbtn"
-                    onClick={() => sendGameInvite(gameInfo.id, "milky")}
+                    onclick={() => {
+                      showState = showState ? false : true;
+                      setShowState(showState);
+                      console.log(showState);
+                    }}
                   ></input>
+                  <HandleInviteModal
+                    show={showState}
+                    setShow={() => {
+                      showState = showState ? false : true;
+                      setShowState(showState);
+                      console.log(showState);
+                    }}
+                    type="game"
+                  />
                 </div>
               ) : (
                 <span>아무거또 모태</span>

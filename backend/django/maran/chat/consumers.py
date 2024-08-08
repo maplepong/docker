@@ -133,55 +133,54 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         if receiver_channel_name:
                             if tournament.is_active == True:
                                 await self.send(text_data=json.dumps({
-                                    'message': "Tournament is already started.",
+                                    'message': "토너먼트가 이미 시작했습니다.",
                                     'sender': 'system',
-                                    'whisper': True,
-                                    'receiver': sender.nickname
+                                    'receiver': sender.nickname,
+                                    'type' : 'tournament_invite_message'
                                 }))
                             elif await sync_to_async(tournament.participants.count)() >= 4:
                                 await self.send(text_data=json.dumps({
-                                    'message': "Tournament is already full.",
+                                    'message': "토너먼트가 이미 가득 찼습니다.",
                                     'sender': 'system',
-                                    'whisper': True,
+                                    'type' : 'tournament_invite_message',
                                     'receiver': sender.nickname
                                 }))
                             else:
                                 await self.send(text_data=json.dumps({
                                     'message': "성공적으로 초대를 전송했습니다.",
                                     'sender': 'system',
-                                    'whisper': True,
+                                    'type' : 'tournament_invite_message',
                                     'receiver': sender.nickname
                                 }))
                                 await self.channel_layer.send(
                                     receiver_channel_name.decode('utf-8'),
                                     {
-                                        'type': 'tournament_invite_message',
+                                        'type': 'tournament_invite',
                                         'sender': sender.nickname,
                                         'receiver' : receiver.nickname,
                                     }
                                 )
                     else:
                         await self.send(text_data=json.dumps({
-                            'message': "User is not connected.",
+                            'message': "접속중이 아닌 유저입니다.",
                             'sender': 'system',
-                            'whisper': True,
+                            'type' : 'tournament_invite_message',
                             'receiver': sender.nickname
                         }))
                 except User.DoesNotExist:
                     await self.send(text_data=json.dumps({
-                        'message': "User does not exist.",
+                        'message': "존재하지 않는 유저입니다.",
                         'sender': 'system',
-                        'whisper': True,
+                        'type' : 'tournament_invite_message',
                         'receiver': sender.nickname
                     }))
                 except Tournament.DoesNotExist:
                     await self.send(text_data=json.dumps({
-                        'message': "Game is not exist.",
-                        'sender': 'system',
-                        'whisper': True,
+                        'message': "토너먼트가 존재하지 않습니다. 홈으로 돌아가 새로고침하세요.",
+                        'type' : 'tournament_invite_message',
                         'receiver': sender.nickname
                     }))
-            elif type == 'invite':
+            elif type == 'game_invite':
                 receiver_nickname = text_data_json['receiver']
                 gameId = text_data_json['gameId']
                 try:
@@ -192,29 +191,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         if receiver_channel_name:
                             if game.status == 1 : # 게임이 이미 시작된 경우
                                 await self.send(text_data=json.dumps({
-                                    'message': "Game is already started.",
+                                    'message': "게임이 이미 시작했습니다. 홈으로 돌아가 새로고침하세요.",
                                     'sender': 'system',
-                                    'whisper': True,
+                                    'type' : 'game_invite_message',
                                     'receiver': sender.nickname
                                     }))
                             elif await sync_to_async(game.players.count)() >= 2:
                                 await self.send(text_data=json.dumps({
-                                    'message': "Game is already full.",
+                                    'message': "이미 게임이 가득 찼습니다.",
                                     'sender': 'system',
-                                    'whisper': True,
+                                    'type' : 'game_invite_message',
                                     'receiver': sender.nickname
                                     }))
                             else:
                                 await self.send(text_data=json.dumps({
                                     'message': "성공적으로 초대를 전송했습니다.",
                                     'sender': 'system',
-                                    'whisper': True,
+                                    'type' : 'game_invite_message',
                                     'receiver': sender.nickname
                                     }))
                                 await self.channel_layer.send(
                                     receiver_channel_name.decode('utf-8'),
                                     {
-                                        'type': 'invite_message',
+                                        'type': 'game_invite',
                                         'sender': sender.nickname,
                                         'receiver' : receiver.nickname,
                                         'gameId': gameId
@@ -222,23 +221,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 )
                     else: # 수신자가 오프라인인 경우
                             await self.send(text_data=json.dumps({
-                                'message': "User is not connected.",
-                                'sender': 'system',
-                                'whisper': True,
+                                'message': "유저가 접속중이 아닙니다.",
+                                'type' : 'game_invite_message',
                                 'receiver': sender.nickname
                                 }))
                 except User.DoesNotExist:
                     await self.send(text_data=json.dumps({
-                        'message': "User does not exist.",
-                        'sender': 'system',
-                        'whisper': True,
+                        'message': "유저가 존재하지 않습니다.",
+                        'type' : 'game_invite_message',
                         'receiver': sender.nickname
                         }))
                 except Game.DoesNotExist:
                     await self.send(text_data=json.dumps({
-                        'message': "Game is not exist.",
-                        'sender': 'system',
-                        'whisper': True,
+                        'message': "게임이 존재하지 않습니다. 홈으로 돌아가 새로고침하세요.",
+                        'type' : 'game_invite_message',
                         'receiver': sender.nickname
                     }))
             elif type == 'update': # 친구 상태 업데이트 받음

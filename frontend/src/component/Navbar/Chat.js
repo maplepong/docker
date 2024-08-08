@@ -4,6 +4,8 @@ import "../../css/Chat.css";
 import NicknameModal from "../NicknameModal.js";
 import socketController from "../../core/socket.js";
 import { requestJoinGame } from "../../core/ApiGame.js";
+import apiTounrament from "../../core/ApiTournament.js";
+import { apiInstance } from "../../core/Api.js";
 
 const Chat = () => {
   const [messages, setMessages] = myReact.useGlobalState("chat", []);
@@ -20,6 +22,12 @@ const Chat = () => {
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
+    if (
+      !data.sender ||
+      data.sender === localStorage.getItem("nickname") ||
+      data.gameId
+    )
+      return;
     setMessages([
       ...messages,
       {
@@ -36,12 +44,46 @@ const Chat = () => {
     ]);
   };
 
+  const onMessageTournamentInvite = (data) => {
+    const chat = document.getElementById("chat");
+    console.log("chat data :", data);
+    if (!data.sender || data.sender === localStorage.getItem("nickname"))
+      return;
+    setMessages([
+      ...messages,
+      {
+        sender: "system",
+        type: "invite",
+        invite_sender: data.sender,
+        message: `${data.sender} 님이 토너먼트에 초대하셨습니다.`,
+      },
+    ]);
+  };
+
+  const handleTournamentInvite = async (method, nickname) => {
+    const res = await apiInstance
+      .request({
+        method: method,
+        url: "tournament/invite",
+        data: {
+          nickname: nickname,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  };
+
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
       { type: "all", func: onMessageDefault },
       { type: "whisper", func: onMessageDefault },
-      { type: "invite", func: onMessageInvite },
+      { type: "game_invite", func: onMessageInvite },
+      { type: "tournament_invite", func: onMessageTournamentInvite },
     ]);
   });
 
@@ -138,11 +180,28 @@ const Chat = () => {
                     enterGame(msg.gameId);
                   }}
                 >
-                  {" "}
                   초대 수락하기
                 </button>
               ) : (
-                ""
+                //tournament invite
+                <div style={{ display: "flex" }}>
+                  <button
+                    class="acceptBtn"
+                    onclick={() => {
+                      handleTournamentInvite("post", msg.invite_sender);
+                    }}
+                  >
+                    초대 수락하기
+                  </button>
+                  <button
+                    class="cancelBtn"
+                    onclick={() => {
+                      handleTournamentInvite("delete", msg.invite_sender);
+                    }}
+                  >
+                    거절하기
+                  </button>
+                </div>
               )}
             </div>
           ))}
