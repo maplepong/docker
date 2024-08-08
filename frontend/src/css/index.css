@@ -12,6 +12,20 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "MapleStory OTF";
+  src: url("../../public/asset/font/MaplestoryOTFBold.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MapleStory OTF";
+  src: url("../../public/asset/font/MaplestoryOTFLight.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   font-family: "MapleStory OTF";
   margin: 0;
