@@ -46,9 +46,15 @@ const TournamentGameRoom = () => {
 
   useEffect(() => {
     if (gameStatus === status.return) {
-      setTimeout(() => {
-        myReact.redirect("tournament-waiting");
-      }, 1000);
+      if (gameInfo.name.includes("semi")) {
+        setTimeout(() => {
+          myReact.redirect("tournament-waiting");
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          myReact.redirect("tournament-result");
+        }, 1000);
+      }
     }
     if (gameStatus === status.finished) {
       console.log("GameResult", gameResultRef.current);
@@ -58,14 +64,7 @@ const TournamentGameRoom = () => {
   }, [gameStatus]);
 
   const sendGameInvite = (gameId, nickname) => {
-    const data = {
-      type: "invite",
-      gameId: gameId,
-      message: "테스트입니다.",
-      receiver: nickname,
-    };
-    console.log(data);
-    SocketController.sendMessage(data);
+    alert("게임 초대가 불가능한 방입니다");
   };
 
   useEffect(() => {
@@ -138,13 +137,14 @@ const TournamentGameRoom = () => {
         const data = JSON.parse(event.data);
         console.log("data : ", data);
         if (data.type === "game_ready") {
+          if (gameInfo.players.length === 2) return; // 이미 2명이 들어와있으면 무시
           console.log("game_ready");
           console.log("data.player_info : ", data.player_info);
           setGameInfo({
             ...gameInfo,
             isGameReady: true,
-            player_info: data.player_info,
-            opponent: gameInfo.opponent || data.player_info.nickname,
+            players: gameInfo.players.push(data.player_info),
+            opponent: data.player_info.nickname,
           });
         } else if (data.type === "game_start") {
           console.log("game_start");

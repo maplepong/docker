@@ -12,25 +12,35 @@ const FriendList = (props) => {
   const friendRequests = props.friendRequests;
 
   return (
-    <div id="friend-list-container">
+    <div id="friend-list-container" class="box">
       <div id="friend-list-title">
-      <h2>친구 목록</h2>
-      <button onclick={() => props.refresh()}>새로고침</button>
+        <h2>친구 목록</h2>
+        <button onclick={() => props.refresh()}>새로고침</button>
       </div>
       <ul id="friend-list-ul">
-      {friendRequests &&
-          friendRequests.receives &&
-          friendRequests.receives.length > 0 ? (
-            friendRequests.receives.map((req) => (<Friend nickname={req.from_user} type="request_receive" />))):  null}
-      {friendRequests &&
-          friendRequests.sends &&
-          friendRequests.sends.length > 0 ? (
-            friendRequests.sends.map((req) =>  (<Friend nickname={req.from_user} type="request_send" />))):  null}
-      {friendList && friendList.length > 0 ? (
-           friendList.map(friend => (
-              <Friend nickname={friend.nickname} type="friend" status={friend.status} />
-            ))): null
-          }
+        {friendRequests &&
+        friendRequests.receives &&
+        friendRequests.receives.length > 0
+          ? friendRequests.receives.map((req) => (
+              <Friend nickname={req.from_user} type="request_receive" />
+            ))
+          : null}
+        {friendRequests &&
+        friendRequests.sends &&
+        friendRequests.sends.length > 0
+          ? friendRequests.sends.map((req) => (
+              <Friend nickname={req.from_user} type="request_send" />
+            ))
+          : null}
+        {friendList && friendList.length > 0
+          ? friendList.map((friend) => (
+              <Friend
+                nickname={friend.nickname}
+                type="friend"
+                status={friend.status}
+              />
+            ))
+          : null}
       </ul>
     </div>
   );

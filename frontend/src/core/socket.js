@@ -43,11 +43,18 @@ const SocketController = () => {
           sender: localStorage.getItem("nickname"),
           ...rest,
         };
+        if (data.sender === "null") {
+          alert("sender가 없습니다.");
+          return;
+        }
         this._ws.current.send(JSON.stringify(data));
         this._ws.current.onmessage = (event) => this._getMessage(event);
       } else {
         alert("socket이 연결되지 않았습니다.");
-        console.log("소켓 연결 불량", this._ws.current ? this._ws.current : "no socket");
+        console.log(
+          "소켓 연결 불량",
+          this._ws.current ? this._ws.current : "no socket"
+        );
       }
     },
 

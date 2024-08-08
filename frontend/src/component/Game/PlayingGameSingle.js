@@ -1,21 +1,24 @@
 /* @jsx myReact.createElement */
 import myReact, { useState, useEffect } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
+import "../../core/Router.js"
+import { redirect } from "statuses";
 // import api from "../../core/Api.js";
 
-const PingPong = ({ gameinfo, gameSocket }) => {
-  let isowner = false;
+const SingleGameRoom = () => {
+  return (
+    <div className="game-container">
+    <canvas id ="myCanvas" width="800" height="640" class="singleCanvas"></canvas>
+    <PingPong/>
+    </div>
+  )
+}
+
+const PingPong = () => {
   let upPressed, downPressed;
   let enemyupPressed, enemydownPressed;
-  let flag = false;
 
   useEffect(() => {
-    if (!gameinfo || !gameSocket.current) {
-      console.log("something is wrong...");
-      return;
-    }
-
-    if (gameinfo.owner === localStorage.getItem("nickname")) isowner = true;
 
     const canvas = document.getElementById("myCanvas");
 
@@ -26,12 +29,12 @@ const PingPong = ({ gameinfo, gameSocket }) => {
 
       const camera = new THREE.PerspectiveCamera(
         75,
-        window.innerWidth / window.innerHeight,
+        640 / 640,
         0.1,
         1000
       );
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(640, 640);
 
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(5, 5, 5).normalize();
@@ -125,6 +128,8 @@ const PingPong = ({ gameinfo, gameSocket }) => {
             ballDirection.x = -ballDirection.x;
           } else {
             rightscore++;
+            // if (rightscore >= 3)
+            //     cancel();
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -146,6 +151,8 @@ const PingPong = ({ gameinfo, gameSocket }) => {
             ballDirection.x = -ballDirection.x;
           } else {
             leftscore++;
+            // if (leftscore >= 3)
+            //     cancel();
             drawText(
               leftscore.toString() + " : " + rightscore.toString(),
               -0.6,
@@ -157,15 +164,19 @@ const PingPong = ({ gameinfo, gameSocket }) => {
         }
       }
 
-      // document.addEventListener('mousemove', (event) => {
-      //     const relativeY = (event.clientY / window.innerHeight) * 2 - 1;
-      //     playerPaddle.position.y = -relativeY * 2;
-      // });
+      const cancel = () => {
+        myReact.redirect("home");
+        window.cancelAnimationFrame(animate);
+        document.removeEventListener("keydown", keyDownHandler);
+        document.removeEventListener("keyup", keyUpHandler);
+        document.removeEventListener("keydown", enemykeyDownHandler);
+        document.removeEventListener("keyup", enemykeyUpHandler);
+      };
 
       document.addEventListener("keydown", keyDownHandler, false);
       document.addEventListener("keyup", keyUpHandler, false);
-      document.addEventListener("enemykeydown", enemykeyDownHandler, false);
-      document.addEventListener("enemykeyup", enemykeyUpHandler, false);
+      document.addEventListener("keydown", enemykeyDownHandler, false);
+      document.addEventListener("keyup", enemykeyUpHandler, false);
 
       function updatePlayerPaddle() {
         if (upPressed) {
@@ -184,81 +195,43 @@ const PingPong = ({ gameinfo, gameSocket }) => {
       }
 
       function animate() {
-        requestAnimationFrame(animate);
+        if (leftscore < 3 && rightscore < 3){
+            requestAnimationFrame(animate);
 
-        //updateBall();
+        updateBall();
 
         updatePlayerPaddle();
         updateaiPaddle();
 
-        renderer.render(scene, camera);
-      }
+        renderer.render(scene, camera);}
+        else{
+            cancel();
+        }
+    }
+    
       animate();
 
-      gameSocket.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleSocketMessage(message);
-      };
-
-      gameSocket.current.onclose = () => {
-        const message = JSON.stringify({
-          type: "game_end",
-          nickname: localStorage.getItem("nickname"),
-        });
-        console.log("gameSocket closed");
-        window.history.back();
-      };
-
-      return () => {
-        document.removeEventListener("keydown", keyDownHandler);
-        document.removeEventListener("keyup", keyUpHandler);
-        document.removeEventListener("enemykeydown", keyDownHandler);
-        document.removeEventListener("enemykeyup", keyUpHandler);
-      };
     } else {
       console.log("Canvas context not supported");
     }
-  }, [gameinfo, gameSocket.current]);
+  }, []);
 
-  // function handleSocketMessage(message) {
-  //     if (message.type === "paddle_move") {
-  //         const { data } = message;
-  //         enemyPaddleX = data.x;
-  //     } else if (message.type === "game_update") {
-  //         const { ball, paddle, uscore } = message.data;
-  //         if (ball && !isowner) {
-  //             x = ball.x;
-  //             y = ball.y;
-  //             dx = ball.dx;
-  //             dy = ball.dy;
-  //         }
-  //         if (paddle) {
-  //             enemyPaddleX = paddle.x;
-  //             console.log("cavnas", canvas.width, "paddle", paddle.x);
-  //             console.log("enemypaddle:", enemyPaddleX);
-  //         }
-  //         if (uscore && !isowner) {
-  //             userscore = uscore.y;
-  //             enemyscore = uscore.x;
-  //         }
-  //     }
-  // }
 
+  function keyUpHandler(e) {
+    if (e.key === "q" || e.key === "Q") {
+      upPressed = false;
+    } else if (e.key === "a" || e.key === "A") {
+      downPressed = false;
+    }
+  }
   function keyDownHandler(e) {
-    if (e.key === "W" || e.key === "w") {
+    if (e.key === "q" || e.key === "Q") {
       upPressed = true;
-    } else if (e.key === "S" || e.key === "s") {
+    } else if (e.key === "a" || e.key === "A") {
       downPressed = true;
     }
   }
 
-  function keyUpHandler(e) {
-    if (e.key === "w" || e.key === "W") {
-      upPressed = false;
-    } else if (e.key === "s" || e.key === "S") {
-      downPressed = false;
-    }
-  }
   function enemykeyUpHandler(e) {
     if (e.key === "e" || e.key === "E") {
       enemyupPressed = false;
@@ -268,17 +241,16 @@ const PingPong = ({ gameinfo, gameSocket }) => {
   }
   function enemykeyDownHandler(e) {
     if (e.key === "e" || e.key === "E") {
-      enemyupPressed = false;
+      enemyupPressed = true;
     } else if (e.key === "d" || e.key === "D") {
-      enemydownPressed = false;
+      enemydownPressed = true;
     }
   }
 
   return (
     <div id="score">
-      <canvas id="myCanvas" width="480" height="320"></canvas>
     </div>
   );
 };
 
-export default PingPong;
+export default SingleGameRoom;

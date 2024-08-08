@@ -66,30 +66,23 @@ const apiTounrament = {
         },
       })
       .then((res) => {
-        console.log(res);
-        return res;
+        console.log(res.data);
+        return res.data;
       })
       .catch((err) => {
         return err;
       });
   },
   end_tournament: async function (result) {
-    return await apiInstance
-      .request({
-        method: "delete",
-        url: "tournament/end_tournament",
-        data: {
-          winner_nickname: result.winner,
-          final_gameid: result.game_id,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        return res;
-      })
-      .catch((err) => {
-        return err;
-      });
+    return await apiInstance.request({
+      method: "delete",
+      url: "tournament/end_tournament",
+      data: {
+        winner_nickname: result.winner,
+        loser_nickname: result.loser,
+        final_gameid: result.game_id,
+      },
+    });
   },
 };
 

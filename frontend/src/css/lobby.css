@@ -36,14 +36,14 @@ body {
 /* game_interface */
 .game_interface {
     position: relative;
-    width: 80%;
+    width: 100%;
     height: 60%;
     margin: 0 auto;
     color: white;
     text-shadow: 1px 1px 1px rgb(0, 0, 0);
     /* font-family: 'Maplestory'; */
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    /* border-top-left-radius: 15px; */
+    /* border-top-right-radius: 15px; */
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     background-color: rgba(0, 0, 0, 0.5);
@@ -210,4 +210,19 @@ body {
 
 .playing .players {
     color: #FF0000;
+}
+
+#pingpong {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 10px;
+    text-align: center;
+    font-size: 50px;
+    color: black;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+}
+
+#container-lobby {
+    margin: 10px;
 }

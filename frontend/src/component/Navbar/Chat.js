@@ -4,10 +4,11 @@ import "../../css/Chat.css";
 import NicknameModal from "../NicknameModal.js";
 import socketController from "../../core/socket.js";
 import { requestJoinGame } from "../../core/ApiGame.js";
+import apiTounrament from "../../core/ApiTournament.js";
+import { apiInstance } from "../../core/Api.js";
 
 const Chat = () => {
   const [messages, setMessages] = myReact.useGlobalState("chat", []);
-
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
@@ -28,6 +29,12 @@ const Chat = () => {
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
+    if (
+      !data.sender ||
+      data.sender === localStorage.getItem("nickname") ||
+      data.gameId
+    )
+      return;
     setMessages([
       ...messages,
       {
@@ -37,19 +44,56 @@ const Chat = () => {
       },
       {
         sender: "system",
-        type: "invite",
+        type: data.type,
         gameId: data.gameId,
         message: `초대 메시지 : ${data.message}`,
       },
     ]);
   };
 
+  const onMessageTournamentInvite = (data) => {
+    const chat = document.getElementById("chat");
+    console.log("chat data :", data);
+    if (!data.sender || data.sender === localStorage.getItem("nickname"))
+      return;
+    setMessages([
+      ...messages,
+      {
+        sender: "system",
+        type: data.type,
+        invite_sender: data.sender,
+        message: `${data.sender} 님이 토너먼트에 초대하셨습니다.`,
+      },
+    ]);
+  };
+
+  const handleTournamentInvite = async (method, nickname) => {
+    const res = await apiInstance
+      .request({
+        method: method,
+        url: "tournament/invite",
+        data: {
+          nickname: nickname,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  };
+
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
-      { type: "all", func: onMessageDefault },
-      { type: "whisper", func: onMessageDefault },
-      { type: "invite", func: onMessageInvite },
+      { type: "all", func: (data) => onMessageDefault(data) },
+      { type: "whisper", func: (data) => onMessageDefault(data) },
+      { type: "game_invite", func: (data) => onMessageInvite(data) },
+      {
+        type: "tournament_invite",
+        func: (data) => onMessageTournamentInvite(data),
+      },
     ]);
   });
 
@@ -149,19 +193,36 @@ const Chat = () => {
                 )}
                 <p class="message">{msg.message}</p>
               </div>
-              {msg.type === "invite" && msg.gameId ? (
+              {msg.type === "game_invite" && msg.gameId ? (
                 <button
                   class="acceptBtn"
                   onclick={() => {
                     enterGame(msg.gameId);
                   }}
                 >
-                  {" "}
                   초대 수락하기
                 </button>
-              ) : (
-                ""
-              )}
+              ) : msg.type === "tournament_invite" ? (
+                //tournament invite
+                <div style={{ display: "flex" }}>
+                  <button
+                    class="acceptBtn"
+                    onclick={() => {
+                      handleTournamentInvite("post", msg.invite_sender);
+                    }}
+                  >
+                    초대 수락하기
+                  </button>
+                  <button
+                    class="cancelBtn"
+                    onclick={() => {
+                      handleTournamentInvite("delete", msg.invite_sender);
+                    }}
+                  >
+                    거절하기
+                  </button>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
