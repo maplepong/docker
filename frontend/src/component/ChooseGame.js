@@ -6,18 +6,17 @@ import "../css/home.css";
 const ChooseGame = () => {
   return (
     <div id="choose-container">
-      <Link to="localgame">
+      {/* <Link to="localgame">
         <div id="mini">
           <span class="word">미니게임</span>
         </div>
-      </Link>
-      <Link to="tournament-waiting">
-        <div id="tour">
-          <span class="word">토너먼트 참여</span>
-        </div>
+      </Link> */}
+      <Link to="tournament-waiting" class="word">
+        <span>토너먼트 참여</span>
+        <div id="tour"></div>
       </Link>
       <Link to="lobby" class="word">
-        <span style="font-size:20px;">게임하기</span>
+        <span>게임하기</span>
         <div id="pong"></div>
       </Link>
     </div>

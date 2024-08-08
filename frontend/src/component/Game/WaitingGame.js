@@ -1,5 +1,6 @@
 /* @jsx myReact.createElement */
 import myReact from "../../core/myReact.js";
+import "../../css/match.css"
 
 const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
   return (

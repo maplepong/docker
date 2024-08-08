@@ -9,6 +9,7 @@ import {
 import api from "../core/Api.js";
 import router from "../core/Router.js";
 import GameList from "./GameList.js";
+import "../css/lobby.css"
 
 const Lobby = (props) => {
   // const [lobbyData, setLobbyData] = useState([]);
@@ -128,13 +129,16 @@ const Lobby = (props) => {
 
   return (
     <div id="container-lobby" className="modal">
-      <button onClick={requestLogin}>login: test</button>
+      {/* <button onClick={requestLogin}>login: test</button> */}
       <div id="lobby-headline">
-        <p>Pingpong🏓</p>
-        <button>X</button>
-        <button id="open-modal" onClick={openModal}>
-          게임 만들기
-        </button>
+        <span id="pingpong">
+          Pingpong🏓
+          <div style="width:20%;"></div>
+          <button id="open-modal" onClick={openModal}>
+            게임 만들기
+          </button>
+        </span>
+        {/* <button>X</button> */}
         <div id="modal-backdrop" class="hidden"></div>
       </div>
       <div id="modal" class="hidden">
@@ -174,7 +178,7 @@ const Lobby = (props) => {
           </form>
         </div>
       </div>
-      <button onClick={updateList}>방이 있을까?</button>
+      {/* <button onClick={updateList}>방이 있을까?</button> */}
       <div class="game_interface">
         <div class="lobby_body">
           <ul class="room_list" id="roomList">

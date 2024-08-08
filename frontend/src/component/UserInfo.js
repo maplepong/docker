@@ -7,6 +7,8 @@ import Matchhistory from "./Matchhistory.js";
 
 const UserInfo = (props) => {
 
+	console.log("USERINFO", props);
+
     if (window.location.pathname != "/myinfo"){
         props.nickname = window.location.pathname.split('/')[2];
     }
@@ -211,15 +213,6 @@ const UserInfo = (props) => {
 					</ul>
 				</div>
 			</div>
-			{/* <div id="patchBox">
-				<div class="infoPatchBox">
-					<p>이미지를 업로드 해주세요.</p>
-					<p>파일을 선택하면 이미지가 변경됩니다.</p>
-					<div>
-						<input type="file" accept="image/*"  id="testUpload" onchange={onFileChange}></input>
-					</div>
-				</div>
-			</div> */}
 			<Matchhistory data={data}/>
 		</div>
 	)
