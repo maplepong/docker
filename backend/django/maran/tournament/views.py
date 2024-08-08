@@ -177,12 +177,14 @@ def start_semifinal(request):
     with transaction.atomic():
         # 첫 번째 세미파이널 게임 생성 및 저장
         semifinal1 = Game.objects.create(name="semifinal1", creator=participants[0], status=0)
-        semifinal1.players.add(participants[0], participants[1])
+        # semifinal1.players.add(participants[0], participants[1])
+        # semifinal1.players.add(participants[0])
         tournament.semifinal_game1 = semifinal1
 
         # 두 번째 세미파이널 게임 생성 및 저장
         semifinal2 = Game.objects.create(name="semifinal2", creator=participants[2], status=0)
-        semifinal2.players.add(participants[2], participants[3])
+        # semifinal2.players.add(participants[2], participants[3])
+        # semifinal2.players.add(participants[2])
         tournament.semifinal_game2 = semifinal2
 
         tournament.save()
@@ -304,7 +306,7 @@ def end_semifinal(request):
     
     if tournament.end_game_count < 2:
         final_game = Game.objects.create(name="final_game", creator= winner, status=0)
-        final_game.players.add(winner)
+        # final_game.players.add(winner)
         tournament.final_game_id = final_game
         tournament.save()
         return JsonResponse({
@@ -315,7 +317,7 @@ def end_semifinal(request):
     # 결승 게임방 생성 및 participants에 남은 인원들을 추가
     elif tournament.end_game_count == 2:
         final_game = tournament.final_game_id
-        final_game.players.add(winner)
+        # final_game.players.add(winner)
         final_game.save()
         
         return JsonResponse({
@@ -387,7 +389,7 @@ def end_tournament(request):
     try:
         winner = User.objects.get(nickname=winner_nickname)
     except User.DoesNotExist:
-        return JsonResponse({'error': 'Winner does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Winner or loser does not exist.'}, status=status.HTTP_404_NOT_FOUND)
     
     # 토너먼트 객체 삭제
     tournament.delete()
@@ -406,3 +408,4 @@ def tournament_detail(request, tournament_id):
         return HttpResponse("Tournament not found.", status=404)
     
     return render(request, 'tournament/tournament_detail.html', {'tournament': tournament})
+

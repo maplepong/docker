@@ -8,6 +8,7 @@ const TournamentSchedule = ({ braket, status, startGame }) => {
       <p>braket : {braket}</p>
       <p>status : {status}</p>
       <button onclick={startGame}>게임시작</button>
+      <button onclick={startGame}>게임시작</button>
     </div>
   );
 };

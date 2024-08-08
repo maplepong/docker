@@ -1,0 +1,92 @@
+.none {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Modal background */
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100; /* Ensure it is above other elements */
+}
+
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd; /* Border to separate the header */
+  padding-bottom: 10px; /* Space below the header */
+}
+
+/* Modal header title */
+.modal-header h3 {
+  margin: 0; /* Remove default margin */
+  font-size: 1.5em; /* Larger font size */
+}
+
+/* Close button */
+.modal-header button {
+  background: none; /* Remove default button background */
+  border: none; /* Remove default button border */
+  font-size: 1.2em; /* Larger font size for the button */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Modal content */
+.modal-content {
+  margin-top: 20px; /* Space above the content */
+}
+
+/* Form styles */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input fields */
+.modal-content form input {
+  margin-bottom: 10px; /* Space between inputs */
+  padding: 10px; /* Space inside the inputs */
+  border: 1px solid #ccc; /* Border for the inputs */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 1em; /* Consistent font size */
+}
+
+/* Submit button */
+.modal-content form button {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  padding: 10px; /* Space inside the button */
+  border: none; /* Remove default border */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 1em; /* Consistent font size */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Message paragraph */
+.modal-content p {
+  margin-top: 20px; /* Space above the paragraph */
+  font-size: 1em; /* Consistent font size */
+}

@@ -1,8 +1,20 @@
 /* @jsx myReact.createElement */
-import myReact from "../../core/myReact.js";
-import "../../css/match.css"
+import myReact, { useEffect } from "../../core/myReact.js";
+import HandleInviteModal from "../Navbar/HandelInviteModal.js";
+import "../../css/match.css";
 
-const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
+const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
+  let show = false;
+  useEffect(() => {
+    setShow();
+  }, []);
+  const setShow = () => {
+    const modal = document.getElementsByClassName("modalContainer")[0];
+    // const bg = document.getElementsByClassName("modal-background")[0];
+    if (!modal) return;
+    modal.classList.toggle("hidden");
+    // modal.classList.toggle("hidden");
+  };
   return (
     <div class="bg">
       <div class="room">
@@ -39,8 +51,11 @@ const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite}) => {
                   <input
                     type="button"
                     class="invbtn"
-                    onClick={() => sendGameInvite(gameInfo.id, "milky")}
+                    onclick={() => {
+                      setShow();
+                    }}
                   ></input>
+                  <HandleInviteModal setShow={setShow} type="game" />
                 </div>
               ) : (
                 <span>아무거또 모태</span>

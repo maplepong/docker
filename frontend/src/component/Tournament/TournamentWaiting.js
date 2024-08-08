@@ -4,7 +4,6 @@ import myReact, { useEffect, useState } from "../../core/myReact.js";
 // import router from "../../Router.js";
 // import GameList from "../Game/GameList.js";
 import "../../css/tournament.css";
-import { api } from "../../core/Api.js";
 
 const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
   console.log(players);
