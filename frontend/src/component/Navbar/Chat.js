@@ -12,12 +12,12 @@ const Chat = () => {
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
-    if(data.whisper === true){
+    if (data.whisper === true) {
       data.type = "whisper";
     }
     setMessages([
       ...messages,
-       {
+      {
         sender: data.sender,
         type: data.type,
         message: data.message,
@@ -32,19 +32,19 @@ const Chat = () => {
     if (
       !data.sender ||
       data.sender === localStorage.getItem("nickname") ||
-      data.gameId
+      !data.gameId
     )
       return;
     setMessages([
       ...messages,
       {
         sender: "system",
-        type: "invite",
         message: `${data.sender} 님이 게임에 초대하셨습니다.`,
+        type: "game_invite",
       },
       {
         sender: "system",
-        type: data.type,
+        type: "game_invite",
         gameId: data.gameId,
         message: `초대 메시지 : ${data.message}`,
       },
@@ -122,10 +122,14 @@ const Chat = () => {
       currentInput = currentInput.slice(whisperTarget.current.length);
       e.target.value = "";
     }
-    if (msgType === "/w" && whisperTarget.current !== "" &&( e.key === "Backspace" || e.key === "Delete")) {
-    
+    if (
+      msgType === "/w" &&
+      whisperTarget.current !== "" &&
+      (e.key === "Backspace" || e.key === "Delete")
+    ) {
       whisperTarget.current = "";
-      setMessageType("/w");}
+      setMessageType("/w");
+    }
     //메시지 타입 변경 이벤트
     if (msgType === "/all") {
       var inputType = currentInput.split(" ")[0];
@@ -184,9 +188,10 @@ const Chat = () => {
               <div class="chat-line">
                 {msg.sender === "system" ? (
                   <p>{`<system> `}</p>
-                ) : msg.type === "whisper" ? (<p>{msg.sender + " " + msg.receiver + "에게 : "}</p>) : (
+                ) : msg.type === "whisper" ? (
+                  <p>{msg.sender + " " + msg.receiver + "에게 : "}</p>
+                ) : (
                   <p style={{ display: "flex" }}>
-                    
                     <NicknameModal nickname={msg.sender} />
                     {` :  `}
                   </p>

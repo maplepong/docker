@@ -420,15 +420,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'tournament_invite',
             'sender': sender,
         }))
-
-    async def invite_message(self, event):
+        
+    async def game_invite(self, event):
         sender = event['sender']
         gameId = event['gameId']
         await self.send(text_data=json.dumps({
-            'type': 'invite',
+            'type': 'game_invite',
             'sender': sender,
             'gameId': gameId
         }))
+
+    # async def invite_message(self, event):
+    #     sender = event['sender']
+    #     gameId = event['gameId']
+    #     await self.send(text_data=json.dumps({
+    #         'type': 'invite',
+    #         'sender': sender,
+    #         'gameId': gameId
+    #     }))
 
     async def update(self, event):
         sender = event['sender']

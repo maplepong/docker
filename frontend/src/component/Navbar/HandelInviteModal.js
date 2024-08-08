@@ -3,9 +3,9 @@ import myReact, { useEffect, useState } from "../../core/myReact";
 import socketController from "../../core/socket";
 import "../../css/modal.css";
 
-const HandleInviteModal = ({setShow, type}) => {
-  const showType = type === "tournament" ? "토너먼트":"게임" ;
-  const sendType = type === "tournament" ? "tournament_invite" : "game_invite" ;
+const HandleInviteModal = ({ setShow, type }) => {
+  const showType = type === "tournament" ? "토너먼트" : "게임";
+  const sendType = type === "tournament" ? "tournament_invite" : "game_invite";
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -68,7 +68,12 @@ const HandleInviteModal = ({setShow, type}) => {
           <p id={"modal-message"}>{message}</p>
         </div>
       </div>
-      <div class={"modal-background"} onclick={()=> {console.log("x");setShow()}} />
+      <div
+        class={"modal-background"}
+        onclick={() => {
+          setShow();
+        }}
+      />
     </div>
   );
 };
