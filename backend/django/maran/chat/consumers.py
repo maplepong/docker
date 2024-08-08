@@ -183,6 +183,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             elif type == 'game_invite':
                 receiver_nickname = text_data_json['receiver']
                 gameId = text_data_json['gameId']
+                message = text_data_json['message']
                 try:
                     receiver = await sync_to_async(User.objects.get)(nickname=receiver_nickname)
                     game = await sync_to_async(Game.objects.get)(id=gameId)
@@ -216,7 +217,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                         'type': 'game_invite',
                                         'sender': sender.nickname,
                                         'receiver' : receiver.nickname,
-                                        'gameId': gameId
+                                        'gameId': gameId,
+                                        'message': message
                                     }
                                 )
                     else: # 수신자가 오프라인인 경우
@@ -424,10 +426,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def game_invite(self, event):
         sender = event['sender']
         gameId = event['gameId']
+        message = event['message']
         await self.send(text_data=json.dumps({
             'type': 'game_invite',
             'sender': sender,
-            'gameId': gameId
+            'gameId': gameId,
+            'message': message
         }))
 
     # async def invite_message(self, event):
