@@ -277,7 +277,6 @@ const Tournament = () => {
             players={players}
             host={host}
           />
-          <button onClick={inviteTournament}>초대하기</button>
           <button onClick={outTournament}>나가기</button>
         </div>
       );

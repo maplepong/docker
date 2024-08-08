@@ -71,9 +71,12 @@ const Chat = () => {
     const res = await apiInstance
       .request({
         method: method,
-        url: "tournament/invite",
+        url: "tournament/handle_invite",
         data: {
           nickname: nickname,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.accessToken}`,
         },
       })
       .then((res) => {
@@ -174,6 +177,12 @@ const Chat = () => {
       myReact.redirect(`gameroom/${gameId}`);
     } else alert("방 진입에 문제가 있습니다.");
   }
+  async function enterTournament(gameId) {
+    const res = await apiTounrament.enter();
+    if (res.status === 200 || res.status === 201) {
+      myReact.redirect(`tournament-waiting`);
+    } else alert("방 진입에 문제가 있습니다.");
+  }
   useEffect(() => {
     const chat = document.getElementById("chat");
     chat.scrollTop = chat.scrollHeight;
@@ -198,35 +207,17 @@ const Chat = () => {
                 )}
                 <p class="message">{msg.message}</p>
               </div>
-              {msg.type === "game_invite" && msg.gameId ? (
+              {msg.type === "game_invite" ||
+              msg.type === "tournament_invite" ? (
                 <button
                   class="acceptBtn"
                   onclick={() => {
-                    enterGame(msg.gameId);
+                    if (msg.type === "game_invite") enterGame(msg.gameId);
+                    else enterTournament();
                   }}
                 >
                   초대 수락하기
                 </button>
-              ) : msg.type === "tournament_invite" ? (
-                //tournament invite
-                <div style={{ display: "flex" }}>
-                  <button
-                    class="acceptBtn"
-                    onclick={() => {
-                      handleTournamentInvite("post", msg.invite_sender);
-                    }}
-                  >
-                    초대 수락하기
-                  </button>
-                  <button
-                    class="cancelBtn"
-                    onclick={() => {
-                      handleTournamentInvite("delete", msg.invite_sender);
-                    }}
-                  >
-                    거절하기
-                  </button>
-                </div>
               ) : null}
             </div>
           ))}

@@ -24,11 +24,11 @@ const apiTounrament = {
           return { players: temp, status: res.status };
         }
       })
-      .catch((error) => {
+      .catch(async (error) => {
         if (error.response?.status === 409) {
-          this.out(); // 퇴장 후 엔터
+          await this.out(); // 퇴장 후 엔터
           console.log("재입장합니다");
-          return this.enter();
+          return await this.enter();
         } else throw error;
       });
   },

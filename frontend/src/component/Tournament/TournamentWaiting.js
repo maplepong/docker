@@ -1,21 +1,19 @@
 /* @jsx myReact.createElement */
 import myReact, { useEffect, useState } from "../../core/myReact.js";
-// import api from "../../Api.js";
-// import router from "../../Router.js";
-// import GameList from "../Game/GameList.js";
+import HandleInviteModal from "../Navbar/HandelInviteModal.js";
 import "../../css/tournament.css";
 
 const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
-  console.log(players);
-  console.log(host);
-
-  // const userImages = players.map(async (player) => {
-  //   const response = await api.userImages("GET", "", player);
-  //   console.log(response);
-  //   return response.image;
-  // });
-
-  // console.log(userImages);
+  let show = true;
+  useEffect(() => {
+    setShow();
+  }, []);
+  const setShow = () => {
+    const modal = document.getElementsByClassName("modalContainer")[0];
+    if (!modal) return;
+    show ? modal.classList.add("hidden") : modal.classList.remove("hidden");
+    show = !show;
+  };
   return (
     <div>
       <div>
@@ -50,6 +48,8 @@ const TournamentWaiting = ({ handleStartGame, players, host, gameStarted }) => {
           </div>
         </div>
       </div>
+      <button onClick={() => setShow()}>초대하기</button>
+      <HandleInviteModal setShow={() => setShow()} type="tournament" />
     </div>
   );
 };

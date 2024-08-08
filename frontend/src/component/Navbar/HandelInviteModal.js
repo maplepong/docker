@@ -1,12 +1,15 @@
 /* @jsx myReact.createElement */
-import myReact, { useEffect, useState } from "../../core/myReact";
+import myReact, { useEffect, useRef, useState } from "../../core/myReact";
 import socketController from "../../core/socket";
 import "../../css/modal.css";
 
 const HandleInviteModal = (props) => {
-  const showType = props.type === "tournament" ? "토너먼트" : "게임";
-  const sendType =
-    props.type === "tournament" ? "tournament_invite" : "game_invite";
+  const info = useRef({
+    showType: props.type === "tournament" ? "토너먼트" : "게임",
+    sendType: props.type === "tournament" ? "tournament_invite" : "game_invite",
+    type: props.type,
+    setShow: props.setShow,
+  });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -35,8 +38,8 @@ const HandleInviteModal = (props) => {
     <div class={`modalContainer`}>
       <div class="modal-container">
         <div class="modal-header">
-          <h3>{showType}에 초대하기</h3>
-          <button onClick={() => props.setShow()}>X</button>
+          <h3>{info.current.showType}에 초대하기</h3>
+          <button onClick={() => info.current.setShow()}>X</button>
         </div>
         <div class="modal-content">
           <input type="text" placeholder="닉네임을 입력해주세요"></input>
@@ -53,14 +56,22 @@ const HandleInviteModal = (props) => {
               }
               const receiver = target.children[0].value;
               const msg = target.children[1].value || "";
-              console.log(receiver, msg);
-              socketController.sendMessage({
-                type: sendType,
-                receiver: receiver,
-                message: msg || "",
-                gameId: window.location.pathname.split("/")[2],
-                sender: localStorage.getItem("nickname"),
-              });
+              const data =
+                props.type === "tournament"
+                  ? {
+                      type: info.current.sendType,
+                      receiver: receiver,
+                      sender: localStorage.getItem("nickname"),
+                    }
+                  : {
+                      type: info.current.sendType,
+                      receiver: receiver,
+                      message: msg || "",
+                      gameId: window.location.pathname.split("/")[2],
+                      sender: localStorage.getItem("nickname"),
+                    };
+              console.log(data);
+              socketController.sendMessage(data);
               setMessage("로딩중입니다...");
             }}
           >
@@ -72,7 +83,7 @@ const HandleInviteModal = (props) => {
       <div
         class={"modal-background"}
         onclick={() => {
-          props.setShow();
+          info.current.setShow();
         }}
       />
     </div>
