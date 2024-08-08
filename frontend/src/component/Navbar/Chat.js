@@ -9,7 +9,6 @@ import { apiInstance } from "../../core/Api.js";
 
 const Chat = () => {
   const [messages, setMessages] = myReact.useGlobalState("chat", []);
-
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
     console.log("chat data :", data);
@@ -37,7 +36,7 @@ const Chat = () => {
       },
       {
         sender: "system",
-        type: "invite",
+        type: data.type,
         gameId: data.gameId,
         message: `초대 메시지 : ${data.message}`,
       },
@@ -53,7 +52,7 @@ const Chat = () => {
       ...messages,
       {
         sender: "system",
-        type: "invite",
+        type: data.type,
         invite_sender: data.sender,
         message: `${data.sender} 님이 토너먼트에 초대하셨습니다.`,
       },
@@ -80,10 +79,13 @@ const Chat = () => {
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
-      { type: "all", func: onMessageDefault },
-      { type: "whisper", func: onMessageDefault },
-      { type: "game_invite", func: onMessageInvite },
-      { type: "tournament_invite", func: onMessageTournamentInvite },
+      { type: "all", func: (data) => onMessageDefault(data) },
+      { type: "whisper", func: (data) => onMessageDefault(data) },
+      { type: "game_invite", func: (data) => onMessageInvite(data) },
+      {
+        type: "tournament_invite",
+        func: (data) => onMessageTournamentInvite(data),
+      },
     ]);
   });
 
@@ -173,7 +175,7 @@ const Chat = () => {
                 )}
                 <p class="message">{msg.message}</p>
               </div>
-              {msg.type === "invite" && msg.gameId ? (
+              {msg.type === "game_invite" && msg.gameId ? (
                 <button
                   class="acceptBtn"
                   onclick={() => {
@@ -182,7 +184,7 @@ const Chat = () => {
                 >
                   초대 수락하기
                 </button>
-              ) : (
+              ) : msg.type === "tournament_invite" ? (
                 //tournament invite
                 <div style={{ display: "flex" }}>
                   <button
@@ -202,7 +204,7 @@ const Chat = () => {
                     거절하기
                   </button>
                 </div>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
