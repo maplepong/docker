@@ -20,6 +20,7 @@ import SingleGameRoom from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
 import TournamentResult from "../component/Tournament/TournamentResult.js";
 import TournamentGameRoom from "../component/Tournament/TournamentGameRoom.js";
+import TopNavbar from "../component/Layout/TopNavbar.js";
 
 const pathList = {
   "/": <App />,
@@ -69,7 +70,8 @@ export default function router() {
   } else {
     // myReact.render(component, "newPage"); //test develope
     myReact.render(
-      <div>
+      <div style="width: 100vw">
+        <TopNavbar />
         {component}
         <Navbar />
       </div>,
