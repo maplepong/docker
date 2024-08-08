@@ -44,7 +44,7 @@ const App = () => {
   return (
     <div class="app">
       <Link to="">
-        <img id="bg"></img>
+        <img id="logo"></img>
       </Link>
       <Login />
       {/* <button id="btn-nav-logout" onclick={() => {api.logout()}}>로그아웃</button> */}

@@ -6,19 +6,32 @@ import "../css/home.css";
 const ChooseGame = () => {
   return (
     <div id="choose-container">
-      {/* <Link to="localgame">
-        <div id="mini">
-          <span class="word">미니게임</span>
+      <div id="top-nav-container">
+      <Link to="">
+      <div id="main-logo">
+
+      <h1 id="main-title">MAPLE•PONG</h1>
+      </div>
+      </Link>
         </div>
-      </Link> */}
-      <Link to="tournament-waiting" class="word">
-        <span>토너먼트 참여</span>
-        <div id="tour"></div>
-      </Link>
-      <Link to="lobby" class="word">
-        <span>게임하기</span>
-        <div id="pong"></div>
-      </Link>
+      <div id="game-container">
+        <Link to="localgame">
+            <span class="word">미니게임</span>
+          <div id="mini">
+          </div>
+        </Link>
+        <Link to="tournament-waiting">
+            <span class="word">토너먼트 참여</span>
+          <div id="tour">
+          </div>
+        </Link>
+        <Link to="lobby">
+          <span class="word">게임하기</span>
+          <div id="pong">
+
+          </div>
+        </Link>
+      </div>
     </div>
   );
 };
