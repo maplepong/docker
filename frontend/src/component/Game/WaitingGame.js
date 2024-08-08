@@ -1,9 +1,19 @@
 /* @jsx myReact.createElement */
-import myReact, { useState } from "../../core/myReact.js";
+import myReact, { useEffect } from "../../core/myReact.js";
 import HandleInviteModal from "../Navbar/HandelInviteModal.js";
 
-const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite }) => {
-  const [showState, setShowState] = useState(false);
+const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
+  let show = false;
+  useEffect(() => {
+    setShow();
+  }, []);
+  const setShow = () => {
+    const modal = document.getElementsByClassName("modalContainer")[0];
+    // const bg = document.getElementsByClassName("modal-background")[0];
+    if (!modal) return;
+    modal.classList.toggle("hidden");
+    // modal.classList.toggle("hidden");
+  };
   return (
     <div class="bg">
       <div class="room">
@@ -41,18 +51,10 @@ const WaitingGame = ({ gameInfo, startGame, exitGame, sendGameInvite }) => {
                     type="button"
                     class="invbtn"
                     onclick={() => {
-                      showState = showState ? false : true;
-                      setShowState(showState);
-                      console.log(showState);
-                    }}
+                      setShow();}}
                   ></input>
                   <HandleInviteModal
-                    show={showState}
-                    setShow={() => {
-                      showState = showState ? false : true;
-                      setShowState(showState);
-                      console.log(showState);
-                    }}
+                    setShow={setShow}
                     type="game"
                   />
                 </div>
