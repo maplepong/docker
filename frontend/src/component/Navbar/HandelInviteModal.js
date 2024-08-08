@@ -3,9 +3,10 @@ import myReact, { useEffect, useState } from "../../core/myReact";
 import socketController from "../../core/socket";
 import "../../css/modal.css";
 
-const HandleInviteModal = ({ setShow, type }) => {
-  const showType = type === "tournament" ? "토너먼트" : "게임";
-  const sendType = type === "tournament" ? "tournament_invite" : "game_invite";
+const HandleInviteModal = (props) => {
+  const showType = props.type === "tournament" ? "토너먼트" : "게임";
+  const sendType =
+    props.type === "tournament" ? "tournament_invite" : "game_invite";
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const HandleInviteModal = ({ setShow, type }) => {
       <div class="modal-container">
         <div class="modal-header">
           <h3>{showType}에 초대하기</h3>
-          <button onClick={setShow}>X</button>
+          <button onClick={() => props.setShow()}>X</button>
         </div>
         <div class="modal-content">
           <input type="text" placeholder="닉네임을 입력해주세요"></input>
@@ -71,7 +72,7 @@ const HandleInviteModal = ({ setShow, type }) => {
       <div
         class={"modal-background"}
         onclick={() => {
-          setShow();
+          props.setShow();
         }}
       />
     </div>

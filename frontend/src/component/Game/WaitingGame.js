@@ -4,16 +4,13 @@ import HandleInviteModal from "../Navbar/HandelInviteModal.js";
 import "../../css/match.css";
 
 const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
-  let show = false;
   useEffect(() => {
     setShow();
   }, []);
   const setShow = () => {
     const modal = document.getElementsByClassName("modalContainer")[0];
-    // const bg = document.getElementsByClassName("modal-background")[0];
     if (!modal) return;
     modal.classList.toggle("hidden");
-    // modal.classList.toggle("hidden");
   };
   return (
     <div class="bg">
@@ -55,7 +52,7 @@ const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
                       setShow();
                     }}
                   ></input>
-                  <HandleInviteModal setShow={setShow} type="game" />
+                  <HandleInviteModal setShow={() => setShow()} type="game" />
                 </div>
               ) : (
                 <span>아무거또 모태</span>
