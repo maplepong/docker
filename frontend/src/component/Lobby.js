@@ -19,7 +19,7 @@ const Lobby = (props) => {
     //test
     current_players_num: 2,
     id: 1234,
-    name: "로딩 중입니다...",
+    name: "방 없음...",
     owner: "test",
     password: "asdjfoierfaofaf",
     players: ["pl1", "pl2"],

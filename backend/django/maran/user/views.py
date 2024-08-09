@@ -300,3 +300,34 @@ def game_record(request):
         })
 
     return JsonResponse({'game_records': record_list}, status=status.HTTP_200_OK)
+
+from collections import Counter
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JWTAuthentication,))
+def rival(request):
+    user = request.user
+    
+    # 최근 20게임 가져오기
+    recent_games = user.game_history.all().order_by('-id')[:20]
+    
+    # 게임이 없는 경우 처리
+    if not recent_games:
+        return JsonResponse({'detail': 'No recent games found'}, status=200)
+    
+    # 각 게임에서 상대방 추출
+    opponents = [game.opponent for game in recent_games]
+    
+    # 상대방 출현 빈도 계산
+    opponent_counts = Counter(opponents)
+    
+    # 가장 많이 게임한 상대방 찾기
+    rival_nickname, games_played_together = opponent_counts.most_common(1)[0]
+    
+    # 라이벌 정보를 응답으로 반환
+    rival_info = {
+        'nickname': rival_nickname,
+        'games_played_together': games_played_together
+    }
+    
+    return JsonResponse(rival_info)
