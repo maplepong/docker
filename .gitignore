@@ -5,3 +5,5 @@ anima*
 frontend/dist
 *frontend/dist
 *frontend/dist/*
+my_certificate.crt
+my_certificate.crt

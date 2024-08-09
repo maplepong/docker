@@ -1,15 +1,19 @@
 /* @jsx myReact.createElement */
 import myReact from "../../core/myReact.js";
+import "../../css/tournament/tournament_schedule.css"
 
 const TournamentSchedule = ({ braket, status, startGame }) => {
+  console.log(braket);
   return (
-    <div>
-      <h1> Tournament Schedule </h1>
-      <p>braket : {braket}</p>
-      <p>status : {status}</p>
-      <button onclick={startGame}>게임시작</button>
-      <button onclick={startGame}>게임시작</button>
+  <div className="tournament-schedule-container">
+    <h1 className="schedule-title">Tournament Schedule</h1>
+    <p className="schedule-detail">브래킷: {bracket}</p>
+    <p className="schedule-detail">상태: {status}</p>
+    <div className="button-container">
+      <button className="start-button" onClick={startGame}>게임 시작</button>
+      <button className="start-button" onClick={startGame}>게임 시작</button>
     </div>
+  </div>
   );
 };
 
