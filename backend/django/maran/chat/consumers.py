@@ -297,12 +297,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             elif type == 'tournament_host_change':
                 tournament = await sync_to_async(Tournament.objects.first)()
                 if tournament:
-                    new_host = tournament.host
+                    new_host = await sync_to_async(lambda: tournament.host.nickname)()
                 await self.channel_layer.group_send(
                     'tournament_group',
                     {
                         'type': 'tournament_host_change',
-                        'new_host': new_host.nickname
+                        'new_host': new_host
                     }
                 )
             elif type == 'tournament_start':

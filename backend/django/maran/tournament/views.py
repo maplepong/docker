@@ -356,7 +356,8 @@ def out_tournament(request):
         if tournament.participants.count() != 0:
             tournament.host = tournament.participants.all()[0]
             tournament.save()
-            return JsonResponse({'message': 'Tournament host changed.'}, status=status.HTTP_200_OK)
+            print("방장 변경", tournament.host.nickname)
+            return JsonResponse({'message': 'Tournament host changed.'}, status=status.HTTP_202_ACCEPTED)
         else:
             tournament.delete()
             return JsonResponse({'message': 'Tournament room deleted.'}, status=status.HTTP_200_OK)
