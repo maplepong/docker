@@ -35,8 +35,9 @@ const SocketController = () => {
     // 메시지를 보내는 함수
     // 무조건 타입 필요
     sendMessage: function sendMessage({ type, ...rest }) {
+      if (!this._ws.current || this._ws.current.readyState !== WebSocket.OPEN)
+        this.initSocket();
       if (this._ws.current && this._ws.current.readyState === WebSocket.OPEN) {
-        // console.log("sending data", type, ...rest);
         if (!type) return console.error("type이 없습니다.");
         const data = {
           type: type,
@@ -79,7 +80,8 @@ const SocketController = () => {
       };
       this._ws.current.onmessage = (e) => this._getMessage(e);
       this._ws.current.onclose = () => {
-        console.error("전체 웹소켓 연결이 중지되었습니다.");
+        document.onvisibilitychange = null;
+        document.onpopstate = null;
         this._ws.current = null;
       };
       this.addEvent();
