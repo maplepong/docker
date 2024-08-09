@@ -2,6 +2,7 @@
 import myReact, { useEffect, Link } from "../../core/myReact.js";
 import apiTounrament from "../../core/ApiTournament.js";
 import socketController from "../../core/socket.js";
+import "../../css/tournament/tournament_result.css"
 
 const TournamentResult = () => {
   const [gameResult, setGameResult] = myReact.useGlobalState(
@@ -30,16 +31,32 @@ const TournamentResult = () => {
   });
 
   return (
-    <div id="tournament-result-container">
-      <div id="tournament-result">
-        <p>id: {gameResult.game_id}</p>
-        <p>winner: {gameResult.winner}</p>
-        <p>loser: {gameResult.loser}</p>
-        <p>status: {gameResult.isUserWin ? "이김" : "짐"}</p>
-        <p>{`${gameResult.winner_score} : ${gameResult.loser_score}`}</p>
-        <Link to="home">돌아가기</Link>
+  <div id="tournament-result-container">
+    <div id="tournament-result">
+      <p className="result-title">Tournament 결과</p>
+      <div className="result-item">
+        <span className="result-label">ID:</span>
+        <span className="result-value">{gameResult.game_id}</span>
       </div>
+      <div className="result-item">
+        <span className="result-label">Winner:</span>
+        <span className="result-value">{gameResult.winner}</span>
+      </div>
+      <div className="result-item">
+        <span className="result-label">Loser:</span>
+        <span className="result-value">{gameResult.loser}</span>
+      </div>
+      <div className="result-item">
+        <span className="result-label">Status:</span>
+        <span className="result-value">{gameResult.isUserWin ? "이김" : "짐"}</span>
+      </div>
+      <div className="result-score">
+        <span>{`${gameResult.winner_score} : ${gameResult.loser_score}`}</span>
+      </div>
+      <Link className="back-link" to="home">돌아가기</Link>
     </div>
+  </div>
+
   );
 };
 

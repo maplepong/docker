@@ -44,6 +44,7 @@ const Navbar = () => {
       friendList[friend.nickname] = {
         nickname: friend.nickname,
         status: friend.status === "on" ? true : false,
+        image: "asset/user/default-user.png"
       };
     });
 
@@ -77,14 +78,16 @@ const Navbar = () => {
           temp[req.nickname] = {
             nickname: req.nickname,
             status: friendList[req.nickname]
-              ? friendList[req.nickname].status
-              : false,
+            ? friendList[req.nickname].status
+            : false,
           };
         });
         friendsCount.current = friends.length;
         setFriendList(temp);
+        console.log("friendList", temp)
       }
-      setFriendRequests(friendRequests);
+      console.log("friendrEquest", friendRequests)
+      setFriendRequests({sends: friendRequests.sends || [], recieves: friendRequests.receives});
       setData(response);
     }
   }, []);

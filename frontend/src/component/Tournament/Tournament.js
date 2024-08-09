@@ -18,7 +18,7 @@ const Tournament = () => {
 
   const maxPlayers = 4;
   const gameId = useRef(null);
-  const [bracket, setBracket] = useState([]);
+  const bracket = useRef([]);
 
   const [gameResult, setGameResult] = myReact.useGlobalState(
     "gameResult",
@@ -99,7 +99,8 @@ const Tournament = () => {
       .then((res) => {
         console.log(res.data);
         gameId.current = res.data.myGameid;
-        setBracket(res.data.bracket);
+        bracket.current = res.data.bracket;
+        console.log("bracket", bracket);
         setTournamentStatus(status.STARTED);
       })
       .catch((err) => {
@@ -147,7 +148,7 @@ const Tournament = () => {
     setTournamentStatus(status.LOADING);
     setPlayers([]);
     setHost("");
-    setBracket([]);
+    bracket.current = [];
     if (type === "tournament_end") {
       alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
     } else {
@@ -167,7 +168,7 @@ const Tournament = () => {
           console.log(err);
         });
 
-      myReact.redirect("home");
+      setTimeout(myReact.redirect("home"), 3000);
     }
   };
 
@@ -299,7 +300,7 @@ const Tournament = () => {
     case status.BETWEEN_ROUND: {
       return (
         <TournamentSchedule
-          bracket={bracket}
+          bracket={bracket.current}
           status={statusMessage || "4강 대기중"}
           startGame={startGame}
         />

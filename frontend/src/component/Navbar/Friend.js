@@ -3,11 +3,18 @@ import myReact, { useEffect } from "../../core/myReact.js";
 import "../../css/friend.css";
 import api from "../../core/Api.js";
 
+const status = {
+  on : "접속중",
+  off : "부재중",
+  sending : "친구요청중",
+  request : "친구해주세요",
+}
+
 const Friend = ({type, nickname, status}) => {
   console.log("Friend", type, nickname);
   const [imagesrc, setImagesrc] = myReact.useGlobalState(nickname+"image", "asset/user/default-user.png");
-  useEffect(() => {
-    api.userImage("GET", null, nickname).then((res) => {
+  useEffect(async() => {
+    await api.userImage("GET", null, nickname).then((res) => {
       console.log("getProfileImage", res.image);
       setImagesrc(res.image);
   }).catch((err) => {
