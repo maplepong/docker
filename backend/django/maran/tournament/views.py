@@ -23,6 +23,8 @@ def new_tournament(request):
     # Tournament 테이블에 데이터가 존재하는지 확인
     if Tournament.objects.exists():
         tournament = Tournament.objects.first()
+        if tournament.is_active:
+            return JsonResponse({'error': 'Tournament is already in progress.'}, status=status.HTTP_400_BAD_REQUEST)
         if tournament.participants.count() >= 4:
             return JsonResponse({'error': 'Tournament room is full.'}, status=status.HTTP_400_BAD_REQUEST)
         if tournament.participants.filter(id=user.id).exists():
@@ -351,9 +353,9 @@ def out_tournament(request):
 
     # 만약 방에서 나간 사용자가 방장이었다면, 방장은 다음 참가자로 변경
     if tournament.host == user:
-        remaining_participants = tournament.participants.all()
-        if remaining_participants.exists():
-            tournament.host = remaining_participants.first()
+        if tournament.participants.count() != 0:
+            tournament.host = tournament.participants.all()[0]
+            tournament.save()
             return JsonResponse({'message': 'Tournament host changed.'}, status=status.HTTP_200_OK)
         else:
             tournament.delete()
