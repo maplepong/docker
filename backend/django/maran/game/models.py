@@ -6,7 +6,7 @@ class Game(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(unique=True, max_length=30)
     creator = models.ForeignKey(
-        User, related_name="games_created", on_delete=models.CASCADE
+        User, related_name="games_created", on_delete=models.CASCADE, null=True, blank=True
     )
     players = models.ManyToManyField(User, related_name="games_joined")
     password = models.CharField(max_length=30, blank=True, null=True)

@@ -307,7 +307,7 @@ def end_semifinal(request):
     tournament.save()
     
     if tournament.end_game_count < 2:
-        final_game = Game.objects.create(name="final_game", creator= winner, status=0)
+        final_game = Game.objects.create(name="final_game", creator=winner, status=0)
         # final_game.players.add(winner)
         tournament.final_game_id = final_game
         tournament.save()
