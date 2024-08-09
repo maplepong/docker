@@ -37,7 +37,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         ballDirection.x = -ballDirection.x;
         sendGameState();
       } else {
-        updateScore(1, 0);
+        updateScore(0, 1);
         sendGameState();
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
@@ -59,7 +59,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         ballDirection.x = -ballDirection.x;
         sendGameState();
       } else {
-        updateScore(0, 1);
+        updateScore(1, 0);
         sendGameState();
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
@@ -236,10 +236,10 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      if (uscore && !isowner) {
-        userscore.current = uscore.y;
-        enemyscore.current = uscore.x;
-      }
+      // if (uscore && !isowner) {
+      //   userscore.current = uscore.y;
+      //   enemyscore.current = uscore.x;
+      // }
     }
   }
 
