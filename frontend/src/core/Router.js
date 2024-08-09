@@ -12,13 +12,12 @@ import UserInfoPage from "../component/UserInfoPage.js";
 import ApiLogin from "../component/ApiLogin.js";
 import SignUp from "../component/SignUp.js";
 import ApiSignUp from "../component/ApiSignUp.js";
-import Game from "../component/Game/PlayingGame.js";
 import Navbar from "../component/Navbar/Navbar.js";
 import Test from "../component/Test";
 import ApiTest from "../component/ApiTest";
 import Lobby from "../component/Lobby.js";
 import GameRoom from "../component/Game/GameRoom.js";
-import PingPong from "../component/Game/PlayingGame.js";
+import PingPong from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
 import '../css/common.css';
 
@@ -33,12 +32,11 @@ const pathList = {
   "api-test": <ApiTest />,
   signup: <SignUp />,
   "api-signup": <ApiSignUp />,
-  gameroom: <Game />,
+  gameroom: <GameRoom />,
   welcome: <Welcome />,
   lobby: <Lobby />,
   test: <Test />,
-  lobby: <Lobby />,
-  pingpong: <PingPong />,
+  localgame: <PingPong />,
   tournament: <Tournament />,
 };
 
