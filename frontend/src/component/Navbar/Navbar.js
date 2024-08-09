@@ -1,7 +1,5 @@
 /* @jsx myReact.createElement */
 import myReact, {
-  Link,
-  useState,
   useEffect,
   useRef,
 } from "../../core/myReact.js";
@@ -92,16 +90,6 @@ const Navbar = () => {
     }
   }, []);
 
-  // if (
-  //   friendsCount !== Object.keys(friendList).length &&
-  //   socketController.isConnected()
-  // ) {
-  //   socketController.sendMessage({ type: "connect" });
-  //   console.log("connect sended");
-  // }
-
-  // console.log("friendsCount ", friendsCount);
-
   const refreshFriend = () => {
     socketController.sendMessage({ type: "connect" });
     console.log("connect sended");
@@ -115,9 +103,7 @@ const Navbar = () => {
         friendRequests={friendRequests}
         refresh={refreshFriend}
       />
-      <div style="flex-direction: column; margin: 5px;">
         <UserStatus data={data} />
-      </div>
     </nav>
   );
 };
