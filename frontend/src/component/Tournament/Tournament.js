@@ -60,7 +60,7 @@ const Tournament = () => {
       {
         type: "tournament_host_change",
         func: function (data) {
-          onGameEnd(data);
+          onHostChange(data);
         },
       },
     ]);
@@ -100,7 +100,7 @@ const Tournament = () => {
         console.log(res.data);
         gameId.current = res.data.myGameid;
         bracket.current = res.data.bracket;
-        console.log("bracket", bracket)
+        console.log("bracket", bracket);
         setTournamentStatus(status.STARTED);
       })
       .catch((err) => {
@@ -144,7 +144,7 @@ const Tournament = () => {
   console.log("players", players);
   console.log("host", host);
 
-  const outTournament = (type) => {
+  const outTournament = async (type) => {
     setTournamentStatus(status.LOADING);
     setPlayers([]);
     setHost("");
@@ -152,10 +152,24 @@ const Tournament = () => {
     if (type === "tournament_end") {
       alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
     } else {
-      apiTounrament.out();
-      socketController.sendMessage({ type: "tournament_out" });
+      await apiTounrament
+        .out()
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            socketController.sendMessage({ type: "tournament_out" });
+          } else if (res.status === 202) {
+            console.log("dfajskl");
+            socketController.sendMessage({ type: "tournament_host_change" });
+            socketController.sendMessage({ type: "tournament_out" });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      setTimeout(myReact.redirect("home"), 3000);
     }
-    setTimeout(myReact.redirect("home"), 3000);
   };
 
   // const onSemifinalEnd = async (data) => {
