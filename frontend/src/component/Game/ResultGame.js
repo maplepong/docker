@@ -15,9 +15,7 @@ const ResultGame = (gameResult) => {
       <p>게임이 종료되었습니다.</p>
       <p>winner:{gameResult.gameResult.winner}</p>
       <p>loser:{gameResult.gameResult.loser}</p>
-      <Link to="lobby">
-        <button>로비로 이동</button>
-      </Link>
+        <button onclick={() => myReact.redirect("lobby")}>로비로 이동</button>
     </div>
   );
 };
