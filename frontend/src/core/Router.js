@@ -20,7 +20,7 @@ import SingleGameRoom from "../component/Game/PlayingGameSingle.js";
 import Tournament from "../component/Tournament/Tournament.js";
 import TournamentResult from "../component/Tournament/TournamentResult.js";
 import TournamentGameRoom from "../component/Tournament/TournamentGameRoom.js";
-import TopNavbar from "../component/Layout/TopNavbar.js";
+import TopNavbar from "../component/Navbar/TopNavbar.js";
 
 const pathList = {
   "/": <App />,

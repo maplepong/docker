@@ -141,6 +141,31 @@ input {
   -webkit-text-stroke: 2px black;
 }
 
+button {
+  width: max-content;
+  height: max-content;
+  padding: 0.3rem 0.3rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 2px solid #333;
+  background: var(--Style, linear-gradient(180deg, #4f8000 0%, #a2d058 100%));
+  box-shadow: 0px 4px 4px 0px rgba(255, 255, 255, 0.25) inset,
+    -1px -4px 3px 0px rgba(0, 0, 0, 0.47) inset;
+  color: #fff;
+  text-align: right;
+  -webkit-text-stroke-width: 2;
+  -webkit-text-stroke-color: #406208;
+  text-shadow: 0px 4px 4px rgb(3, 81, 11);
+  font-family: Ramche;
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
 /* 42 Seoul API 로그인 및 회원가입 버튼 스타일 */
 button.api-login,
 button.signup {

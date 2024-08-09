@@ -114,26 +114,6 @@ const Navbar = () => {
       />
       <div style="flex-direction: column; margin: 5px;">
         <UserStatus data={data} />
-        <div style="display: flex;">
-          <button
-            id="btn-nav-logout"
-            style="margin: 5px;"
-            onclick={() => {
-              api.logout();
-            }}
-          >
-            로그아웃
-          </button>
-          <Link to="myinfo">
-            <button style="margin: 5px;">정보</button>
-          </Link>
-          <Link to="setting">
-            <button style="margin: 5px;">설정</button>
-          </Link>
-          <Link to="home">
-            <button style="margin: 5px;">home</button>
-          </Link>
-        </div>
       </div>
     </nav>
   );
