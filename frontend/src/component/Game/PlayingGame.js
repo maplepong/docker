@@ -37,7 +37,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         ballDirection.x = -ballDirection.x;
         sendGameState();
       } else {
-        updateScore(1, 0);
+        updateScore(0, 1);
         sendGameState();
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
@@ -59,8 +59,14 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         ballDirection.x = -ballDirection.x;
         sendGameState();
       } else {
-        updateScore(0, 1);
+        updateScore(1, 0);
         sendGameState();
+        console.log(
+          "userscore :",
+          userscore.current,
+          "enemyscore :",
+          enemyscore.current
+        );
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
@@ -209,7 +215,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           nickname: localStorage.getItem("nickname"),
         });
         console.log("gameSocket closed");
-        setStatus(3); //변경 필요
+        setStatus(status.finished); //변경 필요
       };
       animate();
       return () => {
@@ -236,10 +242,16 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      // if (uscore && !isowner) {
-      //   userscore.current = uscore.y;
-      //   enemyscore.current = uscore.x;
-      // }
+      if (uscore) {
+        userscore.current = uscore.y;
+        enemyscore.current = uscore.x;
+        drawText(
+          userscore.current.toString() + " : " + enemyscore.current.toString(),
+          -0.3,
+          0,
+          0x0000ff
+        );
+      }
     }
   }
 
@@ -267,7 +279,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     //스코어 업데이트
     userscore.current += leftAdd;
     enemyscore.current += rightAdd;
-    //sendGameState();
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
       gameSocket.current ? gameSocket.current.close() : null;
