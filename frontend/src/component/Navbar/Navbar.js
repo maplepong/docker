@@ -1,8 +1,5 @@
 /* @jsx myReact.createElement */
-import myReact, {
-  useEffect,
-  useRef,
-} from "../../core/myReact.js";
+import myReact, { useEffect, useRef } from "../../core/myReact.js";
 import Chat from "./Chat.js";
 import api from "../../core/Api.js";
 import UserStatus from "./UserStatus.js";
@@ -33,21 +30,35 @@ const Navbar = () => {
 
   const [friendList, setFriendList] = myReact.useGlobalState("friendList", {});
 
-  const onConnect = (data) => {
+  const parseDataToFriendList = (data) => {
+    if (!data || !data.friends || !data.friends.length) return;
+    data.friends.forEach((friend) => {
+      friendList[friend.nickname] = {
+        nickname: friend.nickname,
+        status: friend.status === true ? "on" : "off",
+        image:
+          friendList[friend.nickname]?.image || "asset/user/default-user.png",
+      };
+      friendsCount.current = friendList.length;
+      setFriendList(friendList);
+    });
+  };
+
+  const parseDataToFriendRequests = (data) => {
+    setFriendRequests({
+      sends: data.sends || [],
+      recieves: data.receives || [],
+    });
+  };
+  const onConnect = async (data) => {
+    const newRequests = await api.getRequestFriendList();
+    parseDataToFriendRequests(newRequests);
+
     console.log("ws connnected data :", data.friends);
     if (!data.friends || data.friends.length === 0) {
       return;
     }
-    data.friends.forEach((friend) => {
-      friendList[friend.nickname] = {
-        nickname: friend.nickname,
-        status: friend.status === "on" ? true : false,
-        image: "asset/user/default-user.png"
-      };
-    });
-
-    friendsCount.current = data.friends.length;
-    setFriendList(data.friends);
+    parseDataToFriendList(data);
   };
   const onUpdate = (data) => {
     console.log("ws update data :", data);
@@ -72,20 +83,25 @@ const Navbar = () => {
       const friends = await api.getFriendList();
       if (friends.length != 0) {
         const temp = {};
-        friends.forEach((req) => {
+        friends.forEach(async (req) => {
           temp[req.nickname] = {
             nickname: req.nickname,
             status: friendList[req.nickname]
-            ? friendList[req.nickname].status
-            : false,
+              ? friendList[req.nickname].status
+              : false,
           };
+          temp[req.nickname].image = await api.userImage(
+            "GET",
+            "",
+            req.nickname
+          );
         });
         friendsCount.current = friends.length;
-        setFriendList(temp);
-        console.log("friendList", temp)
+        parseDataToFriendList(friends);
+        console.log("friendList", temp);
       }
-      console.log("friendrEquest", friendRequests)
-      setFriendRequests({sends: friendRequests.sends || [], recieves: friendRequests.receives});
+      console.log("friendrEquest", friendRequests);
+      parseDataToFriendRequests(friendRequests);
       setData(response);
     }
   }, []);
@@ -103,7 +119,7 @@ const Navbar = () => {
         friendRequests={friendRequests}
         refresh={refreshFriend}
       />
-        <UserStatus data={data} />
+      <UserStatus data={data} />
     </nav>
   );
 };
