@@ -209,7 +209,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           nickname: localStorage.getItem("nickname"),
         });
         console.log("gameSocket closed");
-        setStatus(3); //변경 필요
+        setStatus(status.finished); //변경 필요
       };
       animate();
       return () => {
