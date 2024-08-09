@@ -467,7 +467,46 @@ const api = {
   userImage(type, src, nickname) {
     setToken();
     if (nickname) {
+      if (type === "POST") {
+        if (!src) {
+          console.error("api image post:: no image provided");
+          return false;
+        }
+        const formData = new FormData();
+        formData.append("image", src);
+        return apiInstance
+          .request({
+            method: type,
+            url: "user/image/" + nickname,
+            data: formData,
+            headers: {
+              //develope
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            console.log("사진을 올렸다");
+            return response;
+          })
+          .catch((error) => {
+            console.log("사진을 올리지 못했다...");
+            return error;
+          });
+      }
       if (type !== "GET") return Error("권한을 벗어난 요청입니다.");
+      return apiInstance
+        .request({
+          method: type,
+          url: "user/image",
+        })
+        .then((response) => {
+          console.log("사진을 " + type + " 했다");
+          return response.data;
+        })
+        .catch((error) => {
+          console.log("사진을 " + type + " 하지 못했다...");
+          return error;
+        });
       return apiInstance
         .request({
           method: type,
@@ -482,45 +521,6 @@ const api = {
           return error;
         });
     }
-    if (type === "POST") {
-      if (!src) {
-        console.error("api image post:: no image provided");
-        return false;
-      }
-      const formData = new FormData();
-      formData.append("image", src);
-      return apiInstance
-        .request({
-          method: type,
-          url: "user/image",
-          data: formData,
-          headers: {
-            //develope
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          console.log("사진을 올렸다");
-          return response;
-        })
-        .catch((error) => {
-          console.log("사진을 올리지 못했다...");
-          return error;
-        });
-    }
-    return apiInstance
-      .request({
-        method: type,
-        url: "user/image",
-      })
-      .then((response) => {
-        console.log("사진을 " + type + " 했다");
-        return response.data;
-      })
-      .catch((error) => {
-        console.log("사진을 " + type + " 하지 못했다...");
-        return error;
-      });
   },
   inviteToGame(roomId, nickname) {
     return apiInstance
