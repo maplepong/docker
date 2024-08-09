@@ -22,14 +22,14 @@ const FriendList = (props) => {
         friendRequests.receives &&
         friendRequests.receives.length > 0
           ? friendRequests.receives.map((req) => (
-              <Friend nickname={req.from_user} type="request_receive" />
+              <Friend nickname={req.from_user} type="request_receive" status="request"/>
             ))
           : null}
         {friendRequests &&
         friendRequests.sends &&
         friendRequests.sends.length > 0
           ? friendRequests.sends.map((req) => (
-              <Friend nickname={req.from_user} type="request_send" />
+              <Friend nickname={req.from_user} type="request_send" status="send"/>
             ))
           : null}
         {friendList && friendList.length > 0
