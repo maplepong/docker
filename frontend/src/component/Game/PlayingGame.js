@@ -61,6 +61,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       } else {
         updateScore(1, 0);
         sendGameState();
+        console.log("userscore :" ,userscore.current, "enemyscore :", enemyscore.current);
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
@@ -236,10 +237,16 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       if (paddle) {
         aiPaddle.position.y = paddle.y;
       }
-      // if (uscore && !isowner) {
-      //   userscore.current = uscore.y;
-      //   enemyscore.current = uscore.x;
-      // }
+      if (uscore) {
+        userscore.current = uscore.y;
+        enemyscore.current = uscore.x;
+        drawText(
+          userscore.current.toString() + " : " + enemyscore.current.toString(),
+          -0.3,
+          0,
+          0x0000ff
+        );
+      }
     }
   }
 
@@ -267,7 +274,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
     //스코어 업데이트
     userscore.current += leftAdd;
     enemyscore.current += rightAdd;
-    //sendGameState();
     if (userscore.current < 3 && enemyscore.current < 3) resetBall();
     else {
       gameSocket.current ? gameSocket.current.close() : null;
