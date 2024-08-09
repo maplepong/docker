@@ -33,14 +33,10 @@ const apiTounrament = {
       });
   },
   out: async () => {
-    return await apiInstance
-      .request({ method: "DELETE", url: "tournament/out_tournament" })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    return await apiInstance.request({
+      method: "DELETE",
+      url: "tournament/out_tournament",
+    });
   },
   start_semifianl: async function () {
     return await apiInstance
