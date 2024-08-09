@@ -151,8 +151,8 @@ const Tournament = () => {
     if (type === "tournament_end") {
       alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
     } else {
-      socketController.sendMessage({ type: "tournament_out" });
       apiTounrament.out();
+      socketController.sendMessage({ type: "tournament_out" });
     }
     myReact.redirect("home");
   };
