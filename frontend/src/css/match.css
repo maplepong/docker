@@ -1,7 +1,7 @@
 #matchbox
 {
 	background-color: rgb(0,0,0,0.8);
-    width: 700px;
+    width: 900px;
     height: 100%;
     margin: 10px;
     text-align: center;
@@ -11,7 +11,7 @@
 
 #infobox
 {
-    margin: 5px;
+    margin: 0 auto;
     width: 50%;
 }
 
@@ -26,4 +26,19 @@
     color:gray;
     padding:10px;
     border-radius: 10px;
+}
+
+#Matcha
+{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    margin: 20px;
+}
+
+#Records
+{
+    display: flex;
+    margin: 10px;
+    justify-content: space-between;
 }

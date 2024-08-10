@@ -4,11 +4,13 @@ import api from "../../core/Api";
 
 const ResultGame = (gameResult) => {
   useEffect(async () => {
-    await api.sendGameResult(gameResult).catch((err) => {
-      alert(err);
-    });
+    if (gameResult.gameResult.isUserWin == true) {
+        await api.sendGameResult(gameResult).catch((err) => {
+          alert(err);
+        });
+      console.log("gameResult Send:" ,gameResult.gameResult);
+    }
   });
-  console.log(gameResult.gameResult);
 
   return (
     <div>

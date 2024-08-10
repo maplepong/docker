@@ -85,6 +85,7 @@ const UserInfo = (props) => {
 		const post = await api.userImage("POST", FILE, data.nickname)
 		// console.log("post", post.data.image);
 		setData({...data, image : data.image});
+        
 	}
 
 	return (
@@ -213,7 +214,7 @@ const UserInfo = (props) => {
 					</ul>
 				</div>
 			</div>
-			<Matchhistory data={data}/>
+            <Matchhistory data={data.image} />
 		</div>
 	)
 }
