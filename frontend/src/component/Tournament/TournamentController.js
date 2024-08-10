@@ -34,11 +34,10 @@ const createTournament = () => {
           .then((res) => {
             console.log(res);
             if (res.status === 200) {
-              this.sc.sendMessage({ type: "tournament_out" });
+              socketController.sendMessage({ type: "tournament_out" });
             } else if (res.status === 202) {
-              console.log("dfajskl");
-              this.sc.sendMessage({ type: "tournament_host_change" });
-              this.sc.sendMessage({ type: "tournament_out" });
+              socketController.sendMessage({ type: "tournament_host_change" });
+              socketController.sendMessage({ type: "tournament_out" });
             }
           })
           .catch((err) => {
@@ -49,9 +48,11 @@ const createTournament = () => {
       }
     },
     nextStatus: function () {
+      console.log("nextStatus", this._status, status);
       switch (this._status) {
         case status.LOADING: {
           myReact.redirect("tournament/loading");
+          break;
         }
         case status.READY: {
           myReact.redirect("tournament/waiting");

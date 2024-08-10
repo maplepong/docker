@@ -72,6 +72,19 @@ const TournamentWaiting = () => {
     console.log("Host changed to:", data.new_host);
     setHost(data.new_host);
   };
+  const onTournamentStart = async (data) => {
+    await apiInstance
+      .get("tournament/get_bracket")
+      .then((res) => {
+        console.log(res.data);
+        tc.setInfo({ bracket: res.data.bracket, gameId: res.data.myGameid });
+        tc.nextStatus();
+      })
+      .catch((err) => {
+        alert(err);
+        outTournament();
+      });
+  };
 
   const confirmTournament = async () => {
     const currentUser = localStorage.getItem("nickname");
@@ -112,13 +125,13 @@ const TournamentWaiting = () => {
           <div class="tournament-details">
             <div>주최자: {host}</div>
             <div>최대 인원: 4명</div>
-            {host && host === localStorage.getItem("nickcname") && (
+            {/* {host && host === localStorage.getItem("nickcname") && ( */}
               <div class="start-button-container">
                 <button class="start-button" onClick={confirmTournament}>
                   시작하기
                 </button>
               </div>
-            )}
+           
           </div>
         </div>
       </div>

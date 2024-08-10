@@ -13,14 +13,10 @@ const TournamentLoading = () => {
       if (data.status !== 208) {
         socketController.sendMessage({ type: "tournament_in" });
       }
-      if (data.status === 201) {
-        host = localStorage.getItem("nickname");
-        players = [localStorage.getItem("nickname")];
-      } else {
         host = data.host;
         players = data.players;
-      }
       tc.setInfo({ host, players });
+      console.log("host sata", data);
       tc.nextStatus();
     } catch (err) {
       alert(err);
