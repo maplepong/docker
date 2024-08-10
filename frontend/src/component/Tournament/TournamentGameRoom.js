@@ -140,13 +140,28 @@ const TournamentGameRoom = () => {
           if (gameInfo.players.length === 2) return; // 이미 2명이 들어와있으면 무시
           console.log("game_ready");
           console.log("data.player_info : ", data.player_info);
-          setGameInfo({
-            ...gameInfo,
-            isGameReady: true,
-            players: gameInfo.players.push(data.player_info),
-            opponent: data.player_info.nickname,
-          });
-        } else if (data.type === "game_start") {
+          if (gameInfo.owner === data.player_info.nickname) {
+            setGameInfo({
+              ...gameInfo,
+              isGameReady: true,
+              players: gameInfo.players.push(data.player_info),
+              owner_info: data.player_info,
+              opponent: data.player_info.nickname,
+            });
+
+            console.log("opponent : ", data.opponent);
+          } else if (gameInfo.owner !== data.player_info.nickname) {
+            setGameInfo({
+              ...gameInfo,
+              isGameReady: true,
+              players: gameInfo.players.push(data.player_info),
+              opponent: data.player_info.nickname,
+              player_info: data.player_info
+            });
+            console.log("opponent : ", data.opponent);
+          }
+        }
+        else if (data.type === "game_start") {
           console.log("game_start");
           setGameStatus(status.playing);
         } else if (data.type === "client_left") {
