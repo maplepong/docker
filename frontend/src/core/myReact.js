@@ -50,6 +50,7 @@ function createMyReact() {
         await myReactDOM.updateDOM(newFiberRoot);
         this.fiberRoot = newFiberRoot;
         this.enrenderQueue = [];
+        timerId = 0;
         this.isUpdateScheduled = false;
       } else if (eventType === "newPage") {
         this.erase(); ///처음 등록한 콜백 지워짐
@@ -65,16 +66,16 @@ function createMyReact() {
       // 2. if cleanup exist -> save it to the useState. it will be used in unmount
       // 3. empty the callback arr
       // f ->  {callback, fiber.willUnmount}
-      this.callback.forEach(async (cb) => {
+      await this.callback.forEach(async (cb) => {
         // console.log("callback cb", cb);
         cb.fiber.willUnmount?.forEach((cleanup) => cleanup());
         cb.fiber.willUnmount = [];
         const cleanup = await cb.callback();
         cleanup ? this.willUnmount.push(cleanup) : null; // erase시 call
         cleanup ? cb.fiber.willUnmount.push(cleanup) : null; // rerender시 call
-        // console.log("callback f", cb);
+        console.log("callback f", cb);
       });
-      // console.log("Render finished, callback arr is ", this.callback);
+      console.log("Render finished, callback arr is ", this.callback);
       if (this.willUnmount.length)
         console.log("Render finished, willUnmount arr is ", this.willUnmount);
       this.callback = [];
@@ -181,13 +182,19 @@ function createMyReact() {
 const myReact = createMyReact();
 export default myReact;
 
+var timerId = 0;
 function batchUpdates(fiber) {
   myReact.enrenderQueue.push(fiber);
   if (!myReact.isUpdateScheduled) {
     myReact.isUpdateScheduled = true;
-    requestAnimationFrame(() => {
+    timerId = setTimeout(() => {
       myReact.render(null, "batchRender");
-    });
+    }, 500);
+  } else {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      myReact.render(null, "batchRender");
+    }, 500);
   }
 }
 
