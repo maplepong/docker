@@ -172,20 +172,6 @@ const Tournament = () => {
     }
   };
 
-  // const onSemifinalEnd = async (data) => {
-  //   try {
-  //     const res = await apiTounrament.end_semifinal(gameResult);
-  //     console.log("onSemifinalEnd", res);
-  //     alert(res.message);
-  //     gameId.current = res.final_game_id;
-  //   } catch (err) {
-  //     alert(err);
-  //     outTournament();
-  //   }
-  //   return;
-  // };
-
-  // 상태에 따른 init
   useEffect(async () => {
     switch (tournamentStatus) {
       case status.LOADING: {
@@ -196,8 +182,13 @@ const Tournament = () => {
           if (data.status !== 208) {
             socketController.sendMessage({ type: "tournament_in" });
           }
-          setPlayers(data.players);
-          setHost(data.host || data.players[0]);
+          if (data.status === 201) {
+            setHost(localStorage.getItem("nickname"));
+            setPlayers([localStorage.getItem("nickname")]);
+          } else {
+            setPlayers(data.players);
+            setHost(data.host);
+          }
           setTournamentStatus(status.READY);
         } catch (err) {
           alert(err);

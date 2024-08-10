@@ -21,6 +21,8 @@ import Tournament from "../component/Tournament/Tournament.js";
 import TournamentResult from "../component/Tournament/TournamentResult.js";
 import TournamentGameRoom from "../component/Tournament/TournamentGameRoom.js";
 import TopNavbar from "../component/Navbar/TopNavbar.js";
+import TournamentWaiting from "../component/Tournament/TournamentWaiting.js";
+import TournamentLoading from "../component/Tournament/TournamentLoading.js";
 
 const pathList = {
   "/": <App />,
@@ -37,8 +39,11 @@ const pathList = {
   lobby: <Lobby />,
   test: <Test />,
   localgame: <SingleGameRoom />,
-  "tournament-waiting": <Tournament />,
-  "tournament-result": <TournamentResult />,
+  tournament: {
+    loading: <TournamentLoading />,
+    waiting: <TournamentWaiting />,
+    result: <TournamentResult />,
+  },
 };
 
 export default function router() {
@@ -48,7 +53,8 @@ export default function router() {
   console.log("router", window.location.pathname.split("/")[1]);
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
   if (path === "tournament") {
-    component = <TournamentGameRoom />;
+    const subpath = window.location.pathname.split("/")[2];
+    component = pathList[path][subpath];
   } else if (gameIdMatch) {
     const gameId = gameIdMatch[1];
     component = <GameRoom />;
