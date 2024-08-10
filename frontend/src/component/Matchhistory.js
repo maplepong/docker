@@ -30,9 +30,8 @@ const Matchhistory = (props) => {
 			<div style="display:flex;">
 				<div id="infobox">
 					<div style="margin: 5px">
-						<img src={props.data.image} style="width: 10%; height: 10%"></img>
 						<div style="display: flex; flex-direction: column; margin: 5px">
-							<div>{props.data.nickname}</div>
+							<div>{localStorage.nickname}</div>
 							<div>LV 42</div>
 						</div>
 					</div>
