@@ -12,12 +12,14 @@ const HandleInviteModal = (props) => {
   });
   const [message, setMessage] = useState("");
 
-  let show = useRef(false);
-  const setShow = (show) => {
+  let show = useRef(true);
+  const setShow = () => {
     const modal = document.getElementsByClassName("modalContainer")[0];
     if (!modal) return;
-    show ? modal.classList.add("hidden") : modal.classList.remove("hidden");
-    show = !show;
+    show.current
+      ? modal.classList.add("hidden")
+      : modal.classList.remove("hidden");
+    show.current = !show.current;
   };
 
   useEffect(() => {
@@ -47,11 +49,11 @@ const HandleInviteModal = (props) => {
       <button class="invite-button" onClick={() => setShow()}>
         초대하기
       </button>
-      <div class={`modalContainer`}>
+      <div class={`modalContainer hidden`}>
         <div class="modal-container">
           <div class="modal-header">
             <h3>{info.current.showType}에 초대하기</h3>
-            <button onClick={() => setShow(show.current)}>X</button>
+            <button onClick={() => setShow()}>X</button>
           </div>
           <div class="modal-content">
             <input type="text" placeholder="닉네임을 입력해주세요"></input>
@@ -95,7 +97,7 @@ const HandleInviteModal = (props) => {
         <div
           class={"modal-background"}
           onclick={() => {
-            setShow(show.current);
+            setShow();
           }}
         />
       </div>
