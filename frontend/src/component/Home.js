@@ -12,11 +12,6 @@ const Home = () => {
   return (
     <div id="home">
       <ChooseGame />
-      {/* <div id="myStatus"> */}
-      {/* <UserStatus data={data} /> */}
-      {/* <FriendList list={list} friendlist={friendlist} /> */}
-      {/* <Chat /> */}
-      {/* </div> */}
     </div>
   );
 };
