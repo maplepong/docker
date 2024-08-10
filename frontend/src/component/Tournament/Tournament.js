@@ -300,7 +300,7 @@ const Tournament = () => {
     case status.BETWEEN_ROUND: {
       return (
         <TournamentSchedule
-          bracket={bracket.current}
+          bracket={bracket || []}
           status={statusMessage || "4강 대기중"}
           startGame={startGame}
         />

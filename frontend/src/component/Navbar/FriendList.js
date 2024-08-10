@@ -18,6 +18,7 @@ const FriendList = (props) => {
     <div id="friend-list-container" class="box">
       <div id="friend-list-title">
         <h2>친구 목록</h2>
+        <RequestFriend />
         <button onclick={() => props.refresh()}>새로고침</button>
       </div>
       <ul id="friend-list-ul">
@@ -40,7 +41,7 @@ const FriendList = (props) => {
               <Friend
                 nickname={req.to_user}
                 type="request_send"
-                status="send"
+                status="sending"
                 image={""}
               />
             ))
