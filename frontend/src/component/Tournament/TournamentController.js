@@ -21,10 +21,11 @@ const createTournament = () => {
     _result: [],
     _status: status.LOADING,
     _gameId: null,
+    sc: socketController,
     initTournamentSocket: function ({ setPlayers, setHost }) {
       useEffect(() => {
-        socketController.initSocket();
-        socketController.setSocketTypes([
+        this.sc.initSocket();
+        this.sc.setSocketTypes([
           // 시작전 유저 입장
           {
             type: "tournament_in",
@@ -56,10 +57,9 @@ const createTournament = () => {
         ]);
       });
     },
-    outTournament: async (type) => {
-      this._status = this._status.LOADING;
+    outTournament: async function (type) {
+      this._status = status.LOADING;
       this._bracket = { semifinal: [], final: [] };
-      this._tournamentStatus = status.LOADING;
       if (type === "tournament_end") {
         alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
       } else {
@@ -68,11 +68,11 @@ const createTournament = () => {
           .then((res) => {
             console.log(res);
             if (res.status === 200) {
-              socketController.sendMessage({ type: "tournament_out" });
+              this.sc.sendMessage({ type: "tournament_out" });
             } else if (res.status === 202) {
               console.log("dfajskl");
-              socketController.sendMessage({ type: "tournament_host_change" });
-              socketController.sendMessage({ type: "tournament_out" });
+              this.sc.sendMessage({ type: "tournament_host_change" });
+              this.sc.sendMessage({ type: "tournament_out" });
             }
           })
           .catch((err) => {
@@ -82,7 +82,7 @@ const createTournament = () => {
         myReact.redirect("home");
       }
     },
-    nextStatus: () => {
+    nextStatus: function () {
       switch (this._status) {
         case status.LOADING: {
           myReact.redirect("tournament/loading");
