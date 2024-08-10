@@ -44,7 +44,7 @@ const TournamentGameRoom = () => {
 
   const gameResultRef = useRef(null); // playing game에서 받아오는 용도
 
-  useEffect(() => {
+  useEffect(async () => {
     if (gameStatus === status.return) {
       if (gameInfo.name.includes("semi")) {
         setTimeout(() => {
@@ -67,7 +67,7 @@ const TournamentGameRoom = () => {
     alert("게임 초대가 불가능한 방입니다");
   };
 
-  useEffect(() => {
+  useEffect(async () => {
     const fetchGameInfo = async () => {
       SocketController.initSocket();
 
@@ -114,7 +114,7 @@ const TournamentGameRoom = () => {
     };
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (gameInfo.id && !gameSocket.current && !exit) {
       const newgameSocket = new WebSocket(
         "wss://localhost:443/ws/game/" + gameInfo.id + "/",
