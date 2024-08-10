@@ -4,13 +4,14 @@ import socketController from "../../core/socket";
 import api from "../../core/Api";
 
 export const status = {
-  LOADING: 0,
-  READY: 1,
-  STARTED: 2,
-  ROUNED_ONE: 3,
-  BETWEEN_ROUND: 4,
-  ROUNED_TWO: 5,
-  FINISHED: 6,
+  // 컴포넌트
+  LOADING: 0, // Loading
+  READY: 1, // Waiting
+  STARTED: 2, // Schedule
+  ROUNED_ONE: 3, // gameroom
+  BETWEEN_ROUND: 4, // schedule
+  ROUNED_TWO: 5, // gameroom
+  FINISHED: 6, // result
 };
 
 const createTournament = () => {
@@ -91,17 +92,20 @@ const createTournament = () => {
           myReact.redirect("tournament/waiting");
           break;
         }
-        case status.STARTED:
+        case status.STARTED: {
+          myReact.redirect("tournament/semifinal");
+          break;
+        }
         case status.BETWEEN_ROUND: {
-          myReact.redirect("tournament/schedule");
+          myReact.redirect("tournament/final");
           break;
         }
         case status.ROUNED_ONE: {
-          myReact.redirect("tournament/semifinal" + this._gameId);
+          myReact.redirect("tournament/semifinal/" + this._gameId);
           break;
         }
         case status.ROUNED_TWO: {
-          myReact.redirect("tournament/final" + this._gameId);
+          myReact.redirect("tournament/final/" + this._gameId);
           break;
         }
         case status.FINISHED: {
