@@ -78,10 +78,10 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
   }
 
   function updatePlayerPaddle() {
-    if (upPressed) {
+    if (upPressed && playerPaddle.position.y <= 3) {
       playerPaddle.position.y += 0.1;
       sendGameState();
-    } else if (downPressed) {
+    } else if (downPressed && playerPaddle.position.y >= -3) {
       playerPaddle.position.y -= 0.1;
       sendGameState();
     }
@@ -137,8 +137,8 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       three.scene = new THREE.Scene();
       three.scene.background = new THREE.Color("skyblue");
 
-      const axesHelper = new THREE.AxesHelper(3);
-      three.scene.add(axesHelper);
+      // const axesHelper = new THREE.AxesHelper(3);
+      // three.scene.add(axesHelper);
 
       three.camera = new THREE.PerspectiveCamera(75, 640 / 640, 0.1, 1000);
       three.renderer = new THREE.WebGLRenderer({ canvas: canvas });
@@ -148,7 +148,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       three.light.position.set(5, 5, 5).normalize();
       three.scene.add(three.light);
 
-      three.camera.position.set(-4, 0, 3);
+      three.camera.position.set(-5, 0, 3);
       three.camera.lookAt(0, 0, 0);
 
       three.ballRadius = 0.2;
@@ -243,15 +243,15 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         aiPaddle.position.y = paddle.y;
       }
       if (uscore) {
-        userscore.current = uscore.y;
-        enemyscore.current = uscore.x;
-        drawText(
-          userscore.current.toString() + " : " + enemyscore.current.toString(),
-          -0.3,
-          0,
-          0xffffff
-        );
-      }
+          userscore.current = uscore.y;
+          enemyscore.current = uscore.x;
+          drawText(
+            userscore.current.toString() + " : " + enemyscore.current.toString(),
+            -0.3,
+            0,
+            0xffffff
+          );
+        }
     }
   }
 
