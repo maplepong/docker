@@ -4,22 +4,21 @@ import myReact , { useEffect, useState } from "../core/myReact.js";
 import "../css/match.css"
 
 const Matchhistory = (props) => {
-	console.log("매치 히스토리: ", props);
+	console.log("매치 히스토리: ", props.data);
 	
-	const [data, setData] = useState({
-		oppnent: "",
-		user_score: "",
-		opponent_score: "",
-		result: "",
-		game_date: "",
-	});
-
+	const [gameRecords, setGameRecords] = useState([]);
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await api.getGameRecord();
 			console.log("GAMERECORD", response)
-			if (response) {
-				setData(response);
+			console.log("game_records", response.data.game_records)
+			if (response && response.data && response.data.game_records) {
+				setGameRecords(response.data.game_records);
+				console.log("Updated gameRecords", response.data.game_records[0].opponent);
+				// console.log("gameRecords type", typeof gameRecords);
+				// console.log("gameRecords[0] type", typeof gameRecords[0]);
+				// const keys = Object.keys(gameRecords[0]);
+				// console.log("KEYS", keys);
 			} else {
 				console.error("No data returned from API");
 			}
@@ -27,17 +26,19 @@ const Matchhistory = (props) => {
 		fetchData();
 	}, []);
 
+	console.log("gameRecords len", gameRecords.length);
+
 	return (
 		<div id="matchbox">
 			<div style="margin: 10px"> 대전 기록 </div>
 			<div style="display:flex;">
 				<div id="infobox">
 					<div style="margin: 5px">
-						<img src={props.data.image} style="width: 10%; height: 10%"></img>
+						{/* <img src={props.data.image} style="width: 10%; height: 10%"></img>
 						<div style="display: flex; flex-direction: column; margin: 5px">
 							<div>{props.data.nickname}</div>
 							<div>LV 42</div>
-						</div>
+						</div> */}
 					</div>
 					<div style="display: flex; flex-direction: column; margin: 5px">
 						<div class="myInfo">최신 토너먼트 등수 : 1등</div>
@@ -46,13 +47,35 @@ const Matchhistory = (props) => {
 						<div class="myInfo">승률: 25%</div>
 					</div>
 				</div>
-				<div>
-					<h2>Game Record</h2>
-					<p><strong>Opponent:</strong> {data.opponent}</p>
-					<p><strong>Your Score:</strong> {data.user_score}</p>
-					<p><strong>Opponent's Score:</strong> {data.opponent_score}</p>
-					<p><strong>Result:</strong> {data.result}</p>
-					<p><strong>Game Date:</strong> {data.game_date}</p>
+				<div style="display: flex; flex-wrap: wrap;">
+					<strong>Opponent</strong><br />
+					<strong>Your Score</strong><br />
+					<strong>Opponent's Score</strong><br />
+					<strong>Result</strong><br />
+					<strong>Game Date</strong><br />
+					{gameRecords.length > 0 ? (
+						gameRecords.map((record, index) => (
+							<div key={index} style={{ marginRight: "20px" }}>
+								<span style={{ fontSize: "6px" }}>
+									{record.opponent || "no opponet data"}
+								</span>
+								<span style={{ fontSize: "6px" }}>
+									{record.user_score}
+								</span>
+								<span style={{ fontSize: "6px" }}>
+									{record.opponent_score}
+								</span>
+								<span style={{ fontSize: "6px" }}>
+									{record.result}
+								</span>
+								<span style={{ fontSize: "6px" }}>
+									{record.game_date}
+								</span>
+							</div>
+						))
+					) : (
+						<p>No game records available</p>
+					)}
 				</div>
 			</div>
 		</div>
