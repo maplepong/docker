@@ -15,7 +15,7 @@ const TournamentLoading = () => {
       }
       if (data.status === 201) {
         host = localStorage.getItem("nickname");
-        players = localStorage.getItem("nickname");
+        players = [localStorage.getItem("nickname")];
       } else {
         host = data.host;
         players = data.players;

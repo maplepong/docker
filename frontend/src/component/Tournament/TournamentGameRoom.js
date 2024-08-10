@@ -9,7 +9,7 @@ import PingPong from "../Game/PlayingGame.js";
 import SocketController from "../../core/socket.js";
 import Loading from "../Loading.js";
 import WaitingGame from "../Game/WaitingGame.js";
-import ResultGame from "../Game/ResultGame.js";
+import tc from "./TournamentController.js";
 
 const status = {
   loading: 0,
@@ -23,6 +23,7 @@ const TournamentGameRoom = () => {
   // const [ready, setReady] = useState(false);
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
+  const [gameStatus, setGameStatus] = useState(status.loading);
   const [gameInfo, setGameInfo] = useState({
     id: "",
     name: "",
@@ -36,29 +37,17 @@ const TournamentGameRoom = () => {
     player_info: {},
     opponent: "",
   });
-  const [gameStatus, setGameStatus] = useState(status.loading);
-  const [gameResult, setGameResult] = myReact.useGlobalState(
-    "gameResult",
-    null
-  ); // 토너먼트 컴포넌트로 결과 전달
 
+  tc.initTournamentSocket({ setPlayers, setHost });
   const gameResultRef = useRef(null); // playing game에서 받아오는 용도
 
   useEffect(async () => {
     if (gameStatus === status.return) {
-      if (gameInfo.name.includes("semi")) {
-        setTimeout(() => {
-          myReact.redirect("tournament-waiting");
-        }, 1000);
-      } else {
-        setTimeout(() => {
-          myReact.redirect("tournament-result");
-        }, 1000);
-      }
+      tc.nextStatus();
     }
     if (gameStatus === status.finished) {
       console.log("GameResult", gameResultRef.current);
-      setGameResult(gameResultRef.current);
+      tc.setInfo({ result: gameResultRef.current });
       setGameStatus(status.return);
     }
   }, [gameStatus]);
@@ -148,19 +137,16 @@ const TournamentGameRoom = () => {
               owner_info: data.player_info,
               opponent: data.player_info.nickname,
             });
-
           } else if (gameInfo.owner !== data.player_info.nickname) {
             setGameInfo({
               ...gameInfo,
               isGameReady: true,
               players: gameInfo.players.push(data.player_info),
               opponent: data.player_info.nickname,
-              player_info: data.player_info
+              player_info: data.player_info,
             });
-
           }
-        }
-        else if (data.type === "game_start") {
+        } else if (data.type === "game_start") {
           console.log("game_start");
           setGameStatus(status.playing);
         } else if (data.type === "client_left") {

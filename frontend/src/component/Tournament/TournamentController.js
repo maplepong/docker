@@ -23,41 +23,6 @@ const createTournament = () => {
     _status: status.LOADING,
     _gameId: null,
     sc: socketController,
-    initTournamentSocket: function ({ setPlayers, setHost }) {
-      useEffect(() => {
-        this.sc.initSocket();
-        this.sc.setSocketTypes([
-          // 시작전 유저 입장
-          {
-            type: "tournament_in",
-            func: function (data) {
-              if (setPlayers) setPlayers(onPlayerJoined(data));
-            },
-          },
-          // 시작전 유저 퇴장
-          {
-            type: "tournament_out",
-            func: function (data) {
-              if (setPlayers) setPlayers(onPlayerLeft(data));
-            },
-          },
-          // 토너먼트 시작
-          {
-            type: "tournament_start",
-            func: function (data) {
-              onTournamentStart(data);
-            },
-          },
-          //host 변경
-          {
-            type: "tournament_host_change",
-            func: function (data) {
-              if (setHost) setHost(onHostChange(data));
-            },
-          },
-        ]);
-      });
-    },
     outTournament: async function (type) {
       this._status = status.LOADING;
       this._bracket = { semifinal: [], final: [] };
@@ -115,43 +80,7 @@ const createTournament = () => {
       }
       this._status = this._status + 1;
     },
-    onPlayerJoined: function (data) {
-      console.log("playerJoined", data);
-      if (this._players.includes(data.nickname)) {
-        console.log(...this._players, data.nickname, "player alreay exists");
-        return;
-      }
-      this._players.push(data.nickname);
-      return this._players;
-    },
-    onPlayerLeft: function (data) {
-      const idx = this._players.indexOf(data.nickname);
-      if (idx === -1) {
-        return;
-      }
-      this._players.splice(idx, 1);
-      console.log("player left:", players);
-      return this._players;
-    },
-    onHostChange: function (data) {
-      console.log("Host changed to:", data.new_host);
-      this._host = data.new_host;
-      return this._host;
-    },
-    onTournamentStart: async function (data) {
-      await apiInstance
-        .get("tournament/get_bracket")
-        .then((res) => {
-          console.log(res.data);
-          this._gameId = res.data.myGameid;
-          this._bracket = res.data.bracket;
-          this.nextStatus();
-        })
-        .catch((err) => {
-          alert(err);
-          outTournament();
-        });
-    },
+
     setInfo: function ({ host, players, bracket, result, status, gameId }) {
       this._host = host || this._host;
       this._players = players || this._players;
@@ -159,6 +88,7 @@ const createTournament = () => {
       this._result = result || this._result;
       this._status = status || this._status;
       this._gameId = gameId || this._gameId;
+      console.log("setInfo", this);
     },
     getPlayers: function () {
       return this._players;
