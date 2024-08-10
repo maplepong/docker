@@ -621,6 +621,19 @@ const api = {
         return response;
       });
   },
+  getRival() {
+    setToken();
+    return apiInstance
+      .request({
+        method: "GET",
+        url: "user/rival",
+    })
+    .then((response) => {
+        console.log("라이벌은 누구?")
+        console.log(response.data.nickname)
+        return response.data.nickname;
+    })
+  }
 };
 
 export { apiInstance };
