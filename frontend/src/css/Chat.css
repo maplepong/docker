@@ -3,7 +3,9 @@
 }
 
 #container-chat {
-  width: 472px;
+  width: 100%;
+  min-width: 350px;
+  max-width: 600px;
 height: 252px;
 flex-shrink: 0;
   margin: 10px;

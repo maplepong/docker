@@ -11,8 +11,8 @@ function disassembleChildren(children, result){
 		if (Array.isArray(child)){
 			result = disassembleChildren(child, result);
 		}
-		else if (child == undefined || child == null){
-			console.error("child is undefined:: check is needed")
+		else if (child == undefined || child == null || child == ""){
+			// console.error("child is undefined:: check is needed")
 			// result.push("no value"); //수정 및 확인 필요
 		}
 		else {

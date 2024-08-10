@@ -52,10 +52,13 @@ const Login = () => {
       <div id="infos">
         <div>
           <div class="info">
-            <input id="input-username" placeholder="ID"></input>
+            <input id="input-username" placeholder="ID" type="id"></input>
           </div>
           <div class="info">
-            <input id="input-password" placeholder="password"></input>
+            <input id="input-password" placeholder="password" type="password" onKeydown={(e)=> {
+              if(e.key == "Enter") {
+                login();
+            }}}></input>
           </div>
           <div id="otp-block" style="display:none;">
             <p style="color:white;">당신의 Email에서 QR 코드를 확인하고</p>

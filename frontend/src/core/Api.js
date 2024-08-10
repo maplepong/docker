@@ -464,7 +464,7 @@ const api = {
         return error;
       });
   },
-  userImage(type, src, nickname) {
+  async userImage(type, src, nickname) {
     setToken();
     if (nickname) {
       if (type === "POST") {
@@ -474,7 +474,7 @@ const api = {
         }
         const formData = new FormData();
         formData.append("image", src);
-        return apiInstance
+        return await apiInstance
           .request({
             method: type,
             url: "user/image/" + nickname,
@@ -494,19 +494,7 @@ const api = {
           });
       }
       if (type !== "GET") return Error("권한을 벗어난 요청입니다.");
-      return apiInstance
-        .request({
-          method: type,
-          url: "user/image",
-        })
-        .then((response) => {
-          console.log("사진을 " + type + " 했다");
-          return response.data;
-        })
-        .catch((error) => {
-          console.log("사진을 " + type + " 하지 못했다...");
-          return error;
-        });
+      
       return apiInstance
         .request({
           method: type,
@@ -519,6 +507,20 @@ const api = {
         .catch((error) => {
           console.log(nickname + "의 사진을 " + type + "하지 못했습니다.");
           return error;
+        });
+    } else {
+      return await apiInstance
+        .request({
+          method: type,
+          url: "user/image",
+        })
+        .then((response) => {
+          console.log("사진을 " + type + " 했다");
+          return response.data;
+        })
+        .catch((error) => {
+          console.log("사진을 " + type + " 하지 못했다...");
+          return "asset/user/default-user.png"; //default image
         });
     }
   },

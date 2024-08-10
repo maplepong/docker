@@ -5,7 +5,9 @@
     justify-content: center;
     width: 103px;
     height: 184px;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
+    background-color: antiquewhite;
+    border-radius: 4rem;
 }
 
 
