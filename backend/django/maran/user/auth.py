@@ -69,7 +69,7 @@ def api_login(request):
         "client_id": settings.CLIENT_ID,
         "client_secret": settings.CLIENT_SECRET,
         "code": code,
-        "redirect_uri": "http://localhost:5050/api-login",
+        "redirect_uri": "https://localhost:443/api-login",
         "grant_type": "authorization_code",
     }
     print(code)

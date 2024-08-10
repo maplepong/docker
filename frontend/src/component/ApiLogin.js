@@ -4,7 +4,7 @@ import api from "../core/Api.js";
 
 const ApiLogin = () => {
   const api_link =
-    "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-da15e1c7ef76e1c919d318b024eaf492d23793d93fabe249be7b160a5c7a0fa0&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fapi-login&response_type=code";
+    "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-da15e1c7ef76e1c919d318b024eaf492d23793d93fabe249be7b160a5c7a0fa0&redirect_uri=https%3A%2F%2Flocalhost%3A443%2Fapi-login&response_type=code";
 
   const redirect = () => {
     console.log("redirect입니당");
