@@ -20,7 +20,7 @@ const status = {
 };
 
 const TournamentGameRoom = () => {
-  // const [ready, setReady] = useState(false);
+  const gameId = tc.getGameId();
   const gameSocket = useRef(null);
   const [exit, setExit] = useState(false);
   const [gameStatus, setGameStatus] = useState(status.loading);
@@ -38,14 +38,14 @@ const TournamentGameRoom = () => {
     opponent: "",
   });
 
-  tc.initTournamentSocket({ setPlayers, setHost });
   const gameResultRef = useRef(null); // playing game에서 받아오는 용도
 
   useEffect(async () => {
     if (gameStatus === status.return) {
+      tc.setInfo({ result: gameResultRef.current });
+
       tc.nextStatus();
-    }
-    if (gameStatus === status.finished) {
+    } else if (gameStatus === status.finished) {
       console.log("GameResult", gameResultRef.current);
       tc.setInfo({ result: gameResultRef.current });
       setGameStatus(status.return);
@@ -57,43 +57,31 @@ const TournamentGameRoom = () => {
   };
 
   useEffect(async () => {
-    const fetchGameInfo = async () => {
-      SocketController.initSocket();
+    SocketController.initSocket();
 
-      const path = window.location.pathname;
-      const gameIdMatch = path.match(/^\/tournament\/(\d+)$/);
-
-      if (gameIdMatch) {
-        const gameId = gameIdMatch[1];
-        try {
-          const data = await requestGameInfo(gameId);
-          if (data.status === 200) {
-            const updatedGameInfo = data.data;
-            updatedGameInfo.owner_info = updatedGameInfo.players.find(
-              (player) => player.nickname === updatedGameInfo.owner
-            );
-            updatedGameInfo.player_info = updatedGameInfo.players.find(
-              (player) => player.nickname !== updatedGameInfo.owner
-            );
-            if (updatedGameInfo.players.length === 2) {
-              updatedGameInfo.opponent = updatedGameInfo.players.find(
-                (player) => player.nickname !== localStorage.getItem("nickname")
-              ).nickname;
-            }
-            setGameInfo(updatedGameInfo);
-            setGameStatus(status.waiting);
-          } else {
-            console.error("Failed to fetch game info:", data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch game info:", error);
+    try {
+      const data = await requestGameInfo(gameId);
+      if (data.status === 200) {
+        const updatedGameInfo = data.data;
+        updatedGameInfo.owner_info = updatedGameInfo.players.find(
+          (player) => player.nickname === updatedGameInfo.owner
+        );
+        updatedGameInfo.player_info = updatedGameInfo.players.find(
+          (player) => player.nickname !== updatedGameInfo.owner
+        );
+        if (updatedGameInfo.players.length === 2) {
+          updatedGameInfo.opponent = updatedGameInfo.players.find(
+            (player) => player.nickname !== localStorage.getItem("nickname")
+          ).nickname;
         }
+        setGameInfo(updatedGameInfo);
+        setGameStatus(status.waiting);
       } else {
-        console.error("Invalid gameIdMatch:", gameIdMatch);
+        console.error("Failed to fetch game info:", data);
       }
-    };
-
-    fetchGameInfo();
+    } catch (error) {
+      console.error("Failed to fetch game info:", error);
+    }
 
     return () => {
       if (gameSocket.current) {
@@ -133,7 +121,7 @@ const TournamentGameRoom = () => {
             setGameInfo({
               ...gameInfo,
               isGameReady: true,
-              players: gameInfo.players.push(data.player_info),
+              players: [...gameInfo.players, data.player_info],
               owner_info: data.player_info,
               opponent: data.player_info.nickname,
             });
@@ -141,7 +129,7 @@ const TournamentGameRoom = () => {
             setGameInfo({
               ...gameInfo,
               isGameReady: true,
-              players: gameInfo.players.push(data.player_info),
+              players: [...gameInfo.players, data.player_info],
               opponent: data.player_info.nickname,
               player_info: data.player_info,
             });
@@ -223,7 +211,7 @@ const TournamentGameRoom = () => {
           gameInfo={gameInfo}
           startGame={startGame}
           exitGame={exitGame}
-          sendGameInvite={sendGameInvite}
+          type="tournament"
         />
       );
     case status.playing:

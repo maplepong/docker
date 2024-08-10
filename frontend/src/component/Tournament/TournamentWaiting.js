@@ -54,7 +54,7 @@ const TournamentWaiting = () => {
       console.log(...players, data.nickname, "player alreay exists");
       return;
     }
-    
+
     setPlayers([...players, data.nickname]);
     console.log(...players, data.nickname, "player");
   };
@@ -77,12 +77,15 @@ const TournamentWaiting = () => {
       .get("tournament/get_bracket")
       .then((res) => {
         console.log(res.data);
-        tc.setInfo({ bracket: res.data.bracket, gameId: res.data.myGameid });
+        tc.setInfo({
+          bracket: { semifinal: res.data.bracket, final: [] },
+          gameId: res.data.myGameid,
+        });
         tc.nextStatus();
       })
       .catch((err) => {
         alert(err);
-        outTournament();
+        tc.outTournament();
       });
   };
 
@@ -126,16 +129,15 @@ const TournamentWaiting = () => {
             <div>주최자: {host}</div>
             <div>최대 인원: 4명</div>
             {/* {host && host === localStorage.getItem("nickcname") && ( */}
-              <div class="start-button-container">
-                <button class="start-button" onClick={confirmTournament}>
-                  시작하기
-                </button>
-              </div>
-           
+            <div class="start-button-container">
+              <button class="start-button" onClick={confirmTournament}>
+                시작하기
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <button onClick={tc.outTournament}>나가기</button>
+      <button onClick={() => tc.outTournament()}>나가기</button>
       <HandleInviteModal type="tournament" />
     </div>
   );

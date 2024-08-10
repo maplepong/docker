@@ -8,10 +8,10 @@ export const status = {
   LOADING: 0, // Loading
   READY: 1, // Waiting
   STARTED: 2, // Schedule
-  ROUNED_ONE: 3, // gameroom
-  BETWEEN_ROUND: 4, // schedule
-  ROUNED_TWO: 5, // gameroom
-  FINISHED: 6, // result
+  // ROUNED_ONE: 3, // gameroom
+  BETWEEN_ROUND: 3, // schedule
+  // ROUNED_TWO: , // gameroom
+  FINISHED: 4, // result
 };
 
 const createTournament = () => {
@@ -20,12 +20,19 @@ const createTournament = () => {
     _players: [],
     _bracket: { semifinal: [], final: [] },
     _result: [],
-    _status: status.LOADING,
+    _status: 0,
     _gameId: null,
     sc: socketController,
-    outTournament: async function (type) {
-      this._status = status.LOADING;
-      this._bracket = { semifinal: [], final: [] };
+    outTournament: async function _out(type) {
+      console.log(this);
+      this.setInfo({
+        host: "",
+        players: [],
+        bracket: { semifinal: [], final: [] },
+        result: [],
+        status: 0,
+        gameId: null,
+      });
       if (type === "tournament_end") {
         alert("토너먼트가 종료되었습니다. 홈으로 돌아갑니다.");
       } else {
@@ -43,12 +50,13 @@ const createTournament = () => {
           .catch((err) => {
             console.log(err);
           });
-
-        myReact.redirect("home");
       }
+      myReact.redirect("home");
     },
-    nextStatus: function () {
+    nextStatus: function _next() {
       console.log("nextStatus", this._status, status);
+
+      this._status = this._status + 1;
       switch (this._status) {
         case status.LOADING: {
           myReact.redirect("tournament/loading");
@@ -75,14 +83,14 @@ const createTournament = () => {
           break;
         }
         case status.FINISHED: {
-          outTournament("tournament_end");
+          myReact.redirect("tournament/result");
+          // outTournament("tournament_end");
           break;
         }
       }
-      this._status = this._status + 1;
     },
 
-    setInfo: function ({ host, players, bracket, result, status, gameId }) {
+    setInfo: function _set({ host, players, bracket, result, status, gameId }) {
       this._host = host || this._host;
       this._players = players || this._players;
       this._bracket = bracket || this._bracket;

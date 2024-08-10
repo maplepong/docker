@@ -1,6 +1,6 @@
 /* @jsx myReact.createElement */
 import myReact, { useEffect, useState, useRef } from "../../core/myReact.js";
-
+import tc from "./TournamentController.js";
 const TournamentFinished = ({ tournamentResult, outTournament }) => {
   return (
     <div>
@@ -13,7 +13,7 @@ const TournamentFinished = ({ tournamentResult, outTournament }) => {
           ? "우승하셨습니다."
           : "준우승하셨습니다."}
       </p>
-      <button onClick={outTournament}>메인으로 돌아가기</button>
+      <button onClick={() => tc.outTournament()}>메인으로 돌아가기</button>
     </div>
   );
 };
