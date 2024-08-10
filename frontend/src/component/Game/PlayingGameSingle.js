@@ -205,6 +205,7 @@ const PingPong = () => {
 
         renderer.render(scene, camera);}
         else{
+            alert("left Score: " + leftscore + " right Score: " + rightscore);
             cancel();
         }
     }
