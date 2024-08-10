@@ -501,11 +501,11 @@ const api = {
           url: "user/image/" + nickname,
         })
         .then((response) => {
-          console.log(nickname + "의 사진을 " + type + "했습니다.");
+          // console.log(nickname + "의 사진을 " + type + "했습니다.");
           return response.data;
         })
         .catch((error) => {
-          console.log(nickname + "의 사진을 " + type + "하지 못했습니다.");
+          // console.log(nickname + "의 사진을 " + type + "하지 못했습니다.");
           return error;
         });
     } else {

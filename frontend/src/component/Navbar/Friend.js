@@ -21,7 +21,6 @@ const Friend = ({ type, nickname, status }) => {
     await api
       .userImage("GET", null, nickname)
       .then((res) => {
-        console.log("getProfileImage", res.image);
         setImagesrc(res.image);
       })
       .catch((err) => {

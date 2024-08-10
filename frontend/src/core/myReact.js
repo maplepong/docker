@@ -73,7 +73,7 @@ function createMyReact() {
         const cleanup = await cb.callback();
         cleanup ? this.willUnmount.push(cleanup) : null; // erase시 call
         cleanup ? cb.fiber.willUnmount.push(cleanup) : null; // rerender시 call
-        console.log("callback f", cb);
+        // console.log("callback f", cb);
       });
       console.log("Render finished, callback arr is ", this.callback);
       if (this.willUnmount.length)
