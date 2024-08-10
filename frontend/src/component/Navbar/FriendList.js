@@ -8,13 +8,17 @@ import RequestFriend from "../RequestFriend.js";
 import Friend from "./Friend.js";
 
 const FriendList = (props) => {
-  const friendList = props.friendList;
+  const friendList = Object.values(props.friendList);
   const friendRequests = props.friendRequests;
+
+  console.log("friendList", friendList);
+  console.log("friendRequests", friendRequests);
 
   return (
     <div id="friend-list-container" class="box">
       <div id="friend-list-title">
         <h2>친구 목록</h2>
+        <RequestFriend />
         <button onclick={() => props.refresh()}>새로고침</button>
       </div>
       <ul id="friend-list-ul">
@@ -22,14 +26,24 @@ const FriendList = (props) => {
         friendRequests.receives &&
         friendRequests.receives.length > 0
           ? friendRequests.receives.map((req) => (
-              <Friend nickname={req.from_user} type="request_receive" status="request"/>
+              <Friend
+                nickname={req.from_user}
+                type="request_receive"
+                status="request"
+                image={""}
+              />
             ))
           : null}
         {friendRequests &&
         friendRequests.sends &&
         friendRequests.sends.length > 0
           ? friendRequests.sends.map((req) => (
-              <Friend nickname={req.from_user} type="request_send" status="send"/>
+              <Friend
+                nickname={req.to_user}
+                type="request_send"
+                status="sending"
+                image={""}
+              />
             ))
           : null}
         {friendList && friendList.length > 0
@@ -38,6 +52,7 @@ const FriendList = (props) => {
                 nickname={friend.nickname}
                 type="friend"
                 status={friend.status}
+                image={friend.image}
               />
             ))
           : null}
