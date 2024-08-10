@@ -149,7 +149,6 @@ const TournamentGameRoom = () => {
               opponent: data.player_info.nickname,
             });
 
-            console.log("opponent : ", data.opponent);
           } else if (gameInfo.owner !== data.player_info.nickname) {
             setGameInfo({
               ...gameInfo,
@@ -158,7 +157,7 @@ const TournamentGameRoom = () => {
               opponent: data.player_info.nickname,
               player_info: data.player_info
             });
-            console.log("opponent : ", data.opponent);
+
           }
         }
         else if (data.type === "game_start") {
