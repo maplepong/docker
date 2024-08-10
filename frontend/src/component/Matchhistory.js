@@ -43,11 +43,11 @@ const Matchhistory = (props) => {
                 console.log("RIVALDATA", typeof(rivalData));
                 
                 // 상태 업데이트
-                setStats(prevStats => ({
-                    ...prevStats,
-                    winRate: winRate.toFixed(2), // 소수점 2자리까지 승률 저장
-                    rival: rivalData || "None",  // 라이벌 정보 업데이트
-                }));
+                setStats({
+                    ...stats,
+                    winRate: winRate,
+                    rival: rivalData,
+                });
                 console.log("Updated stats:", { winCount, loseCount, winRate, rival: rivalData });
 
             } else {
