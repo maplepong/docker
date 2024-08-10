@@ -156,7 +156,7 @@ function createMyReact() {
     useGlobalState: function (key, initValue) {
       const currentFiber = window.currentFiberNode;
       //이미 초기화된 전역 값
-      if (this.globalState[key]) {
+      if (Object.keys(this.globalState).includes(key)) {
         // setstate 새 컴포넌트 것으로 변경
         const temp = useState(this.globalState[key].value);
         this.globalState[key].setState = temp[1];
