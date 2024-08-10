@@ -3,15 +3,7 @@ import myReact, { useEffect } from "../../core/myReact.js";
 import HandleInviteModal from "../Navbar/HandelInviteModal.js";
 import "../../css/match.css";
 
-const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
-  useEffect(() => {
-    setShow();
-  }, []);
-  const setShow = () => {
-    const modal = document.getElementsByClassName("modalContainer")[0];
-    if (!modal) return;
-    modal.classList.toggle("hidden");
-  };
+const WaitingGame = ({ gameInfo, startGame, exitGame, type }) => {
   return (
     <div class="bg">
       <div class="room">
@@ -45,14 +37,18 @@ const WaitingGame = ({ gameInfo, startGame, exitGame }) => {
                     class="strbtn"
                     onClick={() => startGame()}
                   ></input>
-                  <input
+                  {/* <input
                     type="button"
                     class="invbtn"
                     onclick={() => {
                       setShow();
                     }}
-                  ></input>
-                  <HandleInviteModal setShow={() => setShow()} type="game" />
+                  ></input> */}
+                  {type === "tournament" ? (
+                    ""
+                  ) : (
+                    <HandleInviteModal setShow={() => setShow()} type="game" />
+                  )}
                 </div>
               ) : (
                 <span>아무거또 모태</span>

@@ -15,13 +15,14 @@ const apiTounrament = {
           return {
             players: [localStorage.getItem("nickname")],
             status: res.status,
+            host: localStorage.getItem("nickname"),
           };
         } else {
           const temp = [];
           res.data.participants.forEach((player) => {
             temp.push(player.nickname);
           });
-          return { players: temp, status: res.status };
+          return { players: temp, status: res.status , host: res.data.host};
         }
       })
       .catch(async (error) => {
