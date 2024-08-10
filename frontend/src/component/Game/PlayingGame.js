@@ -43,7 +43,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
           0,
-          0xff0000
+          0xffffff
         );
       }
     }
@@ -71,7 +71,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
           0,
-          0x0000ff
+          0xffffff
         );
       }
     }
@@ -249,7 +249,7 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
           0,
-          0x0000ff
+          0xffffff
         );
       }
     }
