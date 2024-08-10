@@ -44,7 +44,7 @@ const TournamentGameRoom = () => {
 
   const gameResultRef = useRef(null); // playing game에서 받아오는 용도
 
-  useEffect(() => {
+  useEffect(async () => {
     if (gameStatus === status.return) {
       if (gameInfo.name.includes("semi")) {
         setTimeout(() => {
@@ -67,7 +67,7 @@ const TournamentGameRoom = () => {
     alert("게임 초대가 불가능한 방입니다");
   };
 
-  useEffect(() => {
+  useEffect(async () => {
     const fetchGameInfo = async () => {
       SocketController.initSocket();
 
@@ -114,7 +114,7 @@ const TournamentGameRoom = () => {
     };
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (gameInfo.id && !gameSocket.current && !exit) {
       const newgameSocket = new WebSocket(
         "wss://localhost:443/ws/game/" + gameInfo.id + "/",
@@ -140,13 +140,27 @@ const TournamentGameRoom = () => {
           if (gameInfo.players.length === 2) return; // 이미 2명이 들어와있으면 무시
           console.log("game_ready");
           console.log("data.player_info : ", data.player_info);
-          setGameInfo({
-            ...gameInfo,
-            isGameReady: true,
-            players: gameInfo.players.push(data.player_info),
-            opponent: data.player_info.nickname,
-          });
-        } else if (data.type === "game_start") {
+          if (gameInfo.owner === data.player_info.nickname) {
+            setGameInfo({
+              ...gameInfo,
+              isGameReady: true,
+              players: gameInfo.players.push(data.player_info),
+              owner_info: data.player_info,
+              opponent: data.player_info.nickname,
+            });
+
+          } else if (gameInfo.owner !== data.player_info.nickname) {
+            setGameInfo({
+              ...gameInfo,
+              isGameReady: true,
+              players: gameInfo.players.push(data.player_info),
+              opponent: data.player_info.nickname,
+              player_info: data.player_info
+            });
+
+          }
+        }
+        else if (data.type === "game_start") {
           console.log("game_start");
           setGameStatus(status.playing);
         } else if (data.type === "client_left") {

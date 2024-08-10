@@ -179,17 +179,17 @@ const PingPong = () => {
       document.addEventListener("keyup", enemykeyUpHandler, false);
 
       function updatePlayerPaddle() {
-        if (upPressed) {
+        if (upPressed && playerPaddle.position.y <= 3) {
           playerPaddle.position.y += 0.1;
-        } else if (downPressed) {
+        } else if (downPressed && playerPaddle.position.y >= -3) {
           playerPaddle.position.y -= 0.1;
         }
       }
 
       function updateaiPaddle() {
-        if (enemyupPressed) {
+        if (enemyupPressed && aiPaddle.position.y <= 3) {
           aiPaddle.position.y += 0.1;
-        } else if (enemydownPressed) {
+        } else if (enemydownPressed && aiPaddle.position.y >= -3) {
           aiPaddle.position.y -= 0.1;
         }
       }
@@ -205,6 +205,7 @@ const PingPong = () => {
 
         renderer.render(scene, camera);}
         else{
+            alert("left Score: " + leftscore + " right Score: " + rightscore);
             cancel();
         }
     }

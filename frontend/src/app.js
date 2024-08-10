@@ -34,7 +34,7 @@ const App = () => {
 
   document.addEventListener("DOMContentLoaded", () => checkLogin());
 
-  useEffect(() => {
+  useEffect(async () => {
     console.log("test useEffect")
     return () => {
       console.log("test callback");

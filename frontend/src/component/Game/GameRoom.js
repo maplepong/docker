@@ -49,54 +49,43 @@ const GameRoom = () => {
     SocketController.sendMessage(data);
   };
 
-  useEffect(() => {
-    const fetchGameInfo = async () => {
-      SocketController.initSocket();
+  useEffect(async () => {
+    SocketController.initSocket();
 
-      const path = window.location.pathname;
-      const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
+    const path = window.location.pathname;
+    const gameIdMatch = path.match(/^\/gameroom\/(\d+)$/);
 
-      if (gameIdMatch) {
-        const gameId = gameIdMatch[1];
-        try {
-          const data = await requestGameInfo(gameId);
-          if (data.status === 200) {
-            const updatedGameInfo = data.data;
-            updatedGameInfo.owner_info = updatedGameInfo.players.find(
-              (player) => player.nickname === updatedGameInfo.owner
-            );
-            updatedGameInfo.player_info = updatedGameInfo.players.find(
-              (player) => player.nickname !== updatedGameInfo.owner
-            );
-            if (updatedGameInfo.players.length === 2) {
-              updatedGameInfo.opponent = updatedGameInfo.players.find(
-                (player) => player.nickname !== localStorage.getItem("nickname")
-              ).nickname;
-            }
-            setGameInfo(updatedGameInfo);
-            setGameStatus(status.waiting);
-          } else {
-            console.error("Failed to fetch game info:", data);
+    if (gameIdMatch) {
+      const gameId = gameIdMatch[1];
+      try {
+        const data = await requestGameInfo(gameId);
+        if (data.status === 200) {
+          const updatedGameInfo = data.data;
+          updatedGameInfo.owner_info = updatedGameInfo.players.find(
+            (player) => player.nickname === updatedGameInfo.owner
+          );
+          updatedGameInfo.player_info = updatedGameInfo.players.find(
+            (player) => player.nickname !== updatedGameInfo.owner
+          );
+          if (updatedGameInfo.players.length === 2) {
+            updatedGameInfo.opponent = updatedGameInfo.players.find(
+              (player) => player.nickname !== localStorage.getItem("nickname")
+            ).nickname;
           }
-        } catch (error) {
-          console.error("Failed to fetch game info:", error);
+          setGameInfo(updatedGameInfo);
+          setGameStatus(status.waiting);
+        } else {
+          console.error("Failed to fetch game info:", data);
         }
-      } else {
-        console.error("Invalid gameIdMatch:", gameIdMatch);
+      } catch (error) {
+        console.error("Failed to fetch game info:", error);
       }
-    };
-
-    fetchGameInfo();
-
-    return () => {
-      if (gameSocket.current) {
-        gameSocket.current.close();
-        gameSocket.current = null;
-      }
-    };
+    } else {
+      console.error("Invalid gameIdMatch:", gameIdMatch);
+    }
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (gameInfo.id && !gameSocket.current && !exit) {
       const newgameSocket = new WebSocket(
         "wss://localhost:443/ws/game/" + gameInfo.id + "/",
@@ -211,7 +200,12 @@ const GameRoom = () => {
     case status.playing:
       return (
         <div className="game-container">
-          <canvas id="myCanvas" width="800" height="640" class="multiCanvas"></canvas>
+          <canvas
+            id="myCanvas"
+            width="800"
+            height="640"
+            class="multiCanvas"
+          ></canvas>
           <PingPong
             gameinfo={gameInfo}
             gameSocket={gameSocket}

@@ -112,8 +112,6 @@ def game_info(request, game_id):
 def enter(request):
     game_id = request.data.get("id")
     game = Game.objects.get(id=game_id)
-    if game.players.count() == 0:
-        game.creator = request.user
     if game.players.count() >= 2 and request.user not in game.players.all():
         return Response({"detail": "Game is full"}, status = status.HTTP_409_CONFLICT)
     if game.password:
