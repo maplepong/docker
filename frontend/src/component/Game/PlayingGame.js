@@ -61,7 +61,12 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       } else {
         updateScore(1, 0);
         sendGameState();
-        console.log("userscore :" ,userscore.current, "enemyscore :", enemyscore.current);
+        console.log(
+          "userscore :",
+          userscore.current,
+          "enemyscore :",
+          enemyscore.current
+        );
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
