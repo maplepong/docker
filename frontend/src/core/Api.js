@@ -350,9 +350,9 @@ const api = {
         return error;
       });
   },
-  getRequestFriendList() {
+  async getRequestFriendList() {
     setToken();
-    return apiInstance
+    return await apiInstance
       .request({
         method: "GET",
         url: "user/friend-request-list",
@@ -414,15 +414,16 @@ const api = {
         return error;
       });
   },
-  getUserInfomation(nickname) {
+  async getUserInfomation(nickname) {
     setToken();
     console.log("정보를 요청한 닉네임: ", nickname);
-    return apiInstance
+    return await apiInstance
       .request({
         method: "GET",
         url: "user/information?nickname=" + nickname,
       })
       .then((response) => {
+        if (!response) return {};
         console.log(nickname + "의 정보를 불러왔습니다.");
         console.log(typeof response.data, response.data);
         return response.data;
