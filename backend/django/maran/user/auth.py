@@ -51,7 +51,7 @@ def api_signup(request):
             nickname=nickname,
             type=1,
             introduction="42 api user",
-            email=username + "@42seoul.kr",
+            email="api" + id + "@42seoul.kr",
         )
         user.set_unusable_password()
         user.save()
