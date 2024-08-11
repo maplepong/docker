@@ -1,25 +1,29 @@
 /* @jsx myReact.createElement */
 import myReact, { useState, useEffect } from "../../core/myReact.js";
 import "../../css/Pingpong.css";
-import "../../core/Router.js"
+import "../../core/Router.js";
 import { redirect } from "statuses";
 // import api from "../../core/Api.js";
 
 const SingleGameRoom = () => {
   return (
-    <div className="game-container">
-    <canvas id ="myCanvas" width="800" height="640" class="singleCanvas"></canvas>
-    <PingPong/>
+    <div class="game-container">
+      <canvas
+        id="myCanvas"
+        width="800"
+        height="1200"
+        class="singleCanvas"
+      ></canvas>
+      <PingPong />
     </div>
-  )
-}
+  );
+};
 
 const PingPong = () => {
   let upPressed, downPressed;
   let enemyupPressed, enemydownPressed;
 
   useEffect(() => {
-
     const canvas = document.getElementById("myCanvas");
 
     if (canvas) {
@@ -27,12 +31,7 @@ const PingPong = () => {
       const scene = new THREE.Scene();
       scene.background = new THREE.Color("skyblue");
 
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        640 / 640,
-        0.1,
-        1000
-      );
+      const camera = new THREE.PerspectiveCamera(75, 640, 640, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ canvas: canvas });
       renderer.setSize(640, 640);
 
@@ -195,28 +194,26 @@ const PingPong = () => {
       }
 
       function animate() {
-        if (leftscore < 3 && rightscore < 3){
-            requestAnimationFrame(animate);
+        if (leftscore < 3 && rightscore < 3) {
+          requestAnimationFrame(animate);
 
-        updateBall();
+          updateBall();
 
-        updatePlayerPaddle();
-        updateaiPaddle();
+          updatePlayerPaddle();
+          updateaiPaddle();
 
-        renderer.render(scene, camera);}
-        else{
-            alert("left Score: " + leftscore + " right Score: " + rightscore);
-            cancel();
+          renderer.render(scene, camera);
+        } else {
+          alert("left Score: " + leftscore + " right Score: " + rightscore);
+          cancel();
         }
-    }
-    
-      animate();
+      }
 
+      animate();
     } else {
       console.log("Canvas context not supported");
     }
   }, []);
-
 
   function keyUpHandler(e) {
     if (e.key === "q" || e.key === "Q") {
@@ -248,10 +245,7 @@ const PingPong = () => {
     }
   }
 
-  return (
-    <div id="score">
-    </div>
-  );
+  return <div id="score"></div>;
 };
 
 export default SingleGameRoom;

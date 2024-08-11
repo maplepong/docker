@@ -95,7 +95,7 @@ const createTournament = () => {
       this._players = players || this._players;
       this._bracket = bracket || this._bracket;
       this._result = result || this._result;
-      this._status = status || this._status;
+      this._status = typeof status === "number" ? status : this._status;
       this._gameId = gameId || this._gameId;
       console.log("setInfo", this);
     },

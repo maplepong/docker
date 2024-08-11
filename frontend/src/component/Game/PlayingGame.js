@@ -243,15 +243,15 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         aiPaddle.position.y = paddle.y;
       }
       if (uscore) {
-          userscore.current = uscore.y;
-          enemyscore.current = uscore.x;
-          drawText(
-            userscore.current.toString() + " : " + enemyscore.current.toString(),
-            -0.3,
-            0,
-            0xffffff
-          );
-        }
+        userscore.current = uscore.y;
+        enemyscore.current = uscore.x;
+        drawText(
+          userscore.current.toString() + " : " + enemyscore.current.toString(),
+          -0.3,
+          0,
+          0xffffff
+        );
+      }
     }
   }
 
