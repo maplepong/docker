@@ -11,6 +11,12 @@ const TournamentSchedule = () => {
   const gameResult = tc.getResult();
   const status = tc.getStatus() === 2 ? "semifinal" : "final";
   const bracket = tc.getBracket();
+
+  // mock data
+  // const gameId = 543;
+  // const gameResult = { winner: "test1", loser: "test2" };
+  // const status = "final";
+  // const bracket = {semifinal: ["test1", "test2", "test3", "test4"], final: ["test1", "test2"]};
   console.log("bracket", bracket, tc.getBracket());
   const title = tc.getStatus() === 2 ? "준결승전" : "결승전";
   if (tc.getStatus() === 3) {
@@ -67,25 +73,47 @@ const TournamentSchedule = () => {
   }, []);
 
   return (
-    <div className="tournament-schedule-container">
-      <h1 className="schedule-title">Tournament Schedule</h1>
-      <p className="schedule-detail">준결승 대진표: {bracket.semifinal}</p>
-      <p className="schedule-detail">결승 대진표: {bracket.final}</p>
-      {tc.getStatus() === 3 ? (
-        <p className="schedule-detail">"{statusMessage}"</p>
-      ) : (
-        ""
-      )}
-      <p className="schedule-detail">게임 ID: {tc.getGameId()}</p>
-      <p className="schedule-detail">
-        상태: {title}
-        {tc.getStatus()}
+    <div class="tournament-schedule-container">
+      <h1 class="schedule-title">Tournament Schedule</h1>
+
+      <div class="bracket-container">
+        {status === "final" ? (
+          <div class="bracket-round">
+            <p class="round-title">결승 대진표</p>
+            <div class="match">
+              <p class="player">{bracket.final[0]}</p>
+              <span class="versus">vs</span>
+              <p class="player">{bracket.final[1]}</p>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+        <div class="bracket-round">
+          <p class="round-title">준결승 대진표</p>
+          <div>
+            <div key={0} class="match">
+              <p class="player">{bracket.semifinal[0]}</p>
+              <p class="versus">vs</p>
+              <p class="player">{bracket.semifinal[1]}</p>
+            </div>
+            <div key={1} class="match">
+              <p class="player">{bracket.semifinal[2]}</p>
+              <p class="versus">vs</p>
+              <p class="player">{bracket.semifinal[3]}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {tc.getStatus() === 3 && <p class="schedule-detail">"{statusMessage}"</p>}
+      <p class="schedule-detail">게임 ID: {tc.getGameId()}</p>
+      <p class="schedule-detail">
+        상태: {title} {tc.getStatus()}
       </p>
-      <div className="button-container">
-        <button className="start-button" onClick={() => startGame()}>
-          게임 시작
-        </button>
-        <button className="start-button" onClick={() => startGame()}>
+
+      <div class="button-container">
+        <button class="start-button" onClick={() => startGame()}>
           게임 시작
         </button>
       </div>
