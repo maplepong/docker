@@ -331,6 +331,8 @@ def update_game_result(request):
     winner.game_history.add(winner_record)
     loser.game_history.add(loser_record)
 
+    game.delete()
+
     return JsonResponse({"winnerNickname": winner.nickname, "loserNickname": loser.nickname, "winnerScore": 3, "loserScore": loser_score}, status=status.HTTP_200_OK)
 
 def adjust_win_rate(winner, loser):
