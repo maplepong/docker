@@ -13,9 +13,9 @@ const TournamentLoading = () => {
       if (data.status !== 208) {
         socketController.sendMessage({ type: "tournament_in" });
       }
-        host = data.host;
-        players = data.players;
-      tc.setInfo({ host, players });
+      host = data.host;
+      players = data.players;
+      tc.setInfo({ host, players, status: 0 });
       console.log("host sata", data);
       tc.nextStatus();
     } catch (err) {
