@@ -12,11 +12,9 @@ const requestGameInfo = async (gameId) => {
     })
     .then((response) => {
       result = response;
-      console.log("Response:", response);
       return result;
     })
     .catch((error) => {
-      console.error("Error:", error);
       return null;
     });
 };
@@ -34,18 +32,15 @@ const requestJoinGame = async (gameId, password) => {
     })
     .then((response) => {
       result = response;
-      console.log("Response:", response);
       return result;
     })
     .catch((error) => {
-      console.error("Error:", error);
       return error.response;
     });
 };
 
 const requestLobbyList = async () => {
   var result = null;
-  console.log("request Lobby List");
   return await apiInstance
     .request({
       headers: {
@@ -56,7 +51,6 @@ const requestLobbyList = async () => {
     })
     .then((response) => {
       result = response;
-      console.log("Response:", response);
       return result.data.games;
     })
     .catch((error) => {
@@ -67,12 +61,9 @@ const requestLobbyList = async () => {
 
 const requestCreateGame = async (room_title, password) => {
   var result = null;
-  console.log("room_title: ", room_title, "password: ", password);
-  console.log("token??? : ", localStorage.accessToken);
   const formData = new FormData();
   formData.append("room_title", room_title);
   formData.append("password", password);
-  console.log("request Create Game");
   return await apiInstance
     .post("game/new", formData, {
       headers: {
@@ -82,15 +73,11 @@ const requestCreateGame = async (room_title, password) => {
     .then((response) => {
       result = response;
       if (typeof result === "undefined" || result.status != 201) {
-        console.log("room create Error");
-        console.log(result);
         return result;
       }
-      console.log("Response:", response);
       return result;
     })
     .catch((error) => {
-      console.error("Error create game room:", error);
       return error;
     });
 };
@@ -105,11 +92,9 @@ const requestExitGame = async (gameId) => {
     })
     .then((response) => {
       result = response;
-      console.log("Response:", response);
       return result;
     })
     .catch((error) => {
-      console.error("Error:", error);
       return null;
     });
 };

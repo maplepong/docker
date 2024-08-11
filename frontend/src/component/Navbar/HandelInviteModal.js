@@ -84,7 +84,6 @@ const HandleInviteModal = (props) => {
                         gameId: window.location.pathname.split("/")[2],
                         sender: localStorage.getItem("nickname"),
                       };
-                console.log(data);
                 socketController.sendMessage(data);
                 setMessage("로딩중입니다...");
               }}

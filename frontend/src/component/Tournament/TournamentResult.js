@@ -9,11 +9,9 @@ const TournamentResult = () => {
   const gameResult = tc.getResult();
   useEffect(async () => {
     if (gameResult.winner === localStorage.getItem("nickname")) {
-      console.log("gameResult", gameResult);
       await apiTounrament
         .end_tournament(gameResult)
         .then((res) => {
-          console.log(res);
           return res;
         })
         .catch((err) => {

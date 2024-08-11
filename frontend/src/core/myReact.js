@@ -67,17 +67,12 @@ function createMyReact() {
       // 3. empty the callback arr
       // f ->  {callback, fiber.willUnmount}
       await this.callback.forEach(async (cb) => {
-        // console.log("callback cb", cb);
         cb.fiber.willUnmount?.forEach((cleanup) => cleanup());
         cb.fiber.willUnmount = [];
         const cleanup = await cb.callback();
         cleanup ? this.willUnmount.push(cleanup) : null; // erase시 call
         cleanup ? cb.fiber.willUnmount.push(cleanup) : null; // rerender시 call
-        // console.log("callback f", cb);
       });
-      console.log("Render finished, callback arr is ", this.callback);
-      if (this.willUnmount.length)
-        console.log("Render finished, willUnmount arr is ", this.willUnmount);
       this.callback = [];
     },
 
@@ -102,7 +97,6 @@ function createMyReact() {
       if (fiber.changedState && fiber.changedState.length) {
         fiber.changedState.forEach((d) => {
           fiber.state[d.i] = d.value;
-          // console.log("fiber updated state" , fiber.state);
         });
         fiber.changedState = [];
         fiber.changed = false;
@@ -123,7 +117,6 @@ function createMyReact() {
           });
         }
       }
-      //console.log(fiber);
       return fiber;
     },
 
@@ -144,7 +137,6 @@ function createMyReact() {
       } else {
         param = location.origin + "/" + param;
       }
-      console.log("redirect call", param);
       history.pushState({}, "", param);
       router();
     },
@@ -169,7 +161,6 @@ function createMyReact() {
       }
 
       const setGlobalState = (value) => {
-        console.log(this.globalState);
         if (this.globalState[key].value === value) return;
         this.globalState[key].value = value;
         this.globalState[key].setState(value);
@@ -205,13 +196,11 @@ export function useState(initValue) {
 
   const setState = (value) => {
     if (fiber.state[i] === value) return;
-    //console.log("setState err-value same-",value);
     fiber.changedState.push({ i, value });
     // myReact.enrenderQueue.append(["stateChange", fiber, i]);
     // fiber.changed = true;
     batchUpdates(fiber);
     // scheduleUpdate(fiber);
-    // console.log("렌더를 합니다")
     // myReact.render(null, "reRender");
     //render, how I can get the infomation of current page?
   };

@@ -17,9 +17,7 @@ const Lobby = () => {
     setLobbyData(responsedata);
   };
 
-  const resultCreateGame = (responsedata) => {
-    console.log("responsedata : ", responsedata);
-  };
+  const resultCreateGame = (responsedata) => {};
 
   const create_game = async () => {
     const room_title = document.querySelector("#room-name").value;
@@ -27,13 +25,13 @@ const Lobby = () => {
     const vibration = document.querySelector("#vibration").checked;
     resultCreateGame(await requestCreateGame(room_title, password));
     const res = await requestLobbyList();
-    if (res === null) return console.log("requestLobbyList error");
+    if (res === null) return;
     resultLobby(res);
   };
 
   const updateList = async () => {
     const res = await requestLobbyList();
-    if (res === null) return console.log("requestLobbyList error");
+    if (res === null) return ;
     setLobbyData(res);
   };
 

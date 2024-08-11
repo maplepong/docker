@@ -9,7 +9,6 @@ const NicknameModal = ({ nickname, ...rest }) => {
     const menu = e.target
       .closest(".nicknameContainer")
       .getElementsByClassName("hovermenu");
-    console.log(menu);
     if (show) menu[0].classList.remove("hidden");
     else menu[0].classList.add("hidden");
     show = show ? 0 : 1;
@@ -19,11 +18,9 @@ const NicknameModal = ({ nickname, ...rest }) => {
   }
   async function requestFriend() {
     const response = await api.sendFriendRequest(nickname);
-    console.log(response);
   }
   async function inviteToGame() {
     const res = await api.inviteToGame(450, nickname); //임의로 gameid 넣음
-    console.log(res);
   }
   function wisper() {
     alert("귓속말은 아직 불가능");

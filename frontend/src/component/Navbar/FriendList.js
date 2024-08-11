@@ -8,24 +8,24 @@ import RequestFriend from "../RequestFriend.js";
 import Friend from "./Friend.js";
 
 const FriendList = (props) => {
-  const friendList = Object.values(props.friendList);
-  const friendRequests = props.friendRequests;
+  // const friendList = Object.values(props.friendList);
+  // const friendRequests = props.friendRequests;
 
-  console.log("friendList", friendList);
-  console.log("friendRequests", friendRequests);
+  const friendList = [];
+  const friendRequests = {sends:[{from_user:"siwolee", to_user:"sdf"}], recieves:[{from_user:"siwolee", to_user:"sdf"}]}
 
   return (
     <div id="friend-list-container" class="box">
-      <div id="friend-list-title">
+      <div id="friend-list-title" style="color: white;">
         <h2>친구 목록</h2>
         <RequestFriend />
         <button onclick={() => props.refresh()}>새로고침</button>
       </div>
       <ul id="friend-list-ul">
         {friendRequests &&
-        friendRequests.receives &&
-        friendRequests.receives.length > 0
-          ? friendRequests.receives.map((req) => (
+        friendRequests.recieves &&
+        friendRequests.recieves.length > 0
+          ? friendRequests.recieves.map((req) => (
               <Friend
                 nickname={req.from_user}
                 type="request_receive"

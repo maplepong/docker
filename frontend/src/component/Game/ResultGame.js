@@ -8,7 +8,6 @@ const ResultGame = (gameResult) => {
         await api.sendGameResult(gameResult).catch((err) => {
           alert(err);
         });
-      console.log("gameResult Send:" ,gameResult.gameResult);
     }
   });
 

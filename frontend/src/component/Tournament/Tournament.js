@@ -29,34 +29,27 @@ const Tournament = () => {
   const initMessage = gameResult ? "준결승전 경기 완료" : "준결승전 대기중";
   const [statusMessage, setStatusMessage] = useState(initMessage);
 
-  console.log("players", players);
-  console.log("Result", gameResult, "status", tournamentStatus);
-
   useEffect(() => {
     socketController.initSocket();
     socketController.setSocketTypes([
-      // 시작전 유저 입장
       {
         type: "tournament_in",
         func: function (data) {
           onPlayerJoined(data);
         },
       },
-      // 시작전 유저 퇴장
       {
         type: "tournament_out",
         func: function (data) {
           onPlayerLeft(data);
         },
       },
-      // 토너먼트 시작
       {
         type: "tournament_start",
         func: function (data) {
           onTournamentStart(data);
         },
       },
-      //host 변경
       {
         type: "tournament_host_change",
         func: function (data) {
@@ -64,23 +57,14 @@ const Tournament = () => {
         },
       },
     ]);
-    // 방에 입장 요청
     socketController.sendMessage({ type: "tournament", action: "enter" });
-    // 클린업 함수로 컴포넌트 언마운트 시 소켓 해제
-    // return () => {
-    //   if (_ws.current) socketController._ws.current.close();
-    //   _ws.current = null;
-    // };
   });
 
   const onPlayerJoined = (data) => {
-    console.log("playerJoined", data);
     if (players.includes(data.nickname)) {
-      console.log(...players, data.nickname, "player alreay exists");
       return;
     }
     setPlayers([...players, data.nickname]);
-    console.log(...players, data.nickname, "player");
   };
 
   const onPlayerLeft = (data) => {
@@ -89,7 +73,6 @@ const Tournament = () => {
       return;
     }
     players.splice(idx, 1);
-    console.log("player leftL:", players);
     setPlayers([...players]);
   };
 
@@ -97,10 +80,8 @@ const Tournament = () => {
     await apiInstance
       .get("tournament/get_bracket")
       .then((res) => {
-        console.log(res.data);
         gameId.current = res.data.myGameid;
         bracket.current = res.data.bracket;
-        console.log("bracket", bracket);
         setTournamentStatus(status.STARTED);
       })
       .catch((err) => {
@@ -109,12 +90,9 @@ const Tournament = () => {
       });
   };
 
-  const onGameEnd = (data) => {
-    console.log("Game ended for players:", data.league);
-  };
+  const onGameEnd = (data) => {};
 
   const onHostChange = (data) => {
-    console.log("Host changed to:", data.new_host);
     setHost(data.new_host);
   };
 
@@ -130,19 +108,14 @@ const Tournament = () => {
     }
     await apiInstance
       .request({ method: "POST", url: "tournament/start_semifinal" })
-      .then((res) => {
-        console.log(res);
-      })
+      .then((res) => {})
       .catch((err) => {
         alert(err);
-        // outTournament();
         return;
       });
 
     socketController.sendMessage({ type: "tournament_start" });
   };
-  console.log("players", players);
-  console.log("host", host);
 
   const outTournament = async (type) => {
     setTournamentStatus(status.LOADING);
@@ -155,18 +128,14 @@ const Tournament = () => {
       await apiTounrament
         .out()
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
             socketController.sendMessage({ type: "tournament_out" });
           } else if (res.status === 202) {
-            console.log("dfajskl");
             socketController.sendMessage({ type: "tournament_host_change" });
             socketController.sendMessage({ type: "tournament_out" });
           }
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
 
       myReact.redirect("home");
     }
@@ -178,7 +147,6 @@ const Tournament = () => {
         document.onpopstate = outTournament;
         try {
           const data = await apiTounrament.enter();
-          console.log("got data", data);
           if (data.status !== 208) {
             socketController.sendMessage({ type: "tournament_in" });
           }
@@ -192,7 +160,6 @@ const Tournament = () => {
           setTournamentStatus(status.READY);
         } catch (err) {
           alert(err);
-          console.log(err);
           // myReact.redirect("home");
         }
         return () => {
@@ -200,8 +167,6 @@ const Tournament = () => {
         };
       }
       case status.BETWEEN_ROUND:
-        console.log("between round");
-        console.log("gameResult", gameResult);
         if (gameResult.loser === localStorage.getItem("nickname")) {
           socketController.sendMessage({ type: "tournament_out" });
           alert("세미 파이널에서 탈락하셨습니다.");
@@ -213,7 +178,6 @@ const Tournament = () => {
           // }); //백엔드 쪽 수정 필요
           try {
             const res = await apiTounrament.end_semifinal(gameResult);
-            console.log("onSemifinalEnd", res);
             alert(res.message);
             gameId.current = res.final_game_id;
             // 메시지로 판단하여 두 팀 다 끝났을 경우에만 웹소켓 전송
@@ -249,7 +213,6 @@ const Tournament = () => {
   socketController.initSocket();
 
   async function startGame() {
-    console.log(startGame);
     await requestJoinGame(gameId.current, "").catch((err) => {
       return alert(err.response.data.message || err.message || err);
     });
@@ -264,14 +227,11 @@ const Tournament = () => {
       .then((res) => {
         alert("milky님을 초대했습니다");
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
   }
 
   switch (tournamentStatus) {
     case status.READY: {
-      console.log("tournamentState ready");
       return (
         <div id={"tournament"}>
           <WaitingTournament

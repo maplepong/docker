@@ -4,7 +4,6 @@ import myReact, { useEffect, useState } from "../core/myReact.js";
 import "../css/match.css";
 
 const Matchhistory = (props) => {
-  console.log("MATCH HISTORY PROPS", props);
 
   const [gameRecords, setGameRecords] = useState([]);
   const [stats, setStats] = useState({
@@ -17,8 +16,6 @@ const Matchhistory = (props) => {
   useEffect(async () => {
     {
       const response = await api.getGameRecord();
-      console.log("GAMERECORD", response);
-      console.log("game_records", response.data.game_records);
       if (response && response.data && response.data.game_records) {
         const records = response.data.game_records;
         setGameRecords(records);
@@ -37,11 +34,9 @@ const Matchhistory = (props) => {
           { winCount: 0, loseCount: 0 }
         );
 
-        console.log("wincount", winCount, "losecount", loseCount);
         const totalGames = winCount + loseCount;
         const winRate = totalGames > 0 ? (winCount / totalGames) * 100 : 0;
         const rivalData = await api.getRival();
-        console.log("RIVALDATA", typeof rivalData);
 
         // 상태 업데이트
         const tempstats = {
@@ -52,7 +47,6 @@ const Matchhistory = (props) => {
         };
         setStats(tempstats);
 
-        console.log("Updated stats:", tempstats);
       } else {
         console.error("No data returned from API");
       }

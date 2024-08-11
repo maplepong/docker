@@ -9,7 +9,6 @@ import RequestFriend from "../RequestFriend.js";
 const FriendList = (props) => {
   const friendList = props.friendList;
   const friendRequests = props.friendRequests;
-  console.log("friendList..", friendList);
 
   return (
     <div id="box" style="margin: 15px;">

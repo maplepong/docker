@@ -20,7 +20,6 @@ const SocketController = () => {
     // 해당 type은 chat / tournament / friend 가 불려질 때 각자 추가할 것
     _getMessage: function getMessage(e) {
       const data = JSON.parse(e.data);
-      console.log("ws: data :", data);
       // 귓속말 / 전체 채팅 / 초대  / 친구 접속 상태 받기 요청 (접속자 → 서버) / 친구 접속 상태 업데이트 (서버 → 다수)
       if (!data.type) data.type = "all";
       for (const type in this._messageTypes.current) {
@@ -52,24 +51,18 @@ const SocketController = () => {
         this._ws.current.onmessage = (event) => this._getMessage(event);
       } else {
         alert("socket이 연결되지 않았습니다.");
-        console.log(
-          "소켓 연결 불량",
-          this._ws.current ? this._ws.current : "no socket"
-        );
       }
     },
 
     // 첫 사용을 위한 연결
     // 이미 연결되어있으면 리턴
     initSocket: function initSocket() {
-      // console.log("initSocket", this._ws.current);
       if (this._ws.current) return this._ws.current; // 이미 연결되어있으면 리턴
       this._ws.current = new WebSocket(`wss://localhost:443/ws/socket/`, [
         "token",
         localStorage.getItem("accessToken"),
       ]);
       this._ws.current.onopen = () => {
-        console.log("chat socket opened");
         this._ws.current.send(
           JSON.stringify({
             type: "connect",
