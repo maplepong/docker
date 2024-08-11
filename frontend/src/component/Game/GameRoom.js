@@ -45,7 +45,6 @@ const GameRoom = () => {
       message: "테스트입니다.",
       receiver: nickname,
     };
-    console.log(data);
     SocketController.sendMessage(data);
   };
 
@@ -91,9 +90,7 @@ const GameRoom = () => {
         "wss://localhost:443/ws/game/" + gameInfo.id + "/",
         ["token", localStorage.getItem("accessToken")]
       );
-      console.log("Creating new WebgameSocket connection...");
       newgameSocket.onopen = () => {
-        console.log("서버 연결 완료");
         newgameSocket.send(
           JSON.stringify({
             type: "client_connected",
@@ -106,10 +103,7 @@ const GameRoom = () => {
     if (gameSocket.current && !exit) {
       gameSocket.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("data : ", data);
         if (data.type === "game_ready") {
-          console.log("game_ready");
-          console.log("data.player_info : ", data.player_info);
           setGameInfo({
             ...gameInfo,
             isGameReady: true,
@@ -117,13 +111,10 @@ const GameRoom = () => {
             opponent: gameInfo.opponent || data.player_info.nickname,
           });
         } else if (data.type === "game_start") {
-          console.log("game_start");
           setGameStatus(status.playing);
         } else if (data.type === "client_left") {
-          console.log("client_left");
 
           if (gameInfo.owner === localStorage.getItem("nickname")) {
-            console.log("나는 오너");
             setGameInfo({
               ...gameInfo,
               players: gameInfo.players.filter(
@@ -134,7 +125,6 @@ const GameRoom = () => {
               current_players_num: 1,
             });
           } else {
-            console.log("나는 게스트");
             setGameInfo({
               ...gameInfo,
               players: gameInfo.players.filter(
@@ -151,7 +141,6 @@ const GameRoom = () => {
       };
 
       gameSocket.onclose = () => {
-        console.log("서버 연결 종료");
         gameSocket.current = null;
       };
     }
@@ -169,7 +158,6 @@ const GameRoom = () => {
   };
 
   const exitGame = async () => {
-    console.log("--------exit");
     if (gameSocket.current) {
       gameSocket.current.send(
         JSON.stringify({
@@ -182,7 +170,6 @@ const GameRoom = () => {
       setExit(true);
     }
     const response = await requestExitGame(gameInfo.id);
-    if (response && response.status === 200) console.log("exitGame success");
 
     myReact.redirect("lobby");
   };
@@ -215,7 +202,6 @@ const GameRoom = () => {
         </div>
       );
     case status.finished:
-      console.log("gameResult", gameResult.current);
       return <ResultGame gameResult={gameResult.current} />;
     default:
       return <Loading type="game" />;

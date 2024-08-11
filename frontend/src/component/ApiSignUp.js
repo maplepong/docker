@@ -6,10 +6,8 @@ const ApiSignUp = () => {
   async function getInfo() {
     const username = localStorage.getItem("username");
     const nickname = document.querySelector("#new-nickname").value;
-    console.log("nickname: ", nickname, "username: ", username);
     const response = api.requestApiSignup(username, nickname);
     localStorage.removeItem("username");
-    console.log("API SIGNUP RESPONSE STATUS", response.status);
     if (response.status === 201) myReact.redirect("/");
   }
 

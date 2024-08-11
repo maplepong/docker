@@ -128,7 +128,6 @@ const SignUp = () => {
             errorDisplay.innerHTML = "";
             return false;
         }
-        console.log("VERIFY EMAIL!")
         const response = await api.sendEmailVerifyPin(email);
         if (response.status != 200) {
             errorDisplay.innerHTML = "인증 코드를 보내는데 실패했어요."
@@ -147,7 +146,6 @@ const SignUp = () => {
             errorDisplay.innerHTML = ""
             return ;
         }
-        console.log("CHECK PIN!!")
         const response = await api.checkEmailVerifyPin(email, verifyPin);
         if (response.status != 200) {
             errorDisplay.innerHTML = "인증번호 대조에 실패했어요..."
@@ -157,7 +155,6 @@ const SignUp = () => {
             CorrectPin = true;
             errorDisplay.innerHTML = "인증번호가 일치해요!"
         }
-        console.log(response);
     }
     
     function checkPassword(password) {
@@ -207,7 +204,6 @@ const SignUp = () => {
         const password = document.querySelector('#new-password').value;
         const confirmPassword = document.querySelector("#confirm-password").value;
         const errorDisplay = document.querySelector("#p-pass-error");
-        console.log(confirmPassword);
         if (!confirmPassword) {
             errorDisplay.innerHTML = "";
             Confirm = false;

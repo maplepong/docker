@@ -24,7 +24,6 @@ const createTournament = () => {
     _gameId: null,
     sc: socketController,
     outTournament: async function _out(type) {
-      console.log(this);
       this.setInfo({
         host: "",
         players: [],
@@ -39,7 +38,6 @@ const createTournament = () => {
         await apiTounrament
           .out()
           .then((res) => {
-            console.log(res);
             if (res.status === 200) {
               socketController.sendMessage({ type: "tournament_out" });
             } else if (res.status === 202) {
@@ -47,14 +45,11 @@ const createTournament = () => {
               socketController.sendMessage({ type: "tournament_out" });
             }
           })
-          .catch((err) => {
-            console.log(err);
-          });
+          .catch((err) => {});
       }
       myReact.redirect("home");
     },
     nextStatus: function _next() {
-      console.log("nextStatus", this._status, status);
 
       this._status = this._status + 1;
       switch (this._status) {
@@ -97,7 +92,6 @@ const createTournament = () => {
       this._result = result || this._result;
       this._status = typeof status === "number" ? status : this._status;
       this._gameId = gameId || this._gameId;
-      console.log("setInfo", this);
     },
     getPlayers: function () {
       return this._players;

@@ -7,9 +7,8 @@ const GameList = () => {
 	const updateList = async () => {
         const res = await requestLobbyList();
         if (res === null) {
-            return console.log("requestLobbyList error");
+            return ;
         }
-        console.log("Received lobby list:", res);
         setLobbyData(res);
     };
 

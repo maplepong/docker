@@ -54,14 +54,12 @@ const Navbar = () => {
     const newRequests = await api.getRequestFriendList();
     parseDataToFriendRequests(newRequests);
 
-    console.log("ws connnected data :", data.friends);
     if (!data.friends || data.friends.length === 0) {
       return;
     }
     parseDataToFriendList(data);
   };
   const onUpdate = (data) => {
-    console.log("ws update data :", data);
     data.status = data.status === "on" ? true : false;
     friendList[data.sender] = { nickname: data.sender, status: data.status };
     friendsCount.current = Object.keys(friendList).length;
@@ -73,7 +71,6 @@ const Navbar = () => {
     { type: "update", func: onUpdate },
   ]);
 
-  console.log("friendList,", friendList);
 
   useEffect(async () => {
     if (data.id === "") {
@@ -98,9 +95,7 @@ const Navbar = () => {
         });
         friendsCount.current = friends.length;
         parseDataToFriendList(friends);
-        console.log("friendList", temp);
       }
-      console.log("friendrEquest", friendRequests);
       parseDataToFriendRequests(friendRequests);
       setData(response);
     }
@@ -108,7 +103,6 @@ const Navbar = () => {
 
   const refreshFriend = () => {
     socketController.sendMessage({ type: "connect" });
-    console.log("connect sended");
   };
 
   return (

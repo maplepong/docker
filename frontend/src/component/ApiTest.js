@@ -7,34 +7,20 @@ const ApiTest = () => {
     const res = await api.login(() => {
       return ["test", "4545"];
     });
-    console.log(res);
   }
-  async function befriend() {
-    console.log(await api.sendFriendRequest("니얼굴"));
-  }
-  async function getRequestFriendList() {
-    console.log(await api.getRequestFriendList());
-  }
-  async function okFriendList() {
-    console.log(await api.handleFriendRequest("니얼굴", "POST"));
-  }
-  async function deleteFriend() {
-    console.log(await api.deleteFriend("니얼굴"));
-  }
-  async function getInfo() {
-    console.log(await api.getUserInfomation(localStorage.nickname));
-  }
+  async function befriend() {}
+  async function getRequestFriendList() {}
+  async function okFriendList() {}
+  async function deleteFriend() {}
+  async function getInfo() {}
   async function patchInfo() {
     const changedValue = {
       nickname: "테스트",
     };
-    console.log(await api.patchUserInfomation(changedValue));
-    console.log(await api.getUserInfomation(localStorage.nickname));
   }
   async function getImage() {
     const image = await api.userImage("GET");
     const imgContainer = document.querySelector("#testImg");
-    console.log(image);
     if (image && image.image === null) {
       return alert("이미지가 없다!");
     }
@@ -50,16 +36,10 @@ const ApiTest = () => {
     patchImage(filefile);
   };
 
-  async function patchImage(FILE) {
-    console.log(await api.userImage("DELETE"));
-    console.log(await api.userImage("POST", FILE));
-  }
+  async function patchImage(FILE) {}
 
   async function validCheck() {
     const value = document.querySelector("#validinput").value;
-    if (!value || value === "") console.log("no value in input");
-    console.log(await api.validCheck("nickname", value));
-    console.log(await api.validCheck("username", value));
   }
 
   return (

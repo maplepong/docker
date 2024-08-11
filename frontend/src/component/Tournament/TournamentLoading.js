@@ -16,11 +16,9 @@ const TournamentLoading = () => {
       host = data.host;
       players = data.players;
       tc.setInfo({ host, players, status: 0 });
-      console.log("host sata", data);
       tc.nextStatus();
     } catch (err) {
       alert(err);
-      console.log(err);
     }
   }, []);
 

@@ -13,18 +13,14 @@ const Test = () => {
 	const decre = () => {
 		setCount(count - 1);
 	}
-	const callbackTest = () => {
-		console.log("callback : callllllllbackkkkkkk");
-	}
+	const callbackTest = () => {}
 	useEffect(callbackTest, [count]); //count 변수 변경시 실행
 
 	//test: text state
 	const [text, setText] = useState("test");
 	useEffect(function testDep() {
-		console.log("callback : test Dependencies")
 	}, [])
 	const callback = () => {
-		console.log("callback : text change")
 	}
 	useEffect (callback, [text]); // 텍스트 변수 변경시 실행
 	const textchange = () => {
@@ -36,7 +32,6 @@ const Test = () => {
 
 	const image = async(player) => {
 		const response = await api.userImage("GET", "", player);
-		console.log(response);
 		return response.image;
 	}
 	const [userImg, setUserImg] = useState("");
@@ -44,7 +39,7 @@ const Test = () => {
 	
 
 	//onClick말고다른거Test
-	const onOtherTest = () => { console.log("onchange success")}
+	const onOtherTest = () => {}
 
 	return <div class="test">
 			<div>

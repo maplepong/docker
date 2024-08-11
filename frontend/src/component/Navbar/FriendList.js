@@ -14,9 +14,6 @@ const FriendList = (props) => {
   const friendList = [];
   const friendRequests = {sends:[{from_user:"siwolee", to_user:"sdf"}], recieves:[{from_user:"siwolee", to_user:"sdf"}]}
 
-  console.log("friendList", friendList);
-  console.log("friendRequests", friendRequests);
-
   return (
     <div id="friend-list-container" class="box">
       <div id="friend-list-title" style="color: white;">

@@ -13,16 +13,13 @@ const Login = () => {
     const getInfo = () => {
       return [username, password];
     };
-    console.log("끼얏 호우!!!!");
     const response = await api.login(getInfo);
     if (response.status != 200) {
-      console.log(response);
       if (response.status == 201) {
         otpBlock.style.display = "block";
       }
       return response;
     } else {
-      console.log(response);
       myReact.redirect("home");
     }
   }
@@ -42,7 +39,6 @@ const Login = () => {
       await api.logout();
       alert("새로 로그인 합니다.");
       await api.login(getInfo);
-      console.log(response);
       myReact.redirect("home");
     }
   }

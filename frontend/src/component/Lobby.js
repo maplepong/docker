@@ -25,15 +25,12 @@ const Lobby = (props) => {
     players: ["pl1", "pl2"],
     status: "0",
   };
-  console.log(lobbyData);
 
   async function requestLogin() {
     const res = await api.login(() => ["test1", "1234"]);
-    console.log(res);
   }
 
   const create_game = async () => {
-    console.log("create_game");
     const roomTitleElement = document.querySelector("#room-name");
     const passwordElement = document.querySelector("#room-password");
     const vibrationElement = document.querySelector("#vibration");
@@ -47,19 +44,9 @@ const Lobby = (props) => {
     const password = passwordElement.value;
     const vibration = vibrationElement.checked;
 
-    console.log(
-      "room_title:",
-      room_title,
-      "password:",
-      password,
-      "vibration:",
-      vibration
-    );
-
     try {
       const createGameResponse = await requestCreateGame(room_title, password);
       if (createGameResponse.status === 201) {
-        console.log("Game created successfully");
         myReact.redirect("gameroom/" + createGameResponse.data.id);
       } else {
         console.error("Failed to create game:", createGameResponse);
@@ -73,9 +60,8 @@ const Lobby = (props) => {
   const updateList = async () => {
     const res = await requestLobbyList();
     if (res === null) {
-      return console.log("requestLobbyList error");
+      return ;
     }
-    console.log("Received lobby list:", res);
     setLobbyData(res);
   };
 
@@ -102,7 +88,6 @@ const Lobby = (props) => {
   };
 
   const joinGame = async (gameId) => {
-    console.log(gameId);
     const gameInfo = await requestGameInfo(gameId);
     if (!gameInfo.status || gameInfo.status !== 200)
       return console.error("Failed to get game info:", gameInfo);

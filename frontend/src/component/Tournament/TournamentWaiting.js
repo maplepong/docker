@@ -9,8 +9,6 @@ import socketController from "../../core/socket.js";
 
 const TournamentWaiting = () => {
   const [players, setPlayers] = useState(tc.getPlayers());
-  console.log(players);
-  console.log(tc.getPlayers());
   const [host, setHost] = useState(tc.getHost());
   const maxPlayers = 4;
 
@@ -49,14 +47,11 @@ const TournamentWaiting = () => {
   });
 
   const onPlayerJoined = (data) => {
-    console.log("playerJoined", data);
     if (players.includes(data.nickname)) {
-      console.log(...players, data.nickname, "player alreay exists");
       return;
     }
 
     setPlayers([...players, data.nickname]);
-    console.log(...players, data.nickname, "player");
   };
 
   const onPlayerLeft = (data) => {
@@ -65,18 +60,15 @@ const TournamentWaiting = () => {
       return;
     }
     players.splice(idx, 1);
-    console.log("player leftL:", players);
     setPlayers([...players]);
   };
   const onHostChange = (data) => {
-    console.log("Host changed to:", data.new_host);
     setHost(data.new_host);
   };
   const onTournamentStart = async (data) => {
     await apiInstance
       .get("tournament/get_bracket")
       .then((res) => {
-        console.log(res.data);
         tc.setInfo({
           bracket: { semifinal: res.data.bracket, final: [] },
           gameId: res.data.myGameid,
@@ -102,7 +94,6 @@ const TournamentWaiting = () => {
     await apiInstance
       .request({ method: "POST", url: "tournament/start_semifinal" })
       .then((res) => {
-        console.log(res);
         tc.setInfo({ players, host });
         socketController.sendMessage({ type: "tournament_start" });
       })
