@@ -12,7 +12,7 @@ const statusTypes = {
 };
 
 const Friend = ({ type, nickname, status }) => {
-  console.log("Friend", type, nickname);
+  console.log("Friend types : ", type, nickname, status);
   const [imagesrc, setImagesrc] = myReact.useGlobalState(
     nickname + "image",
     "asset/user/default-user.png"
@@ -36,13 +36,13 @@ const Friend = ({ type, nickname, status }) => {
           <div class="request-button-container">
             <button
               class="inter"
-              onClick={() => api.handleFriendRequest(req.from_user, "POST")}
+              onClick={() => api.handleFriendRequest(nickname, "POST")}
             >
               수락
             </button>
             <button
               class="inter"
-              onClick={() => api.handleFriendRequest(req.from_user, "DELETE")}
+              onClick={() => api.handleFriendRequest(nickname, "DELETE")}
             >
               거절
             </button>

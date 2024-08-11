@@ -23,9 +23,9 @@ const FriendList = (props) => {
       </div>
       <ul id="friend-list-ul">
         {friendRequests &&
-        friendRequests.receives &&
-        friendRequests.receives.length > 0
-          ? friendRequests.receives.map((req) => (
+        friendRequests.recieves &&
+        friendRequests.recieves.length > 0
+          ? friendRequests.recieves.map((req) => (
               <Friend
                 nickname={req.from_user}
                 type="request_receive"
