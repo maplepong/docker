@@ -53,7 +53,6 @@ export default function router() {
   var path;
   let component;
   path = window.location.pathname.split("/")[1] || window.location.pathname;
-  console.log("router", window.location.pathname.split("/")[1]);
   const gameIdMatch = window.location.pathname.match(/^\/gameroom\/(\d+)$/);
   if (path === "tournament") {
     const subpath = window.location.pathname.split("/")[2];
@@ -70,7 +69,6 @@ export default function router() {
     component = pathList[path];
   }
 
-  // console.log("component", component);
   if (component === undefined) {
     myReact.render(<Undefined />, "newPage");
   } else if (

@@ -12,7 +12,6 @@ const statusTypes = {
 };
 
 const Friend = ({ type, nickname, status }) => {
-  console.log("Friend types : ", type, nickname, status);
   const [imagesrc, setImagesrc] = myReact.useGlobalState(
     nickname + "image",
     "asset/user/default-user.png"
@@ -23,9 +22,7 @@ const Friend = ({ type, nickname, status }) => {
       .then((res) => {
         setImagesrc(res.image);
       })
-      .catch((err) => {
-        console.log("getProfileImage", err);
-      });
+      .catch((err) => {});
   }, []);
   status = status ? status : false;
 

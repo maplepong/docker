@@ -32,16 +32,11 @@
 
         const ws = new WebSocket(`wss://localhost:443/ws/socket/`, ['token', token]);
 
-        ws.onopen = function () {
-            console.log('WebSocket connected');
-            console.log('Token:', token);
-        };
+        ws.onopen = function () {};
 
         ws.onmessage = function (event) {
-            console.log('Message received:', event);
             try {
                 const data = JSON.parse(event.data);
-                console.log('Parsed data:', data);
 
                 if (data.message && data.sender) {
                     const message = data.message;
@@ -50,16 +45,13 @@
                     const displayMessage = whisper ? `[Whisper] ${sender}: ${message}` : `${sender}: ${message}`;
                     chatArea.value += displayMessage + '\n';
                     chatArea.scrollTop = chatArea.scrollHeight;  // Scroll to the bottom
-                    console.log('Displayed message:', displayMessage);
                 } else if (data.type === 'user_status') {
                     const username = data.username;
                     const status = data.status;
                     handleUserStatus(username, status);
-                    console.log('User status updated:', username, status);
                 } else if (data.type === 'online_users') {
                     const users = data.users;
                     updateOnlineUsers(users);
-                    console.log('Online users updated:', users);
                 }
             } catch (e) {
                 console.error('Error parsing message:', e);
@@ -74,7 +66,6 @@
                 nickname: nickname 
             });
             ws.send(jsonMessage);
-            console.log('Sent message:', jsonMessage);
             messageInput.value = '';
         }
 
@@ -92,7 +83,6 @@
                     userElement.remove();
                 }
             }
-            console.log('Handled user status:', username, status);
         }
 
         function updateOnlineUsers(users) {
@@ -103,7 +93,6 @@
                 li.textContent = user;
                 onlineUsersList.appendChild(li);
             });
-            console.log('Updated online users:', users);
         }
     </script>
 </body>

@@ -11,7 +11,6 @@ const Chat = () => {
   const [messages, setMessages] = myReact.useGlobalState("chat", []);
   const onMessageDefault = (data) => {
     const chat = document.getElementById("chat");
-    console.log("chat data :", data);
     if (data.whisper === true) {
       data.type = "whisper";
     }
@@ -28,7 +27,6 @@ const Chat = () => {
   };
   const onMessageInvite = (data) => {
     const chat = document.getElementById("chat");
-    console.log("chat data :", data);
     if (
       !data.sender ||
       data.sender === localStorage.getItem("nickname") ||
@@ -53,7 +51,6 @@ const Chat = () => {
 
   const onMessageTournamentInvite = (data) => {
     const chat = document.getElementById("chat");
-    console.log("chat data :", data);
     if (!data.sender || data.sender === localStorage.getItem("nickname"))
       return;
     setMessages([
@@ -79,9 +76,7 @@ const Chat = () => {
           Authorization: `Bearer ${localStorage.accessToken}`,
         },
       })
-      .then((res) => {
-        console.log(res);
-      })
+      .then((res) => {})
       .catch((err) => {
         alert(err);
       });
@@ -114,7 +109,6 @@ const Chat = () => {
     if (e.key === "Enter") {
       sendMessage(currentInput);
       e.target.value = "";
-      console.log("currentInput", msgType);
       return;
     }
     //귓속말 타겟
@@ -153,7 +147,6 @@ const Chat = () => {
 
   const chatLabel = document.getElementById("chat-label");
   const setMessageType = (inputType, target) => {
-    console.log(inputType);
     chatLabel.innerText =
       msgTypeList[inputType].showtype + (target ? ` : ${target}에게` : "");
     setMsgType(inputType);

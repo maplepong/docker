@@ -12,12 +12,6 @@ const TournamentSchedule = () => {
   const status = tc.getStatus() === 2 ? "semifinal" : "final";
   const bracket = tc.getBracket();
 
-  // mock data
-  // const gameId = 543;
-  // const gameResult = { winner: "test1", loser: "test2" };
-  // const status = "final";
-  // const bracket = {semifinal: ["test1", "test2", "test3", "test4"], final: ["test1", "test2"]};
-  console.log("bracket", bracket, tc.getBracket());
   const title = tc.getStatus() === 2 ? "준결승전" : "결승전";
   if (tc.getStatus() === 3) {
     bracket.final.push(localStorage.getItem("nickname"));
@@ -27,7 +21,6 @@ const TournamentSchedule = () => {
   );
 
   const startGame = async () => {
-    console.log(startGame);
     await requestJoinGame(gameId, "").catch((err) => {
       return alert(err.response.data.message || err.message || err);
     });
@@ -36,23 +29,16 @@ const TournamentSchedule = () => {
 
   useEffect(async () => {
     if (tc.getStatus() === 3) {
-      console.log("between round");
 
       if (gameResult.loser === localStorage.getItem("nickname")) {
         socketController.sendMessage({ type: "tournament_out" });
         alert("세미 파이널에서 탈락하셨습니다.");
         tc.outTournament("tournament_end");
       } else {
-        // socketController.sendMessage({
-        //   type: "tournament_end",
-        //   status: "tournament_semifinal_end",
-        // }); //백엔드 쪽 수정 필요
         try {
           const res = await apiTounrament.end_semifinal(gameResult);
-          console.log("onSemifinalEnd", res);
           alert(res.message);
           tc.setInfo({ gameId: res.final_game_id });
-          // 메시지로 판단하여 두 팀 다 끝났을 경우에만 웹소켓 전송
           if (res.message === "Final game set up.") {
             socketController.sendMessage({
               type: "tournament_end",

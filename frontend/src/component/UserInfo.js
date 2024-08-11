@@ -6,7 +6,6 @@ import "./Matchhistory.js";
 import Matchhistory from "./Matchhistory.js";
 
 const UserInfo = (props) => {
-  console.log("USERINFO", props);
 
   if (window.location.pathname != "/myinfo") {
     props.nickname = window.location.pathname.split("/")[2];
@@ -27,7 +26,6 @@ const UserInfo = (props) => {
 
   useEffect(async () => {
     const response = await api.getUserInfomation(props.nickname);
-    console.log("USERINFO", response);
     if (response) {
       setData(response);
     } else {
@@ -44,7 +42,6 @@ const UserInfo = (props) => {
     if (flag === 1) {
       var introError = document.querySelector("#intro-error");
       var newIntro = document.querySelector("#newIntro").value;
-      console.log(newIntro);
       if (
         newIntro === null ||
         newIntro === undefined ||
@@ -73,8 +70,6 @@ const UserInfo = (props) => {
   }
 
   const onFileChange = (e) => {
-    if (!e) console.log("이미지에 문제가잇수");
-    else console.log(e);
     const {
       target: { files },
     } = e;
@@ -83,11 +78,7 @@ const UserInfo = (props) => {
   };
 
   async function patchImage(FILE) {
-    // const del = await api.userImage("DELETE")
-    // console.log("del", del);
-    console.log(FILE);
     const post = await api.userImage("POST", FILE, data.nickname);
-    // console.log("post", post.data.image);
     setData({ ...data, image: data.image });
   }
 
@@ -240,7 +231,7 @@ const UserInfo = (props) => {
           </div>
         </div>
 
-        <div id="myinfo-body" onclick={() => console.log(data)}>
+        <div id="myinfo-body" onclick={() => {}}>
           <img id="myinfo-img" src={data.image}></img>
           {/* <button onclick={() => patchInfo()}>이미지 변경</button> */}
           <button

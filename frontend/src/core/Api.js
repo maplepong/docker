@@ -8,8 +8,8 @@ const apiInstance = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 5000,
-  withCredentials: true, //develope
-}); //정리 필요
+  withCredentials: true,
+});
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -23,20 +23,15 @@ apiInstance.interceptors.response.use(
     const originalRequest = error.config;
     if (!error.response || !error.response.status) return Promise.reject(error);
     if (!error.response) {
-      // It's a network error
       if (!originalRequest._retry) {
         originalRequest._retry = true;
-        console.log("Network error - retrying...");
         return apiInstance.request(error.config);
       }
       return Promise.reject(error);
     }
     if (error.response.status === 401) {
-      //token err
-      console.log("401::trying refresh");
       if (!originalRequest._retry) {
         originalRequest._retry = true;
-        console.log("cookie : ", document.cookie);
         const response = await apiInstance
           .request({
             method: "POST",
@@ -47,7 +42,6 @@ apiInstance.interceptors.response.use(
           })
           .then((res) => {
             const accessToken = res.data.access_token;
-            console.log("refreshed token: ", accessToken);
             localStorage.setItem("accessToken", accessToken);
             apiInstance.defaults.headers.common[
               "Authorization"
@@ -58,7 +52,6 @@ apiInstance.interceptors.response.use(
             return apiInstance.request(originalRequest);
           })
           .catch((err) => {
-            console.log("refresh token error", err);
             localStorage.clear();
             myReact.redirect("/");
             alert("로그인이 만료되었습니다");
@@ -91,15 +84,12 @@ const api = {
       })
       .then((res) => {
         const accessToken = res.data.access_token;
-        console.log("refreshed token: ", accessToken);
         localStorage.setItem("accessToken", accessToken);
         apiInstance.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${res.data.access_token}`;
       })
       .catch((err) => {
-        console.log(err);
-        console.log("refresh token error", err);
         localStorage.clear();
         myReact.redirect("/");
         alert("로그인이 만료되었습니다");
@@ -138,10 +128,8 @@ const api = {
   },
   request42ApiLogin(code) {
     if (code === null) {
-      console.log("failed to get Code");
       return;
     }
-    // console.log("Code", code);
     return apiInstance
       .request({
         headers: {
@@ -157,27 +145,21 @@ const api = {
       .then((response) => {
         if (response.status === 202) {
           const username = response.data.id;
-          console.log("id: " + username, "님은 회원가입 필요");
           const signupResponse = localStorage.setItem("username", username);
           myReact.redirect("api-signup");
           return signupResponse;
         } else if (response.status === 200) {
-          console.log(response.data.username);
           const username = response.data.username;
           localStorage.setItem("username", username);
           localStorage.setItem("nickname", response.data.nickname);
           localStorage.setItem("accessToken", response.data.access_token);
           axios.defaults.headers.common["Authorization"] =
             response.data.access_token;
-          console.log("이미 있는 회원입니당");
           myReact.redirect("home");
-          console.log(localStorage.getItem("accessToken"));
-          console.log(localStorage.getItem("nickname"));
           return response;
         }
       })
       .catch((error) => {
-        console.log("42 API LOGIN ERROR", error);
         return error;
       });
   },
@@ -196,11 +178,9 @@ const api = {
         },
       })
       .then((response) => {
-        console.log("API SIGNUP: ", response);
         return response;
       })
       .catch((error) => {
-        console.log("API SIGNUP ERROR: ", error);
         return error;
       });
   },
@@ -217,16 +197,13 @@ const api = {
         },
       })
       .then((response) => {
-        console.log(response);
         return response;
       })
       .catch((error) => {
-        console.log(error);
         return error;
       });
   },
   otpVerifyPin(_username, _pin) {
-    console.log(_username, _pin);
     return apiInstance
       .request({
         headers: {
@@ -240,16 +217,13 @@ const api = {
         },
       })
       .then((response) => {
-        console.log(response);
         return response;
       })
       .catch((error) => {
-        console.log(error);
         return error;
       });
   },
   checkEmailVerifyPin(_email, _pin) {
-    console.log("YOUR EMAIL", _email, "YOUR PIN", _pin);
     return apiInstance
       .request({
         headers: {
@@ -263,11 +237,9 @@ const api = {
         },
       })
       .then((response) => {
-        console.log(response);
         return response;
       })
       .catch((error) => {
-        console.log(error);
         return error;
       });
   },
@@ -279,7 +251,6 @@ const api = {
         url: "user/friend/" + nickname,
       })
       .then((response) => {
-        // console.log(nickname + "에게 친구 요청함")
         if (response.status === 201) {
           alert(response.data.to_user + "님에게 친구신청이 완료되었습니다.");
           return response;
@@ -303,7 +274,6 @@ const api = {
         url: "user/friend-request/" + nickname,
       })
       .then((response) => {
-        console.log(nickname + "의 친구 요청을 " + type + "하였습니다.");
         return response.status;
       })
       .catch((error) => {
@@ -318,7 +288,6 @@ const api = {
         url: "user/friend/" + nickname,
       })
       .then((response) => {
-        console.log(nickname + "(와)과 더 이상 친구가 아닙니다.");
         return response.status;
       })
       .catch((error) => {
@@ -343,7 +312,6 @@ const api = {
         url: "user/friend-list",
       })
       .then((response) => {
-        console.log(response);
         return response.data;
       })
       .catch((error) => {
@@ -358,7 +326,6 @@ const api = {
         url: "user/friend-request-list",
       })
       .then((response) => {
-        // console.log(response);
         return response.data;
       })
       .catch((error) => {
@@ -368,7 +335,6 @@ const api = {
   signup(username, password, nickname, mail) {
     // setToken(); // 없어도 된다.
     const formData = new FormData();
-    console.log("INFO", username, password, nickname, mail);
     formData.append("username", username);
     formData.append("nickname", nickname);
     formData.append("password", password);
@@ -384,12 +350,9 @@ const api = {
         },
       })
       .then((response) => {
-        console.log(response);
-        console.log(username, "의 회원가입 완료!");
         return response;
       })
       .catch((error) => {
-        console.error("Error: ", error.response);
         return error.response;
       });
   },
@@ -401,50 +364,35 @@ const api = {
         url: "user/valid-check?type=" + type + "&value=" + value,
       })
       .then((response) => {
-        console.log(value, " 값은 ", type, " 값으로 적합하다");
         return response;
       })
       .catch((error) => {
         if (!error.response || !error.response.status) return error;
-        if (error.response.status === 409) {
-          console.log(value, " 값은 ", type, " 할수없다.. 중복되었다");
-        } else {
-          console.log(value, " 값은 ", type, " 할수없다.. 요청에 문제가 있다");
-        }
         return error;
       });
   },
   getUserInfomation(nickname) {
     setToken();
-    console.log("정보를 요청한 닉네임: ", nickname);
     return apiInstance
       .request({
         method: "GET",
         url: "user/information?nickname=" + nickname,
       })
       .then((response) => {
-        console.log(nickname + "의 정보를 불러왔습니다.");
-        console.log(typeof response.data, response.data);
         return response.data;
       })
       .catch((error) => {
-        console.log("에러!!");
         return error;
       });
   },
   patchUserInfomation(flag, changedValue) {
-    //409 conflict
     setToken();
-    console.log(flag);
-    console.log(localStorage.nickname);
-    console.log(changedValue);
     const formData = new FormData();
     if (flag === 1) {
       formData.append("introduction", changedValue);
     } else if (flag === 2) {
       formData.append("nickname", changedValue);
       localStorage.nickname = changedValue;
-      console.log("바꼈냐?", localStorage.nickname);
     }
     return apiInstance
       .request({
@@ -456,11 +404,9 @@ const api = {
         },
       })
       .then((response) => {
-        console.log(localStorage.nickname + "의 정보를 변경했습니다.");
         return response.data;
       })
       .catch((error) => {
-        console.log(localStorage.nickname + "의 정보를 변경하지 못했습니다.");
         return error;
       });
   },
@@ -485,11 +431,9 @@ const api = {
             },
           })
           .then((response) => {
-            console.log("사진을 올렸다");
             return response;
           })
           .catch((error) => {
-            console.log("사진을 올리지 못했다...");
             return error;
           });
       }
@@ -501,11 +445,9 @@ const api = {
           url: "user/image/" + nickname,
         })
         .then((response) => {
-          // console.log(nickname + "의 사진을 " + type + "했습니다.");
           return response.data;
         })
         .catch((error) => {
-          // console.log(nickname + "의 사진을 " + type + "하지 못했습니다.");
           return error;
         });
     } else {
@@ -515,11 +457,9 @@ const api = {
           url: "user/image",
         })
         .then((response) => {
-          console.log("사진을 " + type + " 했다");
           return response.data;
         })
         .catch((error) => {
-          console.log("사진을 " + type + " 하지 못했다...");
           return "asset/user/default-user.png"; //default image
         });
     }
@@ -555,14 +495,11 @@ const api = {
             break;
           default:
             alert("문제가 생겼습니다.");
-            console.log(err);
         }
         return err;
       });
   },
   async sendGameResult(result) {
-    console.log("sendGameResult", result.gameResult);
-    console.log("sendGameResult", result.gameResultloser);
 
     const formData = new FormData();
     formData.append("game_id", result.gameResult.game_id);
@@ -571,7 +508,6 @@ const api = {
     formData.append("winner_score", result.gameResult.winner_score);
     formData.append("loser_score", result.gameResult.loser_score);
 
-    console.log(formData.keys());
     return await apiInstance
       .request({
         url: "game/update_game_result",
@@ -580,12 +516,10 @@ const api = {
       })
       .then((res) => {
         if (res.status === 201) {
-          alert(res, "게임결과송신완료.");
         }
         return res;
       })
       .catch((error) => {
-        console.log("게임결과송신실패");
         return error;
       });
   },
@@ -605,7 +539,6 @@ const api = {
         return res;
       })
       .catch((error) => {
-        console.log("게임방을 나가지 못했습니다.");
         return error;
       });
   },
@@ -617,7 +550,6 @@ const api = {
         url: "user/game-record",
       })
       .then((response) => {
-        console.log("게임기록을 불러왔습니다.");
         return response;
       });
   },
@@ -629,8 +561,6 @@ const api = {
         url: "user/rival",
     })
     .then((response) => {
-        console.log("라이벌은 누구?")
-        console.log(response.data.nickname)
         return response.data.nickname;
     })
   }

@@ -11,9 +11,6 @@ const FriendList = (props) => {
   const friendList = Object.values(props.friendList);
   const friendRequests = props.friendRequests;
 
-  console.log("friendList", friendList);
-  console.log("friendRequests", friendRequests);
-
   return (
     <div id="friend-list-container" class="box">
       <div id="friend-list-title">

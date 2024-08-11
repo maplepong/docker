@@ -61,12 +61,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
       } else {
         updateScore(1, 0);
         sendGameState();
-        console.log(
-          "userscore :",
-          userscore.current,
-          "enemyscore :",
-          enemyscore.current
-        );
         drawText(
           userscore.current.toString() + " : " + enemyscore.current.toString(),
           -0.3,
@@ -124,7 +118,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
 
   useEffect(() => {
     if (!gameinfo || !gameSocket.current) {
-      console.log("something is wrong...");
       return;
     }
 
@@ -214,7 +207,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
           type: "game_end",
           nickname: localStorage.getItem("nickname"),
         });
-        console.log("gameSocket closed");
         setStatus(status.finished); //변경 필요
       };
       animate();
@@ -222,8 +214,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         document.removeEventListener("keydown", keyDownHandler);
         document.removeEventListener("keyup", keyUpHandler);
       };
-    } else {
-      console.log("Canvas context not supported");
     }
   }, [gameinfo, gameSocket.current]);
 
@@ -300,7 +290,6 @@ const PingPong = ({ gameinfo, gameSocket, gameResult, setStatus }) => {
         loser: loser,
       };
 
-      console.log("gameResult", gameResult.current);
       // if (stopRef.current) stopRef.current();
       cancel();
       // window.cancelAnimationFrame(animate);

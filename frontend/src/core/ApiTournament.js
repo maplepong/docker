@@ -9,7 +9,6 @@ const apiTounrament = {
         },
       })
       .then((res) => {
-        console.log(res);
         if (res.status === 201) {
           //방장
           return {
@@ -28,7 +27,6 @@ const apiTounrament = {
       .catch(async (error) => {
         if (error.response?.status === 409) {
           await this.out(); // 퇴장 후 엔터
-          console.log("재입장합니다");
           return await this.enter();
         } else throw error;
       });
@@ -43,11 +41,9 @@ const apiTounrament = {
     return await apiInstance
       .request({ method: "POST", url: "tournament/start_semifinal" })
       .then((res) => {
-        console.log(res);
         return res;
       })
       .catch((err) => {
-        console.log(err);
         return err;
       });
   },
@@ -63,7 +59,6 @@ const apiTounrament = {
         },
       })
       .then((res) => {
-        console.log(res.data);
         return res.data;
       })
       .catch((err) => {
